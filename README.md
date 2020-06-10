@@ -9,7 +9,7 @@ This repo aims to have in one place all the research around decentralized stakin
 - Networking  
 
 ### Overview
-The backbone of a decentralized staking pool is in distribuiting the control of the keys that control the validator and its withdrawal key. You can think of it as a giant multisig setup with some N-of-M threshold for signing attestations, block proposals and withddrawal transactions.
+The backbone of a decentralized staking pool is in distribuiting the control of the keys that control the validator and its withdrawal key. You can think of it as a giant multisig setup with some M-of-N threshold for signing attestations, block proposals and withddrawal transactions.
 A good starting point could be [this](https://www.youtube.com/watch?v=Jtz9b7yWbLo) presentation.
 
 If we add a consensus protocol that rewards and punishes pool participants, controls withdrawal and onboarding processes then we have a full mechanism for decentralzied staking pools network.
