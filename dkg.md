@@ -13,5 +13,7 @@ The aggregative properties of BLS signatures enable us to use a threshold scheme
 For the threshold scheme we will use Sahmir's scheme and for the DKG we will use Gennaro, Jarecki, Krawczyk and Rabin.
 
 ### BLS and threshold signatures
-There are 2 properties of BLS signatures that make it ideal for threshold (and DKG) schemes. They are aggregatable and deterministic. 
-Shamir's scheme consists of creating shares 
+There are 2 properties of BLS signatures that make it ideal for threshold (and DKG) schemes, aggregatable and deterministic. 
+We can split a single BLS key into shares via Shamir's secret sharing (SSS) scheme and a DKG scheme. The below scheme is inspired and based on [Gennaro, Jarecki, Krawczyk and Rabin's](https://link.springer.com/content/pdf/10.1007%2F3-540-48910-X_21.pdf) secure verifiable secret sharing (VSS) and [Phillip Schindler's](https://github.com/PhilippSchindler/ethdkg/blob/master/paper/ethdkg.pdf) adaptation to ETH EVM.
+
+$x_{n}$
