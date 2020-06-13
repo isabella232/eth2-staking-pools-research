@@ -5,6 +5,10 @@ This repo aims to have in one place all the research around decentralized stakin
 - Distribuited key generation and redistribuition
 - Rewards/ penalties
 - Consensus
+	- create new pools
+	- coordinate rotation and assignment of participants between pools
+	- [coordinate the execution of the validator's epoch duties by the pool](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_duties.md)
+	- coordinate participants exit from the protocol
 - bilinear pairings and BLS12-381 keys
 - Networking  
 
