@@ -7,5 +7,5 @@ As the eth 2.0 protocol dictates, each validator has new assignments (in his com
 - Aggregate, vereify and broadcast signatures for a proposed block 
 
 Those duties are also the duties of the staking pool in charge of a specific validator. 
-To execute the validator's duty, a round leader $$l_{e_i}$$ is choosen from all the participants of pool $$p_{e_i}$$ in epoch $$e_i$$.
+To execute the validator's duty, a round leader ![formula](https://render.githubusercontent.com/render/math?math=l_{e_i}) is choosen from all the participants of pool ![formula](https://render.githubusercontent.com/render/math?math=p_{e_i}) in epoch ![formula](https://render.githubusercontent.com/render/math?math=e_i).
 
