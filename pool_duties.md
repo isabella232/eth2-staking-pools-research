@@ -11,7 +11,7 @@ To execute the validator's duty, a round leader ![formula](https://render.github
 Choosing a randome ![formula](https://render.githubusercontent.com/render/math?math=l_{e_i}) could be done using the beacon-chains RANDAO seed.
 
 ### Round leader responsibility
-![formula](https://render.githubusercontent.com/render/math?math=l_{e_i}) will broadcast to the pool's parrticipants a proposal for their signature. The proposal depeends on the duty at hand.
+![formula](https://render.githubusercontent.com/render/math?math=l_{e_i}) will broadcast to the pool's parrticipants a proposal for their signature. The proposal depends on the duty at hand.
 * Block attestation - ![formula](https://render.githubusercontent.com/render/math?math=l_{e_i}) will send an [attestation_data](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/beacon-chain.md#attestationdata) object
 * Block proposal - ![formula](https://render.githubusercontent.com/render/math?math=l_{e_i}) will send a [SignedBeaconBlock](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/beacon-chain.md#signedbeaconblock)
 
@@ -25,4 +25,6 @@ The round leader also has the eresponsibility of broadccasting to the rest of th
 
 ### Participant's responsibility
 A participant of ![formula](https://render.githubusercontent.com/render/math?math=p_{e_i}) has the responsibility of recieving a proposal from ![formula](https://render.githubusercontent.com/render/math?math=l_{e_i}), verifying it and signing it.
-If a participant signs a slashable proposal, he will be slashed from the protocol.
+If ![formula](https://render.githubusercontent.com/render/math?math=p_{e_i}) signs a slashable proposal, he will be slashed from the protocol.
+If ![formula](https://render.githubusercontent.com/render/math?math=p_{e_i}) does not sign a proposal he will be penalized
+If ![formula](https://render.githubusercontent.com/render/math?math=p_{e_i}) signs a valid proposal, that proposal was broadcasted and the validator recieved a reward, ![formula](https://render.githubusercontent.com/render/math?math=p_{e_i}) will be rewarded proportionally.
