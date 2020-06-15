@@ -25,13 +25,43 @@ Definitions
 
 Protocol:
 1. Each participant generates a randome secret, then, transfers amount S of ETH to a contract with public key (BLS12-381) of his secret.
-2. Each participant generates a random polynomial of degree MIN_THRESHOLD, calculates a share for each of the other participants, SHARES[MAX_POOL_SIZE].
-3. Each participant creates a commitment to the randome polynomial: for each coefficient, treat it as a secret key. The commitment is the X coordinate of the public key. COMMITMENTS[MIN_THRESHOLD] **we use G as the generator**
+2. Each participant generates a random polynomial of degree MIN_THRESHOLD, calculates a share for each of the other participants, SHARES[MAX_POOL_SIZE]. See below.
+3. Each participant creates a commitment to the randome polynomial, see below.
 4. Each participant broadcasts the shares (individually encrypted for the recipient, TBD) and his polynomial commitment.
 5. Each participant can verifiy the shares he recieved (TBD)
 6. Non disputed participants form the QUORUM
-7. The Joint-Feldman scheme could now contruct the individually calculated shares by simply calculating (individually) the product of all recieved sahres. According to [Gennaro, Jarecki, Krawczyk and Rabin's paper](https://link.springer.com/content/pdf/10.1007%2F3-540-48910-X_21.pdf) that could result in a potential attack which results in a non uniformly distribuited secret. 
+7. The Joint-Feldman scheme could now contruct the individually calculated shares by simply calculating (individually) the product of all recieved sahres. According to [Gennaro, Jarecki, Krawczyk and Rabin's paper](https://link.springer.com/content/pdf/10.1007%2F3-540-48910-X_21.pdf) that could result in a potential attack which results in a non uniformly distribuited secret. See below
 8. To prevent said attack, all qualified parties (QUORUM) will broadcast the calculated shares but with a different generator (H) + a proof that the secret is equal betweeen g^s and h^s [see section 5.3 for moroe info](https://github.com/PhilippSchindler/ethdkg/blob/master/paper/ethdkg.pdf)
 9. The master public key can then be calculated individually by each member. That public key is the pool's validator public key.
 
 An eth EVM example could be found [here](https://github.com/PhilippSchindler/ethdkg). This example uses the BN128 curve but with the recent [EIP-2537](https://github.com/ethereum/EIPs/pull/2537) the same operations can now be done for BLS12-381
+
+### Share Creation
+Giving polynomial ![formula](https://render.githubusercontent.com/render/math?math=F(x)=c_{i_0})+![formula](https://render.githubusercontent.com/render/math?math=c_{i_1}X)+..+![formula](https://render.githubusercontent.com/render/math?math=c_{i_t}X^t) (mod q), where ![formula](https://render.githubusercontent.com/render/math?math=F(0)) is a randomly generated secret.
+A participant will distribuite for other participants their shares, accoridng to their index.
+![formula](https://render.githubusercontent.com/render/math?math=F(1)),![formula](https://render.githubusercontent.com/render/math?math=F(2)), ..![formula](https://render.githubusercontent.com/render/math?math=F(t))
+
+
+### Polynomial Committment
+Giving polynomial ![formula](https://render.githubusercontent.com/render/math?math=F(x)=c_{i_0})+![formula](https://render.githubusercontent.com/render/math?math=c_{i_1}X)+..+![formula](https://render.githubusercontent.com/render/math?math=c_{i_t}X^t) (mod q), 
+a commitment to its coefficients is as followed: ![formula](https://render.githubusercontent.com/render/math?math=g^(c_{i_0})),![formula](https://render.githubusercontent.com/render/math?math=g^(c_{i_1}X)),..,![formula](https://render.githubusercontent.com/render/math?math=g^(c_{i_t}X^t))
+
+### Joint-Feldman Key Recovery
+One the QUORUM is formed, each member simply calculates his individual group secret key (gsk), ![formula](https://render.githubusercontent.com/render/math?math=gsk_i=\sum_{1}^{t}s_{i_j}), where ![formula](https://render.githubusercontent.com/render/math?math=s_{i_j}) is the individual share he recieved from participant j.
+The group's master public key, ![formula](https://render.githubusercontent.com/render/math?math=mpk=\prod_{1}^{t}g^(s_i))
+
+### Gennaro, Jarecki, Krawczyk and Rabin's DKG
+[Reference implementation for BN128 curves DKG on eth](https://github.com/PhilippSchindler/ethdkg)
+Each participant in QUORUM will broadcast  ![formula](https://render.githubusercontent.com/render/math?math=h^(s_i)) and a non-interactive ZK proof that for ![formula](https://render.githubusercontent.com/render/math?math=h^(s_i)) and ![formula](https://render.githubusercontent.com/render/math?math=g^(s_i)),![formula](https://render.githubusercontent.com/render/math?math=s_i) is equal. See section 5.2 [here](https://github.com/PhilippSchindler/ethdkg/blob/master/paper/ethdkg.pdf).
+The master public key, ![formula](https://render.githubusercontent.com/render/math?math=mpk=\prod_{1}^{t}h^(s_i))
+
+### Group Signature
+Each member in QUORUM will partially sign a message, m. ![formula](https://render.githubusercontent.com/render/math?math=\sigma_i=H(m)^(gsk_i))
+The entire group can aggregate the signatures, ![formula](https://render.githubusercontent.com/render/math?math=\sigma=\prod_{1}^{t}\sigma_i). The aggregate signature will be valid if the group threshold is achieved.
+
+### Share Encryption
+TBD
+
+### Share Verification
+
+TBD
