@@ -1,5 +1,5 @@
 # Consensus - Pool Duties
-[![blox.io](https://s3.us-east-2.amazonaws.com/app-files.blox.io/static/media/powered_by.png)](https://blox.io)
+[![blox.io](https://s3.us-east-2.amazonaws.com/app-files.blox.io/static/media/powered_by.png)](https://www.bloxstaking.com)
 
 
 A pool is simply an active eth 2.0 validator identified by a BLS12-381 public key. 

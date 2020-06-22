@@ -1,5 +1,5 @@
 # Distribuited key generation (DKG) and redistribuition
-[![blox.io](https://s3.us-east-2.amazonaws.com/app-files.blox.io/static/media/powered_by.png)](https://blox.io)
+[![blox.io](https://s3.us-east-2.amazonaws.com/app-files.blox.io/static/media/powered_by.png)](https://www.bloxstaking.com)
 
 
 This section describes a standalone eth 1.0 secure DKG process for BLS12-381 keys and the math behind redistribuiting those keys to a different group as part of the participants pool rotation process.
