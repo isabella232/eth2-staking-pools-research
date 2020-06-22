@@ -32,3 +32,6 @@ A way this could work is to continously rotate all participants between the pool
 
 This repository aims to explore all those challenges (and others) towards a formal protocol definition.
 
+### Minimal Pool
+This is a research project towards emulating key concepts in staking pools like creation of new pools, rotation, withdrawal, networking and more.\
+[Minimal Pool](https://github.com/bloxapp/eth2-staking-pools-research/tree/master/minimal_pool)
