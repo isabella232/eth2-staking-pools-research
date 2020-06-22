@@ -30,5 +30,5 @@ This scenario is very feasable as there is no guarantee that a large set of un-a
 A solution to this porblem is to use all the participants (allocated and not) as the set from which pool participants are selected from.  
 A way this could work is to continously rotate all participants between the pools such that new created pools can be secured by the set of "rotating pariticipants".
 
-This repository aims to explore all those challenges (and others) twards a foraml protocol definition.
+This repository aims to explore all those challenges (and others) towards a formal protocol definition.
 
