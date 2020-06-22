@@ -1,4 +1,7 @@
 # Pool Rotation
+[![blox.io](https://s3.us-east-2.amazonaws.com/app-files.blox.io/static/media/powered_by.png)](https://blox.io)
+
+
 Public and open staking pool protocols have some challenges around the security of the funds as the protocol is an layere 2 (L2) protocol.
 Most notably the creation of new pools and the management of rewards/ penalties of active participants require a dynamic set of participants that can be assigned randomly to pools.
 
