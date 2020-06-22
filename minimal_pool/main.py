@@ -1,5 +1,5 @@
 import participant
-from crypto import generate_sk
+from crypto import generate_sk,aggregate_signatures,verify_aggregated_sigs
 
 POOL_SIZE = 3
 POOL_THRESHOLD = 2
@@ -43,10 +43,18 @@ def main():
     for p in participants:
         p.reconstruct_group_secret()
 
-    # p = participant.Participant()
-    # p.generate_polynomial(1111,20)
-    # print(p.distribuite_shares([1,2,3,4,5,6,7,8,9]))
-    # p.node.subscribe_to_topic(p.uuid,"hello")
+    # sign
+    message = b'\xab' * 32
+    sigs = []
+    for p in participants:
+        sigs.append(p.sign(message))
+
+    # aggregate and verify
+    aggregated = aggregate_signatures(sigs)
+    pks = [p.pub_group_key() for p in participants]
+    is_verified = verify_aggregated_sigs(pks,message,aggregated)
+
+    print("verified aggregated sig: " + str(is_verified))
 
 if __name__ == '__main__':
     main()
