@@ -1,5 +1,5 @@
 # Consensus - Creating New Pools
-[![blox.io](https://s3.us-east-2.amazonaws.com/app-files.blox.io/static/media/powered_by.png)](https://www.bloxstaking.com)
+[<img src="https://www.bloxstaking.com/wp-content/uploads/2020/04/Blox-Staking_logo_blue.png" width="100">](https://www.bloxstaking.com/)
 
 
 The process of creating a new validator which can be managed by a pool goes through the same process as any other validator.\

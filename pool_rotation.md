@@ -1,5 +1,5 @@
 # Pool Rotation
-[![blox.io](https://s3.us-east-2.amazonaws.com/app-files.blox.io/static/media/powered_by.png)](https://www.bloxstaking.com)
+[<img src="https://www.bloxstaking.com/wp-content/uploads/2020/04/Blox-Staking_logo_blue.png" width="100">](https://www.bloxstaking.com/)
 
 
 Public and open staking pool protocols have some challenges around the security of the funds as the protocol is a layer 2 (L2) protocol.
