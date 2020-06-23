@@ -1,5 +1,6 @@
 from crypto import Polynomial,reconstruct_secret,sign,pubkey_from_sk
 import pool_node
+import config
 
 KEY_SIZE_BITS = 256
 
@@ -10,10 +11,11 @@ class Participant:
         self.node = pool_node.PoolNode(self.id,self.new_msg)
         self.round_shares = []
         self.group_secret = -1
+        self.current_pool = -1
 
     def distribuite_shares(self,share_indexes):
         if self.current_polynomial == None:
-            raise AssertionError('set a polynomial before distribuiting shares')
+            raise AssertionError('set a polynomial before distributing shares')
         return [self.current_polynomial.evaluate(i) for i in share_indexes]
 
     def reconstruct_group_secret(self):
@@ -30,5 +32,8 @@ class Participant:
         self.current_polynomial.generate_random()
 
     def new_msg(self,msg):
-        if msg.type == "share_distro":
+        if msg.type == config.MSG_SHARE_DISTRO:
             self.round_shares.append(msg.data["share"])
+        if msg.type == config.MSG_NEW_EPOCH:
+            pool_asssignment = self.node.current_epoch_pool_assignment(self.id)
+

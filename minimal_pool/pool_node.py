@@ -1,8 +1,19 @@
 import uuid
+import config
+import threading
+from crypto import hash,KEY_SIZE_BITS
+import random
 
 class State:
-    def __init__(self):
-        self.d = 1
+    def __init__(self,seed):
+        self.seed = seed
+        self.epoch = 0
+
+    def increase_epoch(self):
+        self.epoch += 1
+
+    def mix_seed(self):
+        self.seed = (self.seed * int.from_bytes(hash(self.epoch.to_bytes(length=32,byteorder=config.ENDIANNESS)),byteorder=config.ENDIANNESS)) % KEY_SIZE_BITS
 
 class Message:
     def __init__(self, type, data, sender_id,topic):
@@ -21,8 +32,42 @@ class PoolNode:
         self.peers = []
         self.subscriber = subscriber
         self.topics = {}
-        self.state = State()
+        self.state = State(config.GENESIS_SEED)
         self.known_messages = []
+
+    def execute_round(self):
+        self.state.increase_epoch()
+        self.state.mix_seed()
+        self.send_to_subscriberr(Message(
+                config.MSG_NEW_EPOCH,
+                {"epoch":self.state.epoch},
+                self.id,
+                None
+            )
+        )
+
+        # run it again
+        threading.Timer(config.EPOCH_TIME, self.execute_round).start()
+
+    def current_epoch_pool_assignment(self, index):
+        lst = list(range(config.NUM_OF_PARTICIPANTS))
+        rnd = random.Random(self.state.seed)
+        rnd.shuffle(lst)
+        return lst[index]
+
+    def current_epoch_pools(self):
+        pools = {}
+        for i in range(config.NUM_OF_PARTICIPANTS):
+            pool_id = self.current_epoch_pool_assignment(i) % config.NUMBER_OF_POOLS
+            if pool_id in pools:
+                pools[pool_id].append(i)
+            else:
+                pools[pool_id] = [i]
+        return pools
+
+    """
+        Networking
+    """
 
     def connect(self, node):
         if node.id != self.id:
@@ -38,9 +83,9 @@ class PoolNode:
         else:
             self.known_messages.append(msg.id)
 
-        if msg.type == "share_distro":
+        if msg.type == config.MSG_SHARE_DISTRO:
             if msg.data["p"] == self.id: # send only for specific participant
-                self.subscriber(msg)
+                self.send_to_subscriberr(msg)
 
         # let other nodes know
         self.send(msg)
@@ -72,6 +117,10 @@ class PoolNode:
         # let other nodes know
         for p in self.peers:
             p.remove_from_topic(sender_id, topic)
+
+    def send_to_subscriberr(self,msg):
+        if self.subscriber != None:
+            self.subscriber(msg)
 
     """
         messages

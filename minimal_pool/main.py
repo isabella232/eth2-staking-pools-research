@@ -1,30 +1,31 @@
 import participant
 from crypto import generate_sk,aggregate_signatures,verify_aggregated_sigs
-
-POOL_SIZE = 3
-POOL_THRESHOLD = 2
-NUM_OF_PARTICIPANTS = POOL_SIZE * 3
-EPOCH_TIME = 6 # seconds
+import config
+import pool_node
+import time
 
 def main():
     participants = []
+    watcher_node = pool_node.PoolNode(-1,None)
 
-    print("creating ",NUM_OF_PARTICIPANTS," participants")
-    for i in range(NUM_OF_PARTICIPANTS):
+    print("creating ",config.NUM_OF_PARTICIPANTS," participants")
+    for i in range(config.NUM_OF_PARTICIPANTS):
         p = participant.Participant(i+1)
         sk = generate_sk()
         participants.append(p)
         print("     participant ",i, " initializing with secret: ",sk)
-        p.generate_polynomial(sk,POOL_THRESHOLD)
+        p.generate_polynomial(sk,config.POOL_THRESHOLD)
 
     # connect all participants together
     print("connecting participants to each-other")
     for i in range(len(participants)):
         for j in range(i+1,len(participants)):
-            print("     connecting participants ",i," to ",j)
             participants[i].node.connect(participants[j].node)
-            print("     connecting participants ",j," to ",i)
             participants[j].node.connect(participants[i].node)
+
+            # connecte watcher node as well
+            watcher_node.connect(participants[j].node)
+            watcher_node.connect(participants[i].node)
 
     # subscribe all nodes to topics
     for t in ["shares_for_pool"]:
@@ -50,11 +51,21 @@ def main():
         sigs.append(p.sign(message))
 
     # aggregate and verify
-    aggregated = aggregate_signatures(sigs)
-    pks = [p.pub_group_key() for p in participants]
-    is_verified = verify_aggregated_sigs(pks,message,aggregated)
+    # aggregated = aggregate_signatures(sigs)
+    # pks = [p.pub_group_key() for p in participants]
+    # is_verified = verify_aggregated_sigs(pks,message,aggregated)
+    #
+    # print("verified aggregated sig: " + str(is_verified))
 
-    print("verified aggregated sig: " + str(is_verified))
+    # start epoch execution
+    watcher_node.execute_round()
+    run_continously(watcher_node)
+
+def run_continously(node):
+    while True:
+        pools = node.current_epoch_pools()
+        print(pools)
+        time.sleep(config.EPOCH_TIME+1)
 
 if __name__ == '__main__':
     main()

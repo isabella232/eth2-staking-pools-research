@@ -1,6 +1,7 @@
 import random
 import py_ecc
 from py_ecc.bls import G2ProofOfPossession as bls
+from hashlib import sha256
 
 KEY_SIZE_BITS = 256
 
@@ -22,6 +23,9 @@ def aggregate_signatures(sigs):
 
 def verify_aggregated_sigs(pks, message, sig):
     return bls.FastAggregateVerify(pks,message,sig)
+
+def hash(x: bytes) -> bytes:
+    return sha256(x).digest()
 
 class Polynomial:
     def __init__(self,secret,degree):
