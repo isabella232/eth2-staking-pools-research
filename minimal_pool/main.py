@@ -1,54 +1,52 @@
 import participant
-from crypto import generate_sk,aggregate_signatures,verify_aggregated_sigs
+from crypto import generate_sk
 import config
-import pool_node
-import time
+import threading
+import logging
+
+last_logged_epoch = 0
+participants = []
 
 def main():
-    participants = []
-    watcher_node = pool_node.PoolNode(-1,None)
+    global participants
 
-    print("creating ",config.NUM_OF_PARTICIPANTS," participants")
+    logging.debug("creating %d participants",config.NUM_OF_PARTICIPANTS)
     for i in range(config.NUM_OF_PARTICIPANTS):
-        p = participant.Participant(i+1)
+        p = participant.Participant(i+1) # id can't be 0 as it's the secret
         sk = generate_sk()
         participants.append(p)
-        print("     participant ",i, " initializing with secret: ",sk)
-        p.generate_polynomial(sk,config.POOL_THRESHOLD)
+        p.secret = sk
 
     # connect all participants together
-    print("connecting participants to each-other")
+    logging.debug("connecting participants to each-other")
     for i in range(len(participants)):
+        # connect nodes to eachother
         for j in range(i+1,len(participants)):
             participants[i].node.connect(participants[j].node)
             participants[j].node.connect(participants[i].node)
 
-            # connecte watcher node as well
-            watcher_node.connect(participants[j].node)
-            watcher_node.connect(participants[i].node)
-
     # subscribe all nodes to topics
-    for t in ["shares_for_pool"]:
+    for t in [config.MSG_SHARE_DISTRO]:
         for p in participants:
             p.node.subscribe_to_topic(p.id,t)
 
     # distribuite shares
-    print("distribuiting shares")
-    for i in range(len(participants)):
-        p = participants[i]
-        shares = p.distribuite_shares([participants[i].id for i in range(len(participants))])
-        p.node.broadcast_shares(p.id,shares,"shares_for_pool")
-        print("     participant ",p.id," shared shares: ",shares)
-
-    # reconstruct individual secrets
-    for p in participants:
-        p.reconstruct_group_secret()
-
-    # sign
-    message = b'\xab' * 32
-    sigs = []
-    for p in participants:
-        sigs.append(p.sign(message))
+    # print("distribuiting shares")
+    # for i in range(len(participants)):
+    #     p = participants[i]
+    #     shares = p.distribuite_shares([participant_index_to_distro_index(participants[i].id) for i in range(len(participants))])
+    #     p.node.broadcast_shares(p.id,shares,"shares_for_pool")
+    #     print("     participant ",p.id," shared shares: ",shares)
+    #
+    # # reconstruct individual secrets
+    # for p in participants:
+    #     p.reconstruct_group_secret()
+    #
+    # # sign
+    # message = b'\xab' * 32
+    # sigs = []
+    # for p in participants:
+    #     sigs.append(p.sign(message))
 
     # aggregate and verify
     # aggregated = aggregate_signatures(sigs)
@@ -58,14 +56,36 @@ def main():
     # print("verified aggregated sig: " + str(is_verified))
 
     # start epoch execution
-    watcher_node.execute_round()
-    run_continously(watcher_node)
+    [threading.Thread(target=p.node.execute_round(), args=(p.id,), daemon=True).start() for p in participants]
+
+    # start epoch logging
+    logging.debug("start epoch logging")
+    run_continously(participants[1].node)
 
 def run_continously(node):
-    while True:
-        pools = node.current_epoch_pools()
-        print(pools)
-        time.sleep(config.EPOCH_TIME+1)
+    threading.Timer(config.EPOCH_TIME+1, log_end_of_round,args=[node]).start()
+
+def log_end_of_round(node):
+    global last_logged_epoch
+
+    pools = node.state.pool_participants_for_epoch(last_logged_epoch)
+    # """
+    #     Epoch stats
+    # """
+    logging.debug("\n\n----------------EPOCH %d Summary ----------------\n",last_logged_epoch)
+    logging.debug("Pools for epoch %d: %s", last_logged_epoch, pools)
+    for p in participants:
+        shares = p.node.state.participant_shares_for_epoch(last_logged_epoch,p.id)
+        logging.debug("P(%d) shares recieved: %d",p.id,len(shares))
+    logging.debug("\n\n-------------------------------------------------\n")
+
+    last_logged_epoch = last_logged_epoch + 1
+
+    # run again
+    run_continously(node)
+
+
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s-%(levelname)s-%(message)s',level=logging.DEBUG)
     main()

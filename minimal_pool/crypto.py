@@ -5,7 +5,6 @@ from hashlib import sha256
 
 KEY_SIZE_BITS = 256
 
-
 def generate_sk():
     return random.getrandbits(KEY_SIZE_BITS)
 
