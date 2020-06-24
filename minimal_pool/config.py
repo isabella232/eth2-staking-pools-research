@@ -5,6 +5,7 @@ NUM_OF_PARTICIPANTS = NUMBER_OF_POOLS * 3
 EPOCH_TIME = 6 # seconds
 # used to deterministically simulate a random source for the network
 GENESIS_SEED = 95637185274827421279466020522819461017051869823440212610124288004910264493064
+STARTING_EPOCH = -1 # TODO - this is set to -1 because when execute_epoch (Node) is called it increases it by +1.
 
 MSG_SHARE_DISTRO        = "share_distro"
 MSG_NEW_EPOCH           = "new_epoch"

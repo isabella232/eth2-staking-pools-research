@@ -20,6 +20,7 @@ def main():
     # connect all participants together
     logging.debug("connecting participants to each-other")
     for i in range(len(participants)):
+        # participants[i].node.connect(participants[i].node) # connect to self to propogate msg, could be optimized
         # connect nodes to eachother
         for j in range(i+1,len(participants)):
             participants[i].node.connect(participants[j].node)
@@ -56,7 +57,7 @@ def main():
     # print("verified aggregated sig: " + str(is_verified))
 
     # start epoch execution
-    [threading.Thread(target=p.node.execute_round(), args=(p.id,), daemon=True).start() for p in participants]
+    [threading.Thread(target=p.node.execute_epoch(), args=(p.id,), daemon=True).start() for p in participants]
 
     # start epoch logging
     logging.debug("start epoch logging")

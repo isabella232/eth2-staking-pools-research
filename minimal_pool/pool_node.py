@@ -8,7 +8,7 @@ import logging
 class State:
     def __init__(self,seed):
         self.seed = seed
-        self.epoch = 0
+        self.epoch = config.STARTING_EPOCH
         self.pool_per_epoch = {}
         self.shares_per_epoch = {}
 
@@ -22,14 +22,18 @@ class State:
         self.pool_per_epoch[epoch] = pools
 
     def pool_participants_for_epoch(self,epoch):
-        return self.pool_per_epoch[epoch]
+        if epoch in self.pool_per_epoch:
+            return self.pool_per_epoch[epoch]
+        return None
 
 
     def save_participant_shares(self,shares,epoch,p_id):
         self.shares_per_epoch[epoch] = {p_id:shares}
 
     def participant_shares_for_epoch(self,epoch,p_id):
-        return self.shares_per_epoch[epoch][p_id]
+        if epoch in self.shares_per_epoch:
+            return self.shares_per_epoch[epoch][p_id]
+        return []
 
 class Message:
     def __init__(self, type, data, sender_id):
@@ -54,15 +58,15 @@ class PoolNode:
         # mark mid round
         threading.Timer(config.EPOCH_TIME / 2, self.mid_round_mark).start()
         # run it again
-        threading.Timer(config.EPOCH_TIME, self.execute_round).start()
+        threading.Timer(config.EPOCH_TIME, self.execute_epoch).start()
 
-    def execute_round(self):
+    def execute_epoch(self):
         # save epoch
         self.state.save_pool_participants(self.current_epoch_pools(), self.state.epoch)
 
         # end epoch only if not first
-        if self.state.epoch != 0:
-            self.send_to_subscriberr(Message(
+        if self.state.epoch != config.STARTING_EPOCH:
+            self.send_to_subscriber(Message(
                     config.MSG_END_EPOCH,
                     {"epoch": self.state.epoch - 1},
                     self.id,
@@ -72,7 +76,7 @@ class PoolNode:
         # start new epoch
         self.state.increase_epoch()
         self.state.mix_seed()
-        self.send_to_subscriberr(Message(
+        self.send_to_subscriber(Message(
                 config.MSG_NEW_EPOCH,
                 {"epoch":self.state.epoch},
                 self.id,
@@ -82,7 +86,7 @@ class PoolNode:
         self.chain_round()
 
     def mid_round_mark(self):
-        self.send_to_subscriberr(Message(
+        self.send_to_subscriber(Message(
                 config.MSG_MID_EPOCH,
                 {"epoch": self.state.epoch},
                 self.id,
@@ -114,8 +118,8 @@ class PoolNode:
     """
 
     def connect(self, node):
-        if node.id != self.id:
-            self.peers.append(node)
+        self.peers.append(node)
+
 
     def disconnect(self,node):
         self.peers.remove(node)
@@ -128,7 +132,7 @@ class PoolNode:
             self.known_messages.append(msg.id)
 
         if msg.type == config.MSG_SHARE_DISTRO:
-            self.send_to_subscriberr(msg)
+            self.send_to_subscriber(msg)
 
         # TODO - let other nodes know
         #self.send(msg)
@@ -160,7 +164,7 @@ class PoolNode:
         for p in self.peers:
             p.remove_from_topic(sender_id, topic)
 
-    def send_to_subscriberr(self,msg):
+    def send_to_subscriber(self, msg):
         if self.subscriber != None:
             self.subscriber(msg)
 
@@ -170,7 +174,7 @@ class PoolNode:
     def broadcast_shares(self,sender_id,shares,pool_id):
         for s in shares:
             msg = Message(
-                "share_distro",
+                config.MSG_SHARE_DISTRO,
                 {
                     "from_p_id": sender_id,
                     "p":s[0],
