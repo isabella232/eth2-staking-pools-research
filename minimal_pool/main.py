@@ -27,7 +27,7 @@ def main():
             participants[j].node.connect(participants[i].node)
 
     # subscribe all nodes to topics
-    for t in [config.MSG_SHARE_DISTRO]:
+    for t in [config.MSG_SHARE_DISTRO,config.MSG_EPOCH_SIG]:
         for p in participants:
             p.node.subscribe_to_topic(p.id,t)
 
@@ -64,7 +64,7 @@ def main():
     run_continously(participants[1].node)
 
 def run_continously(node):
-    threading.Timer(config.EPOCH_TIME+1, log_end_of_round,args=[node]).start()
+    threading.Timer(config.EPOCH_TIME*2, log_end_of_round,args=[node]).start()
 
 def log_end_of_round(node):
     global last_logged_epoch
@@ -77,7 +77,13 @@ def log_end_of_round(node):
     logging.debug("Pools for epoch %d: %s", last_logged_epoch, pools)
     for p in participants:
         shares = p.node.state.participant_shares_for_epoch(last_logged_epoch,p.id)
-        logging.debug("P(%d) shares recieved: %d",p.id,len(shares))
+        logging.debug("P(%d) shares received: %d",p.id,len(shares))
+
+        sigs = p.node.state.aggregated_sig_for_epoch(last_logged_epoch)
+        logging.debug("P(%d) sig verified: %s, sig: %s",p.id,sigs["is_verified"],sigs["sig"])
+        for i in range(len(sigs["pks"])):
+            pk = sigs["pks"][i]
+            logging.debug("     PK%d: %s", i,pk)
     logging.debug("\n\n-------------------------------------------------\n")
 
     last_logged_epoch = last_logged_epoch + 1

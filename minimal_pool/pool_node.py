@@ -11,6 +11,7 @@ class State:
         self.epoch = config.STARTING_EPOCH
         self.pool_per_epoch = {}
         self.shares_per_epoch = {}
+        self.aggregated_sig = {}
 
     def increase_epoch(self):
         self.epoch += 1
@@ -24,6 +25,18 @@ class State:
     def pool_participants_for_epoch(self,epoch):
         if epoch in self.pool_per_epoch:
             return self.pool_per_epoch[epoch]
+        return None
+
+    def save_aggregated_sig(self,sig,pks,is_verified,epoch):
+        self.aggregated_sig[epoch] = {
+            "sig":sig.hex(),
+            "pks":[pk.hex() for pk in pks],
+            "is_verified":bool(is_verified),
+        }
+
+    def aggregated_sig_for_epoch(self,epoch):
+        if epoch in self.aggregated_sig:
+            return self.aggregated_sig[epoch]
         return None
 
 
@@ -131,7 +144,7 @@ class PoolNode:
         else:
             self.known_messages.append(msg.id)
 
-        if msg.type == config.MSG_SHARE_DISTRO:
+        if msg.type == config.MSG_SHARE_DISTRO or msg.type == config.MSG_EPOCH_SIG:
             self.send_to_subscriber(msg)
 
         # TODO - let other nodes know
@@ -186,4 +199,16 @@ class PoolNode:
             ) # p is the participant's index and we assume shares are ordered
             self.send(msg)
 
-    # def broadcast_pk_share(self,sender_id,pk,pool_id):
+    def broadcast_sig(self,sender_id,sig,pk,pool_id):
+        msg = Message(
+            config.MSG_EPOCH_SIG,
+            {
+                "from_p_id": sender_id,
+                "sig": sig,
+                "pk": pk,
+                "pool_id": pool_id,
+                "epoch": self.state.epoch,
+            },
+            sender_id
+        )
+        self.send(msg)
