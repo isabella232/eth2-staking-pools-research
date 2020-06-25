@@ -1,7 +1,7 @@
 import uuid
 import config
 import threading
-from crypto import hash,KEY_SIZE_BITS
+from crypto import hash
 import random
 import logging
 
@@ -17,7 +17,7 @@ class State:
         self.epoch += 1
 
     def mix_seed(self):
-        self.seed = (self.seed * int.from_bytes(hash(self.epoch.to_bytes(length=32,byteorder=config.ENDIANNESS)),byteorder=config.ENDIANNESS)) % KEY_SIZE_BITS
+        self.seed = (self.seed * int.from_bytes(hash(self.epoch.to_bytes(32,config.ENDIANNESS)),config.ENDIANNESS)) % config.KEY_SIZE_BITS
 
     def save_pool_participants(self,pools,epoch):
         self.pool_per_epoch[epoch] = pools
