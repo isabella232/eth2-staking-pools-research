@@ -1,8 +1,8 @@
 import participant
-from crypto import generate_sk,test
 import config
 import threading
 import logging
+import crypto
 
 last_logged_epoch = 0
 participants = []
@@ -10,15 +10,18 @@ participants = []
 def main():
     global participants
 
-    logging.debug("creating %d participants",config.NUM_OF_PARTICIPANTS)
-    for i in range(config.NUM_OF_PARTICIPANTS):
-        p = participant.Participant(i+1,generate_sk()) # id can't be 0 as it's the secret
+    logging.debug("creating %d participants via DKG",config.NUM_OF_PARTICIPANTS)
+    ids = range(1,config.NUM_OF_PARTICIPANTS)
+    dkg = crypto.DKG(config.POOL_THRESHOLD, ids)
+    dkg.run()
+    sks = dkg.calculate_group_sk()
+    for i in sks:
+        p = participant.Participant(i,sks[i])
         participants.append(p)
 
     # connect all participants together
     logging.debug("connecting participants to each-other")
     for i in range(len(participants)):
-        # participants[i].node.connect(participants[i].node) # connect to self to propogate msg, could be optimized
         # connect nodes to eachother
         for j in range(i+1,len(participants)):
             participants[i].node.connect(participants[j].node)
@@ -65,8 +68,3 @@ def log_end_of_round(node):
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s-%(levelname)s-%(message)s',level=logging.DEBUG)
     main()
-    # thread = [threading.Thread(target=test, daemon=True) for i in range(0,11)]
-    # for t in thread:
-    #     t.start()
-    # for t in thread:
-    #     t.join()

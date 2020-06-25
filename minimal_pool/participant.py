@@ -5,13 +5,13 @@ import logging
 import threading
 
 class Participant:
-    def __init__(self,id,initial_secret):
+    def __init__(self,id, key):
         self.current_polynomial = None
         self.id = id
         self.node = pool_node.PoolNode(self.id,self.new_msg)
         self.incoming_shares = []
         self.collected_sigs = []
-        self.key = initial_secret
+        self.key = key
         self.epoch_transition_lock = threading.Lock()
 
     def reconstruct_group_secret(self):
@@ -52,8 +52,8 @@ class Participant:
             pks = []
             for s in self.collected_sigs:
                 if s["epoch"] == last_epoch:
-                    sigs.append(bytes.fromhex(s["sig"]))
-                    pks.append(bytes.fromhex(s["pk"]))
+                    sigs.append(s["sig"])
+                    pks.append(s["pk"])
             agg_sigs = crypto.aggregate_signatures(sigs)
             is_verified = crypto.verify_aggregated_sigs(pks,config.TEST_EPOCH_MSG,agg_sigs)
             self.node.state.save_aggregated_sig(agg_sigs,pks,is_verified,last_epoch)
@@ -61,9 +61,12 @@ class Participant:
             logging.debug("participant %d epoch end", self.id)
 
     def mid_epoch(self):
+        # reconstruct my share and group's public key
         self.reconstruct_group_secret()
-        sig = self.sign(config.TEST_EPOCH_MSG).hex()
-        pk = crypto.pk_from_sk(self.key).hex()
+
+        # broadcast my sig
+        sig = self.sign(config.TEST_EPOCH_MSG)
+        pk = crypto.pk_from_sk(self.key)
         self.node.broadcast_sig(
             self.id,
             sig,
@@ -85,12 +88,19 @@ class Participant:
         redistro_polynomial = crypto.Polynomial(self.key, config.POOL_THRESHOLD-1)
         redistro_polynomial.generate_random()
         shares_to_distrb = [[p_id, redistro_polynomial.evaluate(p_id)] for p_id in pool_participants]
-        self.node.broadcast_shares(self.id, shares_to_distrb, pool_asssignment)
+        commitments = redistro_polynomial.coefficients_commitment()
+        self.node.broadcast_shares(
+            self.id,
+            shares_to_distrb,
+            pool_asssignment,
+            commitments
+        )
 
         # add own share to self
         self.incoming_shares.append({  # TODO - find a better way to store own share
             "epoch": self.node.state.epoch,
             "share": redistro_polynomial.evaluate(self.id),
+            "commitments": commitments,
             "from_p_id": self.id,
             "p": self.id,
             "pool_id": pool_asssignment,
