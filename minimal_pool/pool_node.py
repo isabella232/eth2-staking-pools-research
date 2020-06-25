@@ -184,14 +184,14 @@ class PoolNode:
     """
         messages
     """
-    def broadcast_shares(self,sender_id,shares,commitments,pool_id):
+    def broadcast_shares(self, sender_id, shares, commitments, pool_id):
         for s in shares:
             msg = Message(
                 config.MSG_SHARE_DISTRO,
                 {
                     "from_p_id": sender_id,
-                    "p":s[0],
-                    "share":s[1],
+                    "p": s[0],
+                    "share": s[1],
                     "commitments": commitments,
                     "pool_id": pool_id,
                     "epoch": self.state.epoch,
@@ -200,7 +200,7 @@ class PoolNode:
             ) # p is the participant's index and we assume shares are ordered
             self.send(msg)
 
-    def broadcast_sig(self,sender_id,sig,pk,pool_id):
+    def broadcast_sig(self, sender_id, sig, pk, pool_id):
         msg = Message(
             config.MSG_EPOCH_SIG,
             {

@@ -92,8 +92,8 @@ class Participant:
         self.node.broadcast_shares(
             self.id,
             shares_to_distrb,
-            pool_asssignment,
-            commitments
+            commitments,
+            pool_asssignment
         )
 
         # add own share to self

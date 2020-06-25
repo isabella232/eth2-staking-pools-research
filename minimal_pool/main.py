@@ -11,7 +11,7 @@ def main():
     global participants
 
     logging.debug("creating %d participants via DKG",config.NUM_OF_PARTICIPANTS)
-    ids = range(1,config.NUM_OF_PARTICIPANTS)
+    ids = range(1,config.NUM_OF_PARTICIPANTS+1)
     dkg = crypto.DKG(config.POOL_THRESHOLD, ids)
     dkg.run()
     sks = dkg.calculate_group_sk()
