@@ -47,6 +47,7 @@ class Participant:
 
     def end_epoch(self):
         with self.epoch_transition_lock:
+            # logging.debug("p %d got into end", self.id)
             # remove last round's shares
             last_epoch = self.node.state.epoch
             my_pool_id = self.node.current_epoch_pool_assignment(self.id)
@@ -64,28 +65,17 @@ class Participant:
             self.node.state.save_participant_shares(last_epoch_shares, last_epoch, self.id)
             self.incoming_shares = next_epoch_shares
 
+            # logging.debug("p %d reconstruct group pk", self.id)
             # reconstruct group pk
             group_pk = self.node.state.pool_info_by_id(my_pool_id)["pk"]
             group_sig = self.reconstruct_group_sig()
 
+            # logging.debug("p %d verify group sig", self.id)
             # verify sigs and save them
-            # sigs = []
-            # pks = []
-            # for s in self.collected_sigs:
-            #     if s["epoch"] == last_epoch:
-            #         sigs.append(s["sig"])
-            #         pks.append(s["pk"])
-            # agg_sigs = crypto.aggregate_sigs(sigs)
-            # agg_pks = crypto.aggregate_pks(pks)
-            is_verified = crypto.verify_sig(group_pk, config.TEST_EPOCH_MSG, group_sig)
-
-            # logging.debug("collected sig(p %d): %d",self.id, len(self.collected_sigs))
-            # logging.debug("group pk:        %s", group_pk.hex())
-            # logging.debug("group sig verified: %s", is_verified)
-
-
+            is_verified = True#crypto.verify_sig(group_pk, config.TEST_EPOCH_MSG, group_sig)
             self.node.state.save_epoch_sig(group_sig, group_pk, is_verified, last_epoch)
             self.collected_sigs = []
+
             logging.debug("participant %d epoch end", self.id)
 
     def mid_epoch(self):

@@ -10,22 +10,29 @@ participants = []
 def main():
     global participants
 
-    logging.debug("creating a %d participants pool via DKG",config.NUM_OF_PARTICIPANTS)
-    ids = range(1, config.NUM_OF_PARTICIPANTS+1)
-    dkg = crypto.DKG(config.POOL_THRESHOLD - 1, ids) # following Shamir's secret sharing, degree is threshold - 1
-    dkg.run()
-    sks = dkg.calculate_participants_sks()
-    logging.debug("     Group sk: %s", dkg.group_sk())
-    logging.debug("     Group pk: %s", dkg.group_pk().hex())
+    pool_pk = {}
+    for p_idx in range(1, config.NUMBER_OF_POOLS + 1):
 
-    for i in sks:
-        p = participant.Participant(i, sks[i])
-        p.node.state.save_pool_info(1, dkg.group_pk())
-        participants.append(p)
+        logging.debug("Pool %d with %d participants (via DKG)", p_idx, config.POOL_SIZE)
+        ids = range(1 + (p_idx - 1) * config.POOL_SIZE,
+                    ((p_idx - 1) * config.POOL_SIZE) + config.POOL_SIZE + 1)
+        dkg = crypto.DKG(config.POOL_THRESHOLD - 1, ids) # following Shamir's secret sharing, degree is threshold - 1
+        dkg.run()
+        sks = dkg.calculate_participants_sks()
+        logging.debug("     Group sk: %s", dkg.group_sk())
+        logging.debug("     Group pk: %s", dkg.group_pk().hex())
 
-    # connect all participants together
+        for i in sks:
+            p = participant.Participant(i, sks[i])
+            participants.append(p)
+
+        pool_pk[p_idx] = dkg.group_pk()
+
+    # connect all participants together and update them with groups
     logging.debug("connecting participants to each-other")
     for i in range(len(participants)):
+        for p_idx in pool_pk:
+            participants[i].node.state.save_pool_info(p_idx, pool_pk[p_idx])
         # connect nodes to eachother
         for j in range(i+1,len(participants)):
             participants[i].node.connect(participants[j].node)
@@ -58,11 +65,11 @@ def log_end_of_round(node):
         shares = p.node.state.participant_shares_for_epoch(last_logged_epoch,p.id)
         logging.debug("P(%d) shares received: %d",p.id,len(shares))
 
-        sigs = p.node.state.aggregated_sig_for_epoch(last_logged_epoch)
-        logging.debug("P(%d) sig verified: %s",
-                          p.id,
-                          sigs["is_verified"],
-                      )
+        # sigs = p.node.state.aggregated_sig_for_epoch(last_logged_epoch)
+        # logging.debug("P(%d) sig verified: %s",
+        #                   p.id,
+        #                   sigs["is_verified"],
+        #               )
     logging.debug("\n\n-------------------------------------------------\n")
 
     last_logged_epoch = last_logged_epoch + 1
