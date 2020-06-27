@@ -11,15 +11,16 @@ def main():
     global participants
 
     logging.debug("creating a %d participants pool via DKG",config.NUM_OF_PARTICIPANTS)
-    ids = range(1,config.NUM_OF_PARTICIPANTS+1)
+    ids = range(1, config.NUM_OF_PARTICIPANTS+1)
     dkg = crypto.DKG(config.POOL_THRESHOLD - 1, ids) # following Shamir's secret sharing, degree is threshold - 1
     dkg.run()
     sks = dkg.calculate_participants_sks()
     logging.debug("     Group sk: %s", dkg.group_sk())
-    logging.debug("     Group pk:       %s", dkg.group_pk().hex())
+    logging.debug("     Group pk: %s", dkg.group_pk().hex())
 
     for i in sks:
-        p = participant.Participant(i,sks[i])
+        p = participant.Participant(i, sks[i])
+        p.node.state.save_pool_info(1, dkg.group_pk())
         participants.append(p)
 
     # connect all participants together
@@ -57,8 +58,11 @@ def log_end_of_round(node):
         shares = p.node.state.participant_shares_for_epoch(last_logged_epoch,p.id)
         logging.debug("P(%d) shares received: %d",p.id,len(shares))
 
-        # sigs = p.node.state.aggregated_sig_for_epoch(last_logged_epoch)
-        # logging.debug("P(%d) sig verified: %s, sig count: %d",p.id,sigs["is_verified"],len(sigs["pks"]))
+        sigs = p.node.state.aggregated_sig_for_epoch(last_logged_epoch)
+        logging.debug("P(%d) sig verified: %s",
+                          p.id,
+                          sigs["is_verified"],
+                      )
     logging.debug("\n\n-------------------------------------------------\n")
 
     last_logged_epoch = last_logged_epoch + 1

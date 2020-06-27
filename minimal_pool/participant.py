@@ -3,7 +3,6 @@ import pool_node
 import config
 import logging
 import threading
-from  py_ecc.bls.g2_primatives import pubkey_to_G1
 
 class Participant:
     def __init__(self,id, key):
@@ -22,14 +21,23 @@ class Participant:
                 shares[m["from_p_id"]] = m["share"]
         self.key = crypto.reconstruct_sk(shares)
 
-    def reconstruct_group_pk(self):
-        last_epoch = self.node.state.epoch
+    # TODO - remove not needed as we save pool pk by id
+    # def reconstruct_group_pk(self):
+    #     last_epoch = self.node.state.epoch
+    #
+    #     pks = {}
+    #     for s in self.collected_sigs:
+    #         if s["epoch"] == last_epoch:
+    #             pks[s["from_p_id"]] = s["pk"]
+    #     return crypto.reconstruct_pk(pks)
 
-        pks = {}
+    def reconstruct_group_sig(self):
+        last_epoch = self.node.state.epoch
+        sigs = {}
         for s in self.collected_sigs:
             if s["epoch"] == last_epoch:
-                pks[s["from_p_id"]] = pubkey_to_G1(s["pk"])
-        return crypto.reconstruct_pk(pks)
+                sigs[s["from_p_id"]] = s["sig"]
+        return crypto.reconstruct_group_sig(sigs)
 
     def sign_epoch_msg(self,msg):
         return self.sign(msg)
@@ -41,6 +49,8 @@ class Participant:
         with self.epoch_transition_lock:
             # remove last round's shares
             last_epoch = self.node.state.epoch
+            my_pool_id = self.node.current_epoch_pool_assignment(self.id)
+
             last_epoch_shares = []
             next_epoch_shares = []
             for i in range(len(self.incoming_shares)):
@@ -55,24 +65,26 @@ class Participant:
             self.incoming_shares = next_epoch_shares
 
             # reconstruct group pk
-            group_pk = self.reconstruct_group_pk()
+            group_pk = self.node.state.pool_info_by_id(my_pool_id)["pk"]
+            group_sig = self.reconstruct_group_sig()
 
             # verify sigs and save them
-            sigs = []
-            pks = []
-            for s in self.collected_sigs:
-                if s["epoch"] == last_epoch:
-                    sigs.append(s["sig"])
-                    pks.append(s["pk"])
-            agg_sigs = crypto.aggregate_sigs(sigs)
-            agg_pks = crypto.aggregate_pks(pks)
-            is_verified = crypto.verify_sig(agg_pks, config.TEST_EPOCH_MSG, agg_sigs)
+            # sigs = []
+            # pks = []
+            # for s in self.collected_sigs:
+            #     if s["epoch"] == last_epoch:
+            #         sigs.append(s["sig"])
+            #         pks.append(s["pk"])
+            # agg_sigs = crypto.aggregate_sigs(sigs)
+            # agg_pks = crypto.aggregate_pks(pks)
+            is_verified = crypto.verify_sig(group_pk, config.TEST_EPOCH_MSG, group_sig)
 
-            logging.debug("collected sig(p %d): %d",self.id, len(self.collected_sigs))
-            logging.debug("group pk: %s", group_pk.hex())
+            # logging.debug("collected sig(p %d): %d",self.id, len(self.collected_sigs))
+            # logging.debug("group pk:        %s", group_pk.hex())
+            # logging.debug("group sig verified: %s", is_verified)
 
 
-            # self.node.state.save_aggregated_sig(agg_sigs, pks, is_verified, last_epoch)
+            self.node.state.save_epoch_sig(group_sig, group_pk, is_verified, last_epoch)
             self.collected_sigs = []
             logging.debug("participant %d epoch end", self.id)
 

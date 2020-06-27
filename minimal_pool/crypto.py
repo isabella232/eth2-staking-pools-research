@@ -1,7 +1,6 @@
 import random
 from py_ecc.optimized_bls12_381 import curve_order,add as ec_add, multiply as ec_mul,G1
-from py_ecc.bls.hash import i2osp as from_int_to_bytes, os2ip as from_bytes_to_int
-from  py_ecc.bls.g2_primatives import G1_to_pubkey,pubkey_to_G1
+from  py_ecc.bls.g2_primatives import G1_to_pubkey, pubkey_to_G1, signature_to_G2, G2_to_signature
 import milagro_bls_binding as milagro_bls
 from hashlib import sha256
 import config
@@ -20,11 +19,23 @@ def reconstruct_sk(shares):
     l = LagrangeInterpolation(shares, order)
     return l.evaluate()
 
+def reconstruct_group_sig(shares):
+    _sigs = {}
+    for i in shares:
+        _sigs[i] = signature_to_G2(shares[i])
+
+    l = ECLagrangeInterpolation(_sigs, order)
+    ev = l.evaluate()
+    return G2_to_signature(ev)
 """
     given a set of shares, this will reconstruct the group's public key 
 """
 def reconstruct_pk(shares):
-    l = ECLagrangeInterpolation(shares, order)
+    _pks = {}
+    for i in shares:
+        _pks[i] = pubkey_to_G1(shares[i])
+
+    l = ECLagrangeInterpolation(_pks, order)
     ev = l.evaluate()
     return G1_to_pubkey(ev)
 
@@ -201,6 +212,6 @@ class DKG:
         sks = self.calculate_participants_sks()
         pks = {}
         for i in sks:
-            pks[i] = _optimized_pk_from_sk(sks[i])
+            pks[i] = pk_from_sk(sks[i])
         return reconstruct_pk(pks)
 

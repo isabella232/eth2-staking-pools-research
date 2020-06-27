@@ -9,6 +9,7 @@ class State:
     def __init__(self,seed):
         self.seed = seed
         self.epoch = config.STARTING_EPOCH
+        self.pool_info = {}
         self.pool_per_epoch = {}
         self.shares_per_epoch = {}
         self.aggregated_sig = {}
@@ -19,25 +20,35 @@ class State:
     def mix_seed(self):
         self.seed = (self.seed * int.from_bytes(hash(self.epoch.to_bytes(32,config.ENDIANNESS)),config.ENDIANNESS)) % config.KEY_SIZE_BITS
 
+    def save_pool_info(self, pool_id, pk):
+        self.pool_info[pool_id] = {
+            "pk": pk
+        }
+
+    def pool_info_by_id(self, pool_id):
+        if pool_id not in self.pool_info:
+            raise AssertionError("%d pool id does not exist", pool_id)
+        return self.pool_info[pool_id]
+
     def save_pool_participants(self,pools,epoch):
         self.pool_per_epoch[epoch] = pools
 
-    def pool_participants_for_epoch(self,epoch):
-        if epoch in self.pool_per_epoch:
-            return self.pool_per_epoch[epoch]
-        return None
+    def pool_participants_for_epoch(self, epoch):
+        if epoch not in self.pool_per_epoch:
+            raise AssertionError("%d epoch could not be found", epoch)
+        return self.pool_per_epoch[epoch]
 
-    def save_aggregated_sig(self,sig,pks,is_verified,epoch):
+    def save_epoch_sig(self, sig, pk, is_verified, epoch):
         self.aggregated_sig[epoch] = {
-            "sig":sig.hex(),
-            "pks":[pk.hex() for pk in pks],
-            "is_verified":bool(is_verified),
+            "sig": sig.hex(),
+            "pks": pk.hex(),
+            "is_verified": bool(is_verified),
         }
 
     def aggregated_sig_for_epoch(self,epoch):
-        if epoch in self.aggregated_sig:
-            return self.aggregated_sig[epoch]
-        return None
+        if epoch not in self.aggregated_sig:
+            raise AssertionError("%d epoch could not be found", epoch)
+        return self.aggregated_sig[epoch]
 
 
     def save_participant_shares(self,shares,epoch,p_id):
@@ -107,18 +118,18 @@ class PoolNode:
         )
 
     def current_epoch_pool_assignment(self, index):
-        lst = list(range(1,config.NUM_OF_PARTICIPANTS+1)) # indexes must run from 1
+        lst = list(range(1, config.NUM_OF_PARTICIPANTS+1)) # indexes must run from 1
         rnd = random.Random(self.state.seed)
         rnd.shuffle(lst)
         return lst[index-1] % config.NUMBER_OF_POOLS + 1 # indexes must run from 1
 
-    def current_epoch_pool_participants(self,pool_id):
+    def current_epoch_pool_participants(self, pool_id):
         pools = self.current_epoch_pools()
         return pools[pool_id]
 
     def current_epoch_pools(self):
         pools = {}
-        for i in range(1,config.NUM_OF_PARTICIPANTS+1): # indexes must run from 1
+        for i in range(1, config.NUM_OF_PARTICIPANTS+1): # indexes must run from 1
             pool_id = self.current_epoch_pool_assignment(i)
             if pool_id in pools:
                 pools[pool_id].append(i)
