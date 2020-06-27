@@ -185,13 +185,14 @@ class PoolNode:
         messages
     """
     def broadcast_shares(self, sender_id, shares, commitments, pool_id):
-        for s in shares:
+        for p_indx in shares:
+            s = shares[p_indx]
             msg = Message(
                 config.MSG_SHARE_DISTRO,
                 {
                     "from_p_id": sender_id,
-                    "p": s[0],
-                    "share": s[1],
+                    "p": p_indx,
+                    "share": s,
                     "commitments": commitments,
                     "pool_id": pool_id,
                     "epoch": self.state.epoch,

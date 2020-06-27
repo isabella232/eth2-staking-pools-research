@@ -3,6 +3,7 @@ import pool_node
 import config
 import logging
 import threading
+from  py_ecc.bls.g2_primatives import pubkey_to_G1
 
 class Participant:
     def __init__(self,id, key):
@@ -14,15 +15,21 @@ class Participant:
         self.key = key
         self.epoch_transition_lock = threading.Lock()
 
-    def reconstruct_group_secret(self):
-        shares = []
+    def reconstruct_group_sk(self):
+        shares = {}
         for m in self.incoming_shares:
             if m["epoch"] == self.node.state.epoch:
-                shares.append(m["share"])
+                shares[m["from_p_id"]] = m["share"]
         self.key = crypto.reconstruct_sk(shares)
 
-    def reconstruct_group_key(self):
-        return crypto.pk_from_sk(self.key)
+    def reconstruct_group_pk(self):
+        last_epoch = self.node.state.epoch
+
+        pks = {}
+        for s in self.collected_sigs:
+            if s["epoch"] == last_epoch:
+                pks[s["from_p_id"]] = pubkey_to_G1(s["pk"])
+        return crypto.reconstruct_pk(pks)
 
     def sign_epoch_msg(self,msg):
         return self.sign(msg)
@@ -32,7 +39,7 @@ class Participant:
 
     def end_epoch(self):
         with self.epoch_transition_lock:
-            # isolate last round's shares
+            # remove last round's shares
             last_epoch = self.node.state.epoch
             last_epoch_shares = []
             next_epoch_shares = []
@@ -47,6 +54,9 @@ class Participant:
             self.node.state.save_participant_shares(last_epoch_shares, last_epoch, self.id)
             self.incoming_shares = next_epoch_shares
 
+            # reconstruct group pk
+            group_pk = self.reconstruct_group_pk()
+
             # verify sigs and save them
             sigs = []
             pks = []
@@ -55,14 +65,20 @@ class Participant:
                     sigs.append(s["sig"])
                     pks.append(s["pk"])
             agg_sigs = crypto.aggregate_sigs(sigs)
-            is_verified = crypto.verify_aggregated_sigs(pks,config.TEST_EPOCH_MSG,agg_sigs)
-            self.node.state.save_aggregated_sig(agg_sigs,pks,is_verified,last_epoch)
+            agg_pks = crypto.aggregate_pks(pks)
+            is_verified = crypto.verify_sig(agg_pks, config.TEST_EPOCH_MSG, agg_sigs)
+
+            logging.debug("collected sig(p %d): %d",self.id, len(self.collected_sigs))
+            logging.debug("group pk: %s", group_pk.hex())
+
+
+            # self.node.state.save_aggregated_sig(agg_sigs, pks, is_verified, last_epoch)
             self.collected_sigs = []
             logging.debug("participant %d epoch end", self.id)
 
     def mid_epoch(self):
         # reconstruct my share and group's public key
-        self.reconstruct_group_secret()
+        self.reconstruct_group_sk()
 
         # broadcast my sig
         sig = self.sign(config.TEST_EPOCH_MSG)
@@ -85,10 +101,8 @@ class Participant:
     def start_epoch(self):
         pool_asssignment = self.node.current_epoch_pool_assignment(self.id)
         pool_participants = self.node.current_epoch_pool_participants(pool_asssignment)
-        redistro_polynomial = crypto.Polynomial(self.key, config.POOL_THRESHOLD-1)
-        redistro_polynomial.generate_random()
-        shares_to_distrb = [[p_id, redistro_polynomial.evaluate(p_id)] for p_id in pool_participants]
-        commitments = redistro_polynomial.coefficients_commitment()
+        redistro_polynomial = crypto.Redistribuition(config.POOL_THRESHOLD-1, self.key, pool_participants) # following Shamir's secret sharing, degree is threshold - 1
+        shares_to_distrb, commitments = redistro_polynomial.generate_shares()
         self.node.broadcast_shares(
             self.id,
             shares_to_distrb,
@@ -99,7 +113,7 @@ class Participant:
         # add own share to self
         self.incoming_shares.append({  # TODO - find a better way to store own share
             "epoch": self.node.state.epoch,
-            "share": redistro_polynomial.evaluate(self.id),
+            "share": shares_to_distrb[self.id],
             "commitments": commitments,
             "from_p_id": self.id,
             "p": self.id,

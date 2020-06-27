@@ -17,23 +17,22 @@ def generate_sk():
     given a set of shares, this will reconstruct a participant's group secret 
 """
 def reconstruct_sk(shares):
-    return sum([i for i in shares]) % order
+    l = LagrangeInterpolation(shares, order)
+    return l.evaluate()
 
 """
     given a set of shares, this will reconstruct the group's public key 
-    returns Optimized_Point3D
 """
 def reconstruct_pk(shares):
     l = ECLagrangeInterpolation(shares, order)
     ev = l.evaluate()
-    return ev
+    return G1_to_pubkey(ev)
 
-"""
-    returns an Optimized_Point3D pk
-"""
 def pk_from_sk(sk):
-    #ec_mul(G1,sk)#bls.SkToPk(from_int_to_bytes(sk,32))
-    return ec_mul(G1,sk)
+    return G1_to_pubkey(_optimized_pk_from_sk(sk))
+
+def _optimized_pk_from_sk(sk):
+    return ec_mul(G1, sk)
 
 def sign_with_sk(sk, msg):
     return bls.Sign(sk.to_bytes(32,config.ENDIANNESS), msg) # TODO - use py_ecc functions
@@ -68,7 +67,7 @@ class Polynomial:
         return sum([self.coefficients[i] * (point ** i) for i in range(len(self.coefficients))]) % self.mod
 
     def coefficients_commitment(self):
-        return [pk_from_sk(self.coefficients[i]) for i in range(len(self.coefficients))]
+        return [_optimized_pk_from_sk(self.coefficients[i]) for i in range(len(self.coefficients))]
 
 class LagrangeInterpolation:
     def __init__(self, shares, mod):
@@ -96,10 +95,10 @@ class LagrangeInterpolation:
             # then modulo inverse is b^(m-2) mode m
             return pow(b, m - 2, m)
 
-    def sum_func(self,lst):
+    def sum_func(self, lst):
         ret = lst[0]
-        for i in range(1,len(lst)):
-            ret = self.add_func(ret,lst[i])
+        for i in range(1, len(lst)):
+            ret = self.add_func(ret, lst[i])
         return ret
 
     def add_func(self,a,b):
@@ -123,6 +122,26 @@ class ECLagrangeInterpolation(LagrangeInterpolation):
     def mul_func(self, a, b):
         return ec_mul(a, b)
 
+
+class Redistribuition:
+    def __init__(self, threshold, sk, participant_indexes):
+        self.threshold = threshold
+        self.indexes = participant_indexes
+        self.sk = sk
+
+    def generate_shares(self):
+        poly = Polynomial(self.sk, self.threshold, order)
+        poly.generate_random()
+        commitment = poly.coefficients_commitment()
+
+        shares = {}
+        for p_idx in self.indexes:
+            s = poly.evaluate(p_idx)
+            shares[p_idx] = s
+
+        return shares, commitment
+
+
 class DKG:
     def __init__(self, threshold, participant_indexes):
         self.threshold = threshold
@@ -133,7 +152,7 @@ class DKG:
     def run(self):
         for idx in self.indexes:
             poly_sk = generate_sk()
-            poly = Polynomial(poly_sk, self.threshold-1, order) # following Shamir's secret sharing, degree is threshold - 1
+            poly = Polynomial(poly_sk, self.threshold, order)
             poly.generate_random()
             commitment = poly.coefficients_commitment()
 
@@ -182,6 +201,6 @@ class DKG:
         sks = self.calculate_participants_sks()
         pks = {}
         for i in sks:
-            pks[i] = pk_from_sk(sks[i])
+            pks[i] = _optimized_pk_from_sk(sks[i])
         return reconstruct_pk(pks)
 
