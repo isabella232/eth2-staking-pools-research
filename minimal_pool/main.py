@@ -14,7 +14,16 @@ def main():
     ids = range(1,config.NUM_OF_PARTICIPANTS+1)
     dkg = crypto.DKG(config.POOL_THRESHOLD, ids)
     dkg.run()
-    sks = dkg.calculate_group_sk()
+    sks = dkg.calculate_participants_sks()
+    logging.debug("     Group sk: %s", dkg.group_sk())
+    logging.debug("     Group pk:       %s", dkg.group_pk().hex())
+    logging.debug("     real Group pk:  %s", crypto.pk_from_sk(dkg.group_sk()).hex())
+
+    sig = crypto.sign_with_sk(dkg.group_sk(), config.TEST_EPOCH_MSG)
+    i = crypto.verify_sig(dkg.group_pk(), config.TEST_EPOCH_MSG, sig)
+    logging.debug("%s",i)
+
+
     for i in sks:
         p = participant.Participant(i,sks[i])
         participants.append(p)
@@ -64,7 +73,44 @@ def log_end_of_round(node):
     run_continously(node)
 
 
-
+from  py_ecc.bls.g2_primatives import G1_to_pubkey,pubkey_to_G1
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s-%(levelname)s-%(message)s',level=logging.DEBUG)
-    main()
+    # main()
+
+    logging.debug("creating %d participants via DKG", config.NUM_OF_PARTICIPANTS)
+    ids = range(1, config.NUM_OF_PARTICIPANTS + 1)
+    dkg = crypto.DKG(config.POOL_THRESHOLD, ids)
+    dkg.run()
+    sks = dkg.calculate_participants_sks()
+    logging.debug("     Group sk: %s", dkg.group_sk())
+    logging.debug("     Group pk:       %s", G1_to_pubkey(dkg.group_pk()).hex())
+    logging.debug("     real Group pk:  %s", G1_to_pubkey(crypto.pk_from_sk(dkg.group_sk())).hex())
+
+    sigs = []
+    pks = []
+    for sk in sks:
+        sig = crypto.sign_with_sk(sks[sk],config.TEST_EPOCH_MSG)
+        pk = G1_to_pubkey(crypto.pk_from_sk(sks[sk]))
+        is1 = crypto.verify_sig(
+            pk,
+            config.TEST_EPOCH_MSG,
+            sig)
+        logging.debug("verified %d with group pk %s", sk,is1)
+        sigs.append(sig)
+        pks.append(pk)
+
+    agg = crypto.aggregate_sigs(sigs)
+    is1 = crypto.verify_aggregated_sigs(
+        pks,
+        config.TEST_EPOCH_MSG,
+        agg)
+    logging.debug("verified with multi pk %s", is1)
+
+    agg_pks = crypto.aggregate_pks(pks)
+    is1 = crypto.verify_sig(
+        agg_pks,
+        config.TEST_EPOCH_MSG,
+        agg)
+    logging.debug("verified with group sk/pk %s", is1)
+

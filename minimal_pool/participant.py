@@ -19,16 +19,16 @@ class Participant:
         for m in self.incoming_shares:
             if m["epoch"] == self.node.state.epoch:
                 shares.append(m["share"])
-        self.key = crypto.reconstruct_secret(shares)
+        self.key = crypto.reconstruct_sk(shares)
+
+    def reconstruct_group_key(self):
+        return crypto.pk_from_sk(self.key)
 
     def sign_epoch_msg(self,msg):
         return self.sign(msg)
 
     def sign(self,message):
         return crypto.sign_with_sk(self.key, message)
-
-    # def pub_group_key(self):
-    #     return crypto.pk_from_sk(self.key)
 
     def end_epoch(self):
         with self.epoch_transition_lock:
@@ -54,7 +54,7 @@ class Participant:
                 if s["epoch"] == last_epoch:
                     sigs.append(s["sig"])
                     pks.append(s["pk"])
-            agg_sigs = crypto.aggregate_signatures(sigs)
+            agg_sigs = crypto.aggregate_sigs(sigs)
             is_verified = crypto.verify_aggregated_sigs(pks,config.TEST_EPOCH_MSG,agg_sigs)
             self.node.state.save_aggregated_sig(agg_sigs,pks,is_verified,last_epoch)
             self.collected_sigs = []
