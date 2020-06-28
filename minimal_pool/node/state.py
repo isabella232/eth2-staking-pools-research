@@ -19,16 +19,16 @@ class Epoch:
             return self.shares[p_id]
         return []
 
-    def save_aggregated_sig(self, pool_id, sig, pk, is_verified):
+    def save_aggregated_sig(self, pool_id, sig, ids, is_verified):
         self.agg_sigs[pool_id] = {
             "sig": sig.hex(),
-            "pks": pk.hex(),
+            "ids": ids,
             "is_verified": bool(is_verified),
         }
 
     def aggregated_sig_for_pool(self, pool_id):
         if pool_id not in self.agg_sigs:
-            raise AssertionError("%d pool could not be found for epoch %d", pool_id, self.epoch)
+            return None
         return self.agg_sigs[pool_id]
 
     def pool_id_for_participant(self, index):

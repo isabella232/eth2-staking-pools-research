@@ -81,7 +81,7 @@ class Polynomial:
         self.coefficients.append(self.secret) # important it's in index 0, see valuate
         self.coefficients.extend([generate_sk() for _ in range(0, self.degree)])
 
-    def evaluate(self,point):
+    def evaluate(self, point):
         return sum([self.coefficients[i] * (point ** i) for i in range(len(self.coefficients))]) % self.mod
 
     def coefficients_commitment(self):

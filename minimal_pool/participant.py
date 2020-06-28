@@ -14,6 +14,7 @@ class Participant:
         self.key = key
 
         # locks
+        self.epoch_lock = threading.Lock() # will lock at the beginning of each epoch, releases at end
         self.incoming_shares_lock = threading.Lock()
         self.collected_sigs_lock = threading.Lock()
         self.key_lock = threading.Lock()
@@ -41,10 +42,12 @@ class Participant:
         with self.collected_sigs_lock:
             last_epoch = self.node.state.epoch
             sigs = {}
+            ids = []
             for s in self.collected_sigs:
                 if s["epoch"].number == last_epoch:
                     sigs[s["from_p_id"]] = s["sig"]
-            return crypto.reconstruct_group_sig(sigs)
+                    ids.append(s["from_p_id"])
+            return ids, crypto.reconstruct_group_sig(sigs)
 
     def sign_epoch_msg(self,msg):
         return self.sign(msg)
@@ -62,7 +65,7 @@ class Participant:
         with self.incoming_shares_lock:
             for i in range(len(self.incoming_shares)):
                 s = self.incoming_shares[i]
-                if s["epoch"] == last_epoch:
+                if s["epoch"].number == last_epoch:
                     last_epoch_shares.append(s)
                 else:
                     next_epoch_shares.append(s)
@@ -73,12 +76,14 @@ class Participant:
         self.node.state.save_epoch(epoch)
 
         # reconstruct group pk and sig
-        # group_pk = self.node.state.pool_info_by_id(my_pool_id)["pk"]
-        # group_sig = self.reconstruct_group_sig()
+        group_pk = crypto.readable_pk(self.node.state.pool_info_by_id(my_pool_id)["pk"])
+        ids, group_sig = self.reconstruct_group_sig()
+        group_sig = crypto.readable_sig(group_sig)
 
         # verify sigs and save them
-        # is_verified = crypto.verify_sig(group_pk, config.TEST_EPOCH_MSG, group_sig)
-        # self.node.state.save_epoch_sig(group_sig, group_pk, is_verified, last_epoch)
+        is_verified = crypto.verify_sig(group_pk, config.TEST_EPOCH_MSG, group_sig)
+        epoch.save_aggregated_sig(my_pool_id, group_sig, ids, is_verified)
+        self.node.state.save_epoch(epoch)
         with self.collected_sigs_lock:
             self.collected_sigs = []
 
@@ -112,8 +117,10 @@ class Participant:
     def start_epoch(self, epoch):
         pool_asssignment = epoch.pool_id_for_participant(self.id)
         pool_participants = epoch.pool_participants_by_id(pool_asssignment)
+
         with self.key_lock:
-            redistro_polynomial = crypto.Redistribuition(config.POOL_THRESHOLD-1, self.key, pool_participants) # following Shamir's secret sharing, degree is threshold - 1
+            redistro_polynomial = crypto.Redistribuition(config.POOL_THRESHOLD - 1, self.key,
+                                                         pool_participants)  # following Shamir's secret sharing, degree is threshold - 1
             shares_to_distrb, commitments = redistro_polynomial.generate_shares()
         self.node.broadcast_shares(
             epoch,
@@ -133,6 +140,7 @@ class Participant:
                 "p": self.id,
                 "pool_id": pool_asssignment,
             })
+
         logging.debug("participant %d epoch %d start", self.id, self.node.state.epoch)
 
     def new_msg(self,msg):
@@ -143,9 +151,15 @@ class Participant:
                     if msg.data not in self.incoming_shares:
                         self.incoming_shares.append(msg.data)
         if msg.type == config.MSG_NEW_EPOCH:
+            self.epoch_lock.acquire()
             threading.Thread(target=self.start_epoch, args=[msg.data["epoch"]], daemon=True).start()
         if msg.type == config.MSG_END_EPOCH:
-            threading.Thread(target=self.end_epoch, args=[msg.data["epoch"]], daemon=True).start()
+            def wait_and_release(t, participant):
+                t.join()
+                participant.epoch_lock.release()
+            t = threading.Thread(target=self.end_epoch, args=[msg.data["epoch"]], daemon=True)
+            t.start()
+            threading.Thread(target=wait_and_release, args=[t, self], daemon=True).start()
         if msg.type == config.MSG_MID_EPOCH:
             threading.Thread(target=self.mid_epoch, args=[msg.data["epoch"]], daemon=True).start()
         if msg.type == config.MSG_EPOCH_SIG:

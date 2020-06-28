@@ -55,24 +55,30 @@ def run_continously(node):
 def log_end_of_round(node):
     global last_logged_epoch
 
-    # pools = node.state.pool_participants_for_epoch(last_logged_epoch)
-    # # """
-    # #     Epoch stats
-    # # """
-    # logging.debug("\n\n----------------EPOCH %d Summary ----------------\n",last_logged_epoch)
-    # logging.debug("Pools for epoch %d: %s", last_logged_epoch, pools)
-    # for p in participants:
-    #     shares = p.node.state.participant_shares_for_epoch(last_logged_epoch,p.id)
-    #     logging.debug("P(%d) shares received: %d",p.id,len(shares))
-    #
-    #     # sigs = p.node.state.aggregated_sig_for_epoch(last_logged_epoch)
-    #     # logging.debug("P(%d) sig verified: %s",
-    #     #                   p.id,
-    #     #                   sigs["is_verified"],
-    #     #               )
-    # logging.debug("\n\n-------------------------------------------------\n")
-    #
-    # last_logged_epoch = last_logged_epoch + 1
+    epoch = node.state.get_epoch(last_logged_epoch)
+    pools = epoch.pools_info
+    # """
+    #     Epoch stats
+    # """
+    logging.debug("\n\n----------------EPOCH %d Summary ----------------\n", last_logged_epoch)
+    logging.debug("Pools for epoch %d: %s", last_logged_epoch, pools)
+    for p in participants:
+        shares = epoch.participant_shares(p.id)
+        logging.debug("P(%d) shares received: %d", p.id, len(shares))
+
+    for p_id in pools:
+        sigs = epoch.aggregated_sig_for_pool(p_id)
+        if sigs is not None:
+            logging.debug("pool %d sig verified: %s with %d participants",
+                              p_id,
+                              sigs["is_verified"],
+                              len(sigs["ids"])
+                          )
+        else:
+            logging.debug("pool %d no sigs found", p_id)
+    logging.debug("\n\n-------------------------------------------------\n")
+
+    last_logged_epoch = last_logged_epoch + 1
 
     # run again
     run_continously(node)
