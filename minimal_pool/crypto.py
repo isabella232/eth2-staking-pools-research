@@ -68,7 +68,7 @@ class Polynomial:
         self.mod = mod
 
     def generate_random(self):
-        self.coefficients.append(self.secret) # important it's in index 0, see valuate
+        self.coefficients.append(self.secret)  # important it's in index 0, see valuate
         self.coefficients.extend([generate_sk() for _ in range(0, self.degree)])
 
     def evaluate(self, point):

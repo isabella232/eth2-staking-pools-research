@@ -2,7 +2,6 @@ from node.state import State
 from node.message import Message
 import config
 import threading
-import random
 
 
 """
@@ -24,9 +23,6 @@ class PoolNode:
         threading.Timer(config.EPOCH_TIME, self.execute_epoch).start()
 
     def execute_epoch(self):
-        # save epoch
-        # self.state.save_pool_participants(self.current_epoch_pools(), self.state.epoch)
-
         # end epoch only if not first
         if self.state.epoch != config.STARTING_EPOCH:
             e = self.state.get_epoch(self.state.epoch)
@@ -56,26 +52,6 @@ class PoolNode:
                 self.id,
             )
         )
-
-    # def current_epoch_pool_assignment(self, index):
-    #     lst = list(range(1, config.NUM_OF_PARTICIPANTS+1)) # indexes must run from 1
-    #     rnd = random.Random(self.state.seed)
-    #     rnd.shuffle(lst)
-    #     return lst[index-1] % config.NUMBER_OF_POOLS + 1 # indexes must run from 1
-    #
-    # def current_epoch_pool_participants(self, pool_id):
-    #     pools = self.current_epoch_pools()
-    #     return pools[pool_id]
-    #
-    # def current_epoch_pools(self):
-    #     pools = {}
-    #     for i in range(1, config.NUM_OF_PARTICIPANTS+1): # indexes must run from 1
-    #         pool_id = self.current_epoch_pool_assignment(i)
-    #         if pool_id in pools:
-    #             pools[pool_id].append(i)
-    #         else:
-    #             pools[pool_id] = [i]
-    #     return pools
 
     """
         Networking
@@ -149,7 +125,7 @@ class PoolNode:
                     "epoch": epoch,
                  },
                 sender_id
-            ) # p is the participant's index and we assume shares are ordered
+            )  # p is the participant's index and we assume shares are ordered
             self.send(msg)
 
     def broadcast_sig(self, epoch, sender_id, sig, pk, pool_id):

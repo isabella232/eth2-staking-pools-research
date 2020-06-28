@@ -132,12 +132,12 @@ def benchmark_dkg():
     for p_indx in sks:
         sk = sks[p_indx]
 
-        redistro = crypto.Redistribuition(config.POOL_THRESHOLD -1, sk, ids) # following Shamir's secret sharing, degree is threshold - 1
+        redistro = crypto.Redistribuition(config.POOL_THRESHOLD -1, sk, ids)  # following Shamir's secret sharing, degree is threshold - 1
         shares, commitment = redistro.generate_shares()
-        for idx in ids:
-            if p_indx not in re_distro_shares:
-                re_distro_shares[p_indx] = {}
-            re_distro_shares[p_indx][idx] = shares[idx]
+        for i in ids:
+            if i not in re_distro_shares:
+                re_distro_shares[i] = {}
+            re_distro_shares[i][p_indx] = shares[i]
         re_distro_comm[p_indx] = commitment
 
     sk_per_id = {}

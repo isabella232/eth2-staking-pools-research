@@ -95,13 +95,14 @@ class Participant:
 
 
     def mid_epoch(self, epoch):
+        my_pool_id = epoch.pool_id_for_participant(self.id)
+
         # reconstruct my group share
         self.reconstruct_group_sk(epoch)
 
         # broadcast my sig
         sig = self.sign(config.TEST_EPOCH_MSG)
         pk = crypto.pk_from_sk(self.key)
-        my_pool_id = epoch.pool_id_for_participant(self.id)
 
         self.node.broadcast_sig(
             epoch,
@@ -127,7 +128,6 @@ class Participant:
         with self.key_lock:
             redistro_polynomial = crypto.Redistribuition(config.POOL_THRESHOLD - 1, self.key, pool_participants)  # following Shamir's secret sharing, degree is threshold - 1
             shares_to_distrb, commitments = redistro_polynomial.generate_shares()
-
         self.node.broadcast_shares(
             epoch,
             self.id,
