@@ -1,10 +1,11 @@
 import random
 from py_ecc.optimized_bls12_381 import curve_order,add as ec_add, multiply as ec_mul,G1
-from  py_ecc.bls.g2_primatives import G1_to_pubkey, pubkey_to_G1, signature_to_G2, G2_to_signature
+from py_ecc.bls.g2_primatives import G1_to_pubkey, pubkey_to_G1, signature_to_G2, G2_to_signature
 import milagro_bls_binding as milagro_bls
 from hashlib import sha256
 import config
 import math
+import time
 
 bls = milagro_bls
 order = curve_order
@@ -19,34 +20,40 @@ def reconstruct_sk(shares):
     l = LagrangeInterpolation(shares, order)
     return l.evaluate()
 
-def reconstruct_group_sig(shares):
-    _sigs = {}
-    for i in shares:
-        _sigs[i] = signature_to_G2(shares[i])
-
-    l = ECLagrangeInterpolation(_sigs, order)
-    ev = l.evaluate()
-    return G2_to_signature(ev)
 """
     given a set of shares, this will reconstruct the group's public key 
 """
 def reconstruct_pk(shares):
     _pks = {}
     for i in shares:
-        _pks[i] = pubkey_to_G1(shares[i])
+        _pks[i] = shares[i]
 
     l = ECLagrangeInterpolation(_pks, order)
     ev = l.evaluate()
-    return G1_to_pubkey(ev)
+    return ev
 
 def pk_from_sk(sk):
-    return G1_to_pubkey(_optimized_pk_from_sk(sk))
-
-def _optimized_pk_from_sk(sk):
     return ec_mul(G1, sk)
 
+def readable_pk(optimized_pk):
+    return G1_to_pubkey(optimized_pk)
+
 def sign_with_sk(sk, msg):
-    return bls.Sign(sk.to_bytes(32,config.ENDIANNESS), msg) # TODO - use py_ecc functions
+    return signature_to_G2(bls.Sign(sk.to_bytes(32,config.ENDIANNESS), msg))
+
+def readable_sig(optimized_sig):
+    return G2_to_signature(optimized_sig)
+
+def reconstruct_group_sig(shares):
+    _sigs = {}
+    for i in shares:
+        _sigs[i] = shares[i]
+
+    l = ECLagrangeInterpolation(_sigs, order)
+    ev = l.evaluate()
+    end = time.time()
+
+    return ev
 
 def aggregate_sigs(sigs):
     return bls.Aggregate(sigs)
@@ -58,7 +65,7 @@ def verify_aggregated_sigs(pks, message, sig):
     return bls.FastAggregateVerify(pks,message,sig)
 
 def verify_sig(pk, message, sig):
-    return bls.Verify(pk,message,sig)
+    return bls.Verify(pk, message,sig)
 
 def hash(x: bytes) -> bytes:
     return sha256(x).digest()
@@ -78,7 +85,7 @@ class Polynomial:
         return sum([self.coefficients[i] * (point ** i) for i in range(len(self.coefficients))]) % self.mod
 
     def coefficients_commitment(self):
-        return [_optimized_pk_from_sk(self.coefficients[i]) for i in range(len(self.coefficients))]
+        return [pk_from_sk(self.coefficients[i]) for i in range(len(self.coefficients))]
 
 class LagrangeInterpolation:
     def __init__(self, shares, mod):

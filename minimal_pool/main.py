@@ -20,7 +20,7 @@ def main():
         dkg.run()
         sks = dkg.calculate_participants_sks()
         logging.debug("     Group sk: %s", dkg.group_sk())
-        logging.debug("     Group pk: %s", dkg.group_pk().hex())
+        logging.debug("     Group pk: %s", crypto.readable_pk(dkg.group_pk()).hex())
 
         for i in sks:
             p = participant.Participant(i, sks[i])
@@ -55,24 +55,24 @@ def run_continously(node):
 def log_end_of_round(node):
     global last_logged_epoch
 
-    pools = node.state.pool_participants_for_epoch(last_logged_epoch)
-    # """
-    #     Epoch stats
-    # """
-    logging.debug("\n\n----------------EPOCH %d Summary ----------------\n",last_logged_epoch)
-    logging.debug("Pools for epoch %d: %s", last_logged_epoch, pools)
-    for p in participants:
-        shares = p.node.state.participant_shares_for_epoch(last_logged_epoch,p.id)
-        logging.debug("P(%d) shares received: %d",p.id,len(shares))
-
-        # sigs = p.node.state.aggregated_sig_for_epoch(last_logged_epoch)
-        # logging.debug("P(%d) sig verified: %s",
-        #                   p.id,
-        #                   sigs["is_verified"],
-        #               )
-    logging.debug("\n\n-------------------------------------------------\n")
-
-    last_logged_epoch = last_logged_epoch + 1
+    # pools = node.state.pool_participants_for_epoch(last_logged_epoch)
+    # # """
+    # #     Epoch stats
+    # # """
+    # logging.debug("\n\n----------------EPOCH %d Summary ----------------\n",last_logged_epoch)
+    # logging.debug("Pools for epoch %d: %s", last_logged_epoch, pools)
+    # for p in participants:
+    #     shares = p.node.state.participant_shares_for_epoch(last_logged_epoch,p.id)
+    #     logging.debug("P(%d) shares received: %d",p.id,len(shares))
+    #
+    #     # sigs = p.node.state.aggregated_sig_for_epoch(last_logged_epoch)
+    #     # logging.debug("P(%d) sig verified: %s",
+    #     #                   p.id,
+    #     #                   sigs["is_verified"],
+    #     #               )
+    # logging.debug("\n\n-------------------------------------------------\n")
+    #
+    # last_logged_epoch = last_logged_epoch + 1
 
     # run again
     run_continously(node)
