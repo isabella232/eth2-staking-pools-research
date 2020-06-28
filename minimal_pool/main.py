@@ -3,6 +3,7 @@ import config
 import threading
 import logging
 import crypto
+from node import node
 
 last_logged_epoch = 0
 participants = []
@@ -10,13 +11,15 @@ participants = []
 def main():
     global participants
 
+    n = node.PoolNode(-1, None)
+    epoch_0 = n.state.get_epoch(0)
+
     pool_pk = {}
     for p_idx in range(1, config.NUMBER_OF_POOLS + 1):
+        ids = epoch_0.pool_participants_by_id(p_idx)
+        logging.debug("Pool %d participants: %s (via DKG)", p_idx, ids)
 
-        logging.debug("Pool %d with %d participants (via DKG)", p_idx, config.POOL_SIZE)
-        ids = range(1 + (p_idx - 1) * config.POOL_SIZE,
-                    ((p_idx - 1) * config.POOL_SIZE) + config.POOL_SIZE + 1)
-        dkg = crypto.DKG(config.POOL_THRESHOLD - 1, ids) # following Shamir's secret sharing, degree is threshold - 1
+        dkg = crypto.DKG(config.POOL_THRESHOLD - 1, ids)  # following Shamir's secret sharing, degree is threshold - 1
         dkg.run()
         sks = dkg.calculate_participants_sks()
         logging.debug("     Group sk: %s", dkg.group_sk())
@@ -50,7 +53,7 @@ def main():
     run_continously(participants[1].node)
 
 def run_continously(node):
-    threading.Timer(config.EPOCH_TIME + 3, log_end_of_round,args=[node]).start()
+    threading.Timer(config.EPOCH_TIME + 3, log_end_of_round, args=[node]).start()
 
 def log_end_of_round(node):
     global last_logged_epoch

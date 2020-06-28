@@ -104,6 +104,9 @@ class LagrangeInterpolation:
             return pow(b, m - 2, m)
 
     def sum_func(self, lst):
+        if len(lst) == 0:
+            return 0
+
         ret = lst[0]
         for i in range(1, len(lst)):
             ret = self.add_func(ret, lst[i])

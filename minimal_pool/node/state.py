@@ -41,6 +41,16 @@ class Epoch:
         pools = self._calculate_pools()
         return pools[pool_id]
 
+    """
+        for pool p_i (pool_id), to which pool p_z at epoch +1 
+        does members of p_i need to distribuite shares
+    """
+    def share_distribuition_target(self, pool_id):
+        lst = list(range(1, config.NUMBER_OF_POOLS + 1))  # indexes must run from 1
+        rnd = random.Random(self.seed)
+        rnd.shuffle(lst)
+        return lst[pool_id - 1]
+
     def _calculate_pools(self):
         pools = {}
         for i in range(1, config.NUM_OF_PARTICIPANTS + 1):  # indexes must run from 1
@@ -53,7 +63,7 @@ class Epoch:
 
 class State:
     def __init__(self, seed):
-        self.seed = seed
+        self.initial_seed = seed
         self.epoch = config.STARTING_EPOCH
         self.pool_info = {}
         # self.pool_per_epoch = {}
@@ -65,34 +75,40 @@ class State:
 
         self.epochs = {}
 
-    def _increase_epoch(self):
+    def increase_epoch(self):
         self.epoch += 1
 
-    def _mix_seed(self):
-        epoch_number_bytes = self.epoch.to_bytes(32, config.ENDIANNESS)
+    def _mix_seed(self, for_epoch):
+        epoch_number_bytes = for_epoch.to_bytes(32, config.ENDIANNESS)
         mixer = int.from_bytes(crypto.hash(epoch_number_bytes), config.ENDIANNESS)
-        self.seed = (self.seed * mixer) % config.KEY_SIZE_BITS
+        return (self.initial_seed * mixer) % crypto.order
 
     """
         will create a new epoch for current epoch number
     """
-    def new_poch(self):
+    def _new_epoch(self, new_epoch_number):
         with self.epochs_lock:
-            self._increase_epoch()
-            self._mix_seed()
+            seed = self._mix_seed(new_epoch_number)
 
             e = Epoch(
-                self.epoch,
-                self.seed
+                new_epoch_number,
+                seed
             )
-            self.epochs[self.epoch] = e
+            self.epochs[new_epoch_number] = e
             return e
 
     def save_epoch(self, epoch):
         with self.epochs_lock:
             self.epochs[epoch.number] = epoch
 
+    """
+        will return the epoch by number.
+        
+    """
     def get_epoch(self, epoch_number):
+        if epoch_number not in self.epochs:
+            return self._new_epoch(epoch_number)
+
         with self.epochs_lock:
             return self.epochs[epoch_number]
 

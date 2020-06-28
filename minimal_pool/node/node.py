@@ -34,7 +34,8 @@ class PoolNode:
             )
 
         # start new epoch
-        e = self.state.new_poch()
+        self.state.increase_epoch()
+        e = self.state.get_epoch(self.state.epoch)
         self.send_to_subscriber(Message(
                 config.MSG_NEW_EPOCH,
                 {"epoch": e},
