@@ -8,7 +8,7 @@ class Participant:
     def __init__(self, id, key):
         self.current_polynomial = None
         self.id = id
-        self.node = node.PoolNode(self.id, self.new_msg)
+        self.node = node.PoolNode(self.id, self.handle_messages)
         self.incoming_shares = []
         self.collected_sigs = []
         self.key = key
@@ -29,27 +29,25 @@ class Participant:
                 self.key = crypto.reconstruct_sk(shares)
 
     # TODO - remove not needed as we save pool pk by id
-    # def reconstruct_group_pk(self):
-    #     last_epoch = self.node.state.epoch
-    #
-    #     pks = {}
-    #     for s in self.collected_sigs:
-    #         if s["epoch"] == last_epoch:
-    #             pks[s["from_p_id"]] = s["pk"]
-    #     return crypto.reconstruct_pk(pks)
-
-    def reconstruct_group_sig(self):
+    def reconstruct_group_pk(self, for_epoch):
         with self.collected_sigs_lock:
-            last_epoch = self.node.state.epoch
+            pks = {}
+            for s in self.collected_sigs:
+                if s["epoch"].number == for_epoch:
+                    pks[s["from_p_id"]] = s["pk"]
+            return crypto.reconstruct_pk(pks)
+
+    def reconstruct_group_sig(self, for_epoch):
+        with self.collected_sigs_lock:
             sigs = {}
             ids = []
             for s in self.collected_sigs:
-                if s["epoch"].number == last_epoch:
+                if s["epoch"].number == for_epoch:
                     sigs[s["from_p_id"]] = s["sig"]
                     ids.append(s["from_p_id"])
             return ids, crypto.reconstruct_group_sig(sigs)
 
-    def sign_epoch_msg(self,msg):
+    def sign_epoch_msg(self, msg):
         return self.sign(msg)
 
     def sign(self,message):
@@ -57,6 +55,7 @@ class Participant:
 
     def end_epoch(self, epoch):
         # remove last round's shares
+        # TODO - move incoming_shares to mid_epoch?
         last_epoch = self.node.state.epoch
         my_pool_id = epoch.pool_id_for_participant(self.id)
 
@@ -76,9 +75,14 @@ class Participant:
         self.node.state.save_epoch(epoch)
 
         # reconstruct group pk and sig
-        group_pk = crypto.readable_pk(self.node.state.pool_info_by_id(my_pool_id)["pk"])
-        ids, group_sig = self.reconstruct_group_sig()
+        group_pk = self.node.state.pool_info_by_id(my_pool_id)["pk"]
+        ids, group_sig = self.reconstruct_group_sig(epoch.number)
         group_sig = crypto.readable_sig(group_sig)
+
+        pk = self.reconstruct_group_pk(epoch.number)
+        logging.debug("p %d pool %d, group pk: %s", self.id, epoch.pool_id_for_participant(self.id),
+                      crypto.readable_pk(pk).hex())
+
 
         # verify sigs and save them
         is_verified = crypto.verify_sig(group_pk, config.TEST_EPOCH_MSG, group_sig)
@@ -91,43 +95,45 @@ class Participant:
 
 
     def mid_epoch(self, epoch):
-        # reconstruct my share and group's public key
+        # reconstruct my group share
         self.reconstruct_group_sk(epoch)
 
         # broadcast my sig
         sig = self.sign(config.TEST_EPOCH_MSG)
         pk = crypto.pk_from_sk(self.key)
+        my_pool_id = epoch.pool_id_for_participant(self.id)
+
         self.node.broadcast_sig(
             epoch,
             self.id,
             sig,
             pk,
-            epoch.pool_id_for_participant(self.id)
+            my_pool_id
         )
         with self.collected_sigs_lock:
             self.collected_sigs.append({  # TODO - find a better way to store own share
                 "from_p_id": self.id,
                 "sig": sig,
                 "pk": pk,
-                "pool_id": epoch.pool_id_for_participant(self.id),
+                "pool_id": my_pool_id,
                 "epoch": epoch,
             })
         logging.debug("participant %d epoch %d mid", self.id, epoch.number)
 
     def start_epoch(self, epoch):
-        pool_asssignment = epoch.pool_id_for_participant(self.id)
-        pool_participants = epoch.pool_participants_by_id(pool_asssignment)
+        my_pool_id = epoch.pool_id_for_participant(self.id)
+        pool_participants = epoch.pool_participants_by_id(my_pool_id)
 
         with self.key_lock:
-            redistro_polynomial = crypto.Redistribuition(config.POOL_THRESHOLD - 1, self.key,
-                                                         pool_participants)  # following Shamir's secret sharing, degree is threshold - 1
+            redistro_polynomial = crypto.Redistribuition(config.POOL_THRESHOLD - 1, self.key, pool_participants)  # following Shamir's secret sharing, degree is threshold - 1
             shares_to_distrb, commitments = redistro_polynomial.generate_shares()
+
         self.node.broadcast_shares(
             epoch,
             self.id,
             shares_to_distrb,
             commitments,
-            pool_asssignment
+            my_pool_id
         )
 
         # add own share to self
@@ -138,12 +144,12 @@ class Participant:
                 "commitments": commitments,
                 "from_p_id": self.id,
                 "p": self.id,
-                "pool_id": pool_asssignment,
+                "pool_id": my_pool_id,
             })
 
         logging.debug("participant %d epoch %d start", self.id, self.node.state.epoch)
 
-    def new_msg(self,msg):
+    def handle_messages(self, msg):
         if msg.type == config.MSG_SHARE_DISTRO:
             e = msg.data["epoch"]
             if e.pool_id_for_participant(self.id) == msg.data["pool_id"] and msg.data["p"] == self.id:

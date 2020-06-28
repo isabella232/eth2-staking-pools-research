@@ -107,32 +107,3 @@ class State:
         return self.pool_info[pool_id]
 
 
-
-    # def save_pool_participants(self,pools,epoch):
-    #     self.pool_per_epoch[epoch] = pools
-    #
-    # def pool_participants_for_epoch(self, epoch):
-    #     if epoch not in self.pool_per_epoch:
-    #         raise AssertionError("%d epoch could not be found", epoch)
-    #     return self.pool_per_epoch[epoch]
-
-    # def save_epoch_sig(self, sig, pk, is_verified, epoch):
-    #     self.aggregated_sig[epoch] = {
-    #         "sig": sig.hex(),
-    #         "pks": pk.hex(),
-    #         "is_verified": bool(is_verified),
-    #     }
-    #
-    # def aggregated_sig_for_epoch(self,epoch):
-    #     if epoch not in self.aggregated_sig:
-    #         raise AssertionError("%d epoch could not be found", epoch)
-    #     return self.aggregated_sig[epoch]
-
-
-    # def save_participant_shares(self,shares,epoch,p_id):
-    #     self.shares_per_epoch[epoch] = {p_id:shares}
-    #
-    # def participant_shares_for_epoch(self,epoch,p_id):
-    #     if epoch in self.shares_per_epoch:
-    #         return self.shares_per_epoch[epoch][p_id]
-    #     return []

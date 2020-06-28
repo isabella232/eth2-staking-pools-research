@@ -5,7 +5,6 @@ import milagro_bls_binding as milagro_bls
 from hashlib import sha256
 import config
 import math
-import time
 
 bls = milagro_bls
 order = curve_order
@@ -24,11 +23,7 @@ def reconstruct_sk(shares):
     given a set of shares, this will reconstruct the group's public key 
 """
 def reconstruct_pk(shares):
-    _pks = {}
-    for i in shares:
-        _pks[i] = shares[i]
-
-    l = ECLagrangeInterpolation(_pks, order)
+    l = ECLagrangeInterpolation(shares, order)
     ev = l.evaluate()
     return ev
 
@@ -39,19 +34,14 @@ def readable_pk(optimized_pk):
     return G1_to_pubkey(optimized_pk)
 
 def sign_with_sk(sk, msg):
-    return signature_to_G2(bls.Sign(sk.to_bytes(32,config.ENDIANNESS), msg))
+    return signature_to_G2(bls.Sign(sk.to_bytes(32, config.ENDIANNESS), msg))
 
 def readable_sig(optimized_sig):
     return G2_to_signature(optimized_sig)
 
 def reconstruct_group_sig(shares):
-    _sigs = {}
-    for i in shares:
-        _sigs[i] = shares[i]
-
-    l = ECLagrangeInterpolation(_sigs, order)
+    l = ECLagrangeInterpolation(shares, order)
     ev = l.evaluate()
-    end = time.time()
 
     return ev
 
@@ -119,10 +109,10 @@ class LagrangeInterpolation:
             ret = self.add_func(ret, lst[i])
         return ret
 
-    def add_func(self,a,b):
+    def add_func(self, a, b):
         return a+b
 
-    def mul_func(self,a,b):
+    def mul_func(self, a, b):
         return a*b
 
 class ECLagrangeInterpolation(LagrangeInterpolation):

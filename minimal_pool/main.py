@@ -26,15 +26,15 @@ def main():
             p = participant.Participant(i, sks[i])
             participants.append(p)
 
-        pool_pk[p_idx] = dkg.group_pk()
+        pool_pk[p_idx] = crypto.readable_pk(dkg.group_pk())
 
     # connect all participants together and update them with groups
     logging.debug("connecting participants to each-other")
     for i in range(len(participants)):
         for p_idx in pool_pk:
             participants[i].node.state.save_pool_info(p_idx, pool_pk[p_idx])
-        # connect nodes to eachother
-        for j in range(i+1,len(participants)):
+        # connect nodes to each other
+        for j in range(i+1, len(participants)):
             participants[i].node.connect(participants[j].node)
             participants[j].node.connect(participants[i].node)
 
@@ -69,10 +69,10 @@ def log_end_of_round(node):
     for p_id in pools:
         sigs = epoch.aggregated_sig_for_pool(p_id)
         if sigs is not None:
-            logging.debug("pool %d sig verified: %s with %d participants",
+            logging.debug("pool %d %s sig verified: %s",
                               p_id,
+                              sigs["ids"],
                               sigs["is_verified"],
-                              len(sigs["ids"])
                           )
         else:
             logging.debug("pool %d no sigs found", p_id)
@@ -85,70 +85,75 @@ def log_end_of_round(node):
 
 
 from  py_ecc.bls.g2_primatives import G1_to_pubkey,pubkey_to_G1
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s-%(levelname)s-%(message)s',level=logging.DEBUG)
-    main()
+import time
+def benchmark_dkg():
+    num_of_part = 10
+    logging.debug("creating %d participants via DKG", num_of_part)
+    ids = range(1, num_of_part)
 
-    # logging.debug("creating %d participants via DKG", config.NUM_OF_PARTICIPANTS)
-    # ids = range(1, config.NUM_OF_PARTICIPANTS + 1)
-    # dkg = crypto.DKG(config.POOL_THRESHOLD, ids)
-    # dkg.run()
-    # sks = dkg.calculate_participants_sks()
-    # logging.debug("     Group sk: %s", dkg.group_sk())
-    # logging.debug("     Group pk:       %s", dkg.group_pk().hex())
-    # logging.debug("     real Group pk:  %s", crypto.pk_from_sk(dkg.group_sk()).hex())
-    #
-    # sigs = []
-    # pks = []
-    # for sk in sks:
-    #     sig = crypto.sign_with_sk(sks[sk],config.TEST_EPOCH_MSG)
-    #     pk = crypto.pk_from_sk(sks[sk])
-    #     is1 = crypto.verify_sig(
-    #         pk,
-    #         config.TEST_EPOCH_MSG,
-    #         sig)
-    #     logging.debug("verified %d with group pk %s", sk,is1)
-    #     sigs.append(sig)
-    #     pks.append(pk)
-    #
-    # agg = crypto.aggregate_sigs(sigs)
-    # is1 = crypto.verify_aggregated_sigs(
-    #     pks,
-    #     config.TEST_EPOCH_MSG,
-    #     agg)
-    # logging.debug("verified with multi pk %s", is1)
-    #
-    # agg_pks = crypto.aggregate_pks(pks)
-    # is1 = crypto.verify_sig(
-    #     agg_pks,
-    #     config.TEST_EPOCH_MSG,
-    #     agg)
-    # logging.debug("verified with group sk/pk %s", is1)
-    #
-    #
-    #
-    #
-    #
-    # ## redistribuite
-    # re_distro_shares = {}
-    # re_distro_comm = {}
-    # for p_indx in sks:
-    #     sk = sks[p_indx]
-    #
-    #     redistro = crypto.Redistribuition(config.POOL_THRESHOLD -1, sk, ids) # following Shamir's secret sharing, degree is threshold - 1
-    #     shares, commitment = redistro.generate_shares()
-    #     for idx in ids:
-    #         if p_indx not in re_distro_shares:
-    #             re_distro_shares[p_indx] = {}
-    #         re_distro_shares[p_indx][idx] = shares[idx]
-    #     re_distro_comm[p_indx] = commitment
-    #
-    # sk_per_id = {}
-    # pk_per_id = {}
-    # for idx in ids:
-    #     sk_per_id[idx] = crypto.reconstruct_sk(re_distro_shares[idx])
-    #     pk_per_id[idx] = crypto._optimized_pk_from_sk(sk_per_id[idx])
-    #
-    # group_pk_after_redistro = G1_to_pubkey(crypto.reconstruct_pk(pk_per_id))
-    #
-    # logging.debug("     Group pk after redistro: %s", group_pk_after_redistro.hex())
+    start = time.time()
+    dkg = crypto.DKG(config.POOL_THRESHOLD, ids)
+    dkg.run()
+    sks = dkg.calculate_participants_sks()
+    logging.debug("     Group sk:       %s", dkg.group_sk())
+    logging.debug("     Group sig:      %s", crypto.readable_sig(crypto.sign_with_sk(dkg.group_sk(),config.TEST_EPOCH_MSG)).hex())
+    end = time.time()
+    logging.debug("dkg: %f sec", (end-start))
+    logging.debug("     Group pk:       %s", crypto.readable_pk(dkg.group_pk()).hex())
+    logging.debug("     real Group pk:  %s", crypto.readable_pk(crypto.pk_from_sk(dkg.group_sk())).hex())
+
+    sigs = {}
+    pks = {}
+    for sk in sks:
+        sig = crypto.sign_with_sk(sks[sk], config.TEST_EPOCH_MSG)
+        pk = crypto.pk_from_sk(sks[sk])
+
+        sigs[sk] = sig
+        pks[sk] = pk
+
+
+    # reconstruct sig and pk
+    start=time.time()
+    recon_pk = crypto.reconstruct_pk(pks)
+    recon_sig = crypto.reconstruct_group_sig(sigs)
+    end = time.time()
+    logging.debug("reconstruct sk/pk: %f sec", (end - start))
+
+    recon_pk = crypto.readable_pk(recon_pk)
+    logging.debug("pk after reconstruction: %s", recon_pk.hex())
+    recon_sig = crypto.readable_sig(recon_sig)
+    logging.debug("sig after reconstruction: %s", recon_sig.hex())
+
+
+    ## redistribuite
+    start = time.time()
+    re_distro_shares = {}
+    re_distro_comm = {}
+    for p_indx in sks:
+        sk = sks[p_indx]
+
+        redistro = crypto.Redistribuition(config.POOL_THRESHOLD -1, sk, ids) # following Shamir's secret sharing, degree is threshold - 1
+        shares, commitment = redistro.generate_shares()
+        for idx in ids:
+            if p_indx not in re_distro_shares:
+                re_distro_shares[p_indx] = {}
+            re_distro_shares[p_indx][idx] = shares[idx]
+        re_distro_comm[p_indx] = commitment
+
+    sk_per_id = {}
+    pk_per_id = {}
+    for idx in ids:
+        sk_per_id[idx] = crypto.reconstruct_sk(re_distro_shares[idx])
+        pk_per_id[idx] = crypto.pk_from_sk(sk_per_id[idx])
+
+    group_pk_after_redistro = G1_to_pubkey(crypto.reconstruct_pk(pk_per_id))
+
+    logging.debug("     Group pk after redistro: %s", group_pk_after_redistro.hex())
+    end = time.time()
+    logging.debug("redistro: %f sec", (end - start))
+
+
+if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s-%(levelname)s-%(message)s', level=logging.DEBUG)
+    main()
+    # benchmark_dkg()
