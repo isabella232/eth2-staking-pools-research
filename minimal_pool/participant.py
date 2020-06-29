@@ -28,7 +28,6 @@ class Participant:
                     shares[m["from_p_id"]] = m["share"]
                     ids.append(m["from_p_id"])
             with self.key_lock:
-                logging.debug("p %d, epoch %d, reconstruct_sk from: %s", self.id, epoch.number, ids)
                 self.key = crypto.reconstruct_sk(shares)
 
     # TODO - remove not needed as we save pool pk by id
@@ -88,9 +87,9 @@ class Participant:
         if group_sig is not None:
             group_sig = crypto.readable_sig(group_sig)
 
-            ids, pk = self.reconstruct_group_pk(epoch.number)
-            logging.debug("p %d pk from: %s VS %s, group pk: %s", self.id, ids, epoch.pool_participants_by_id(my_pool_id),
-                      crypto.readable_pk(pk).hex())
+            # ids, pk = self.reconstruct_group_pk(epoch.number)
+            # logging.debug("p %d, epoch %d, pk from: %s VS %s, group pk: %s", self.id, epoch.number, ids, epoch.pool_participants_by_id(my_pool_id),
+            #           crypto.readable_pk(pk).hex())
 
 
             # verify sigs and save them
@@ -101,14 +100,12 @@ class Participant:
         with self.collected_sigs_lock:
             self.collected_sigs = []
 
+        self.reconstruct_group_sk(self.node.state.get_epoch(epoch.number + 1))  # reconstruct keys for next epoch
+
         logging.debug("participant %d epoch %d end", self.id, epoch.number)
 
     def mid_epoch(self, epoch):
         my_pool_id = epoch.pool_id_for_participant(self.id)
-
-        # reconstruct my group share
-        if epoch.number != 0:  # TODO - change from special case
-            self.reconstruct_group_sk(epoch)
 
         # broadcast my sig
         sig = self.sign(config.TEST_EPOCH_MSG)
@@ -121,6 +118,7 @@ class Participant:
             pk,
             my_pool_id
         )
+
         with self.collected_sigs_lock:
             self.collected_sigs.append({  # TODO - find a better way to store own share
                 "from_p_id": self.id,
@@ -129,24 +127,20 @@ class Participant:
                 "pool_id": my_pool_id,
                 "epoch": epoch,
             })
+
         logging.debug("participant %d epoch %d mid", self.id, epoch.number)
 
     """ 
-        At the start of every epoch we distribute shares to the next, deterministically chosen, the shares for this
-        participant's key
+        At the start of every epoch we distribute shares to the next epoch, target for distribution is deterministically chosen.
     """
     def start_epoch(self, epoch):
         next_epoch = self.node.state.get_epoch(epoch.number + 1)
         my_pool_id = epoch.pool_id_for_participant(self.id)
-        pool_participants = next_epoch.pool_participants_by_id(
-            epoch.share_distribuition_target(my_pool_id)
-        )
+        pool_participants = next_epoch.pool_participants_by_id(my_pool_id)  # returns target for the share distribution
 
         with self.key_lock:
             redistro_polynomial = crypto.Redistribuition(config.POOL_THRESHOLD - 1, self.key, pool_participants)  # following Shamir's secret sharing, degree is threshold - 1
             shares_to_distrb, commitments = redistro_polynomial.generate_shares()
-
-        logging.debug("p %d, epoch %d, shares to: %s", self.id, epoch.number, pool_participants)
 
         self.node.broadcast_shares(
             next_epoch,

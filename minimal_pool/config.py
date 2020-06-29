@@ -1,6 +1,6 @@
-POOL_SIZE = 4
+POOL_SIZE = 3
 NUMBER_OF_POOLS = 2
-POOL_THRESHOLD = 3
+POOL_THRESHOLD = 2
 NUM_OF_PARTICIPANTS = NUMBER_OF_POOLS * POOL_SIZE
 EPOCH_TIME = 6  # seconds
 # used to deterministically simulate a random source for the network

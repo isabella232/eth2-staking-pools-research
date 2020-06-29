@@ -4,12 +4,15 @@ import threading
 import crypto
 
 class Epoch:
-    def __init__(self, number, seed, agg_sigs = {}, shares = {}):
+    def __init__(self, number, seed):
         self.number = number
         self.seed = seed
         self.pools_info = self._calculate_pools()
-        self.agg_sigs = agg_sigs
-        self.shares = shares
+        self.agg_sigs = {}
+        self.shares = {}
+
+    def __repr__(self):
+        return "<Epoch  number:%s>" % (self.number)
 
     def save_participant_shares(self, shares, p_id):
         self.shares[p_id] = shares
@@ -40,16 +43,6 @@ class Epoch:
     def pool_participants_by_id(self, pool_id):
         pools = self._calculate_pools()
         return pools[pool_id]
-
-    """
-        for pool p_i (pool_id), to which pool p_z at epoch +1 
-        does members of p_i need to distribuite shares
-    """
-    def share_distribuition_target(self, pool_id):
-        lst = list(range(1, config.NUMBER_OF_POOLS + 1))  # indexes must run from 1
-        rnd = random.Random(self.seed)
-        rnd.shuffle(lst)
-        return lst[pool_id - 1]
 
     def _calculate_pools(self):
         pools = {}
@@ -87,15 +80,14 @@ class State:
         will create a new epoch for current epoch number
     """
     def _new_epoch(self, new_epoch_number):
-        with self.epochs_lock:
-            seed = self._mix_seed(new_epoch_number)
+        seed = self._mix_seed(new_epoch_number)
+        e = Epoch(
+            new_epoch_number,
+            seed
+        )
+        self.save_epoch(e)
+        return e
 
-            e = Epoch(
-                new_epoch_number,
-                seed
-            )
-            self.epochs[new_epoch_number] = e
-            return e
 
     def save_epoch(self, epoch):
         with self.epochs_lock:
