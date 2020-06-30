@@ -1,6 +1,6 @@
 import random
 from py_ecc.optimized_bls12_381 import curve_order,add as ec_add, multiply as ec_mul,G1
-from py_ecc.bls.g2_primatives import G1_to_pubkey, pubkey_to_G1, signature_to_G2, G2_to_signature
+from py_ecc.bls.g2_primatives import G1_to_pubkey, signature_to_G2, G2_to_signature
 import milagro_bls_binding as milagro_bls
 from hashlib import sha256
 import config

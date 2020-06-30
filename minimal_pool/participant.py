@@ -12,6 +12,12 @@ class Participant:
         self.incoming_shares = []
         self.collected_sigs = []
         self.key = key
+        """ 
+            limit computation will run sig reconstruction and verification only for participant ids
+            in the list.
+            Use this to save on computation resources.
+        """
+        self.limit_computation_to_ids = range(1, config.NUM_OF_PARTICIPANTS + 1)
 
         # locks
         self.epoch_lock = threading.Lock() # will lock at the beginning of each epoch, releases at end
@@ -63,42 +69,35 @@ class Participant:
     def end_epoch(self, epoch):
         # remove last round's shares
         # TODO - move incoming_shares to mid_epoch?
-        last_epoch = self.node.state.epoch
         my_pool_id = epoch.pool_id_for_participant(self.id)
 
-        last_epoch_shares = []
-        next_epoch_shares = []
-        with self.incoming_shares_lock:
-            for i in range(len(self.incoming_shares)):
-                s = self.incoming_shares[i]
-                if s["epoch"].number == last_epoch:
-                    last_epoch_shares.append(s)
-                else:
-                    next_epoch_shares.append(s)
-            self.incoming_shares = next_epoch_shares
+        if self.id in self.limit_computation_to_ids:
+            logging.debug("p %d computation", self.id)
 
-        # save
-        epoch.save_participant_shares(last_epoch_shares, self.id)
-        self.node.state.save_epoch(epoch)
+            last_epoch_shares = []
+            next_epoch_shares = []
+            with self.incoming_shares_lock:
+                # clear irrelevant shares
+                self.incoming_shares = [s for s in self.incoming_shares if s["epoch"].number > epoch.number]
 
-        # reconstruct group pk and sig
-        group_pk = self.node.state.pool_info_by_id(my_pool_id)["pk"]
-        ids, group_sig = self.reconstruct_group_sig(epoch.number)
-        if group_sig is not None:
-            group_sig = crypto.readable_sig(group_sig)
-
-            # ids, pk = self.reconstruct_group_pk(epoch.number)
-            # logging.debug("p %d, epoch %d, pk from: %s VS %s, group pk: %s", self.id, epoch.number, ids, epoch.pool_participants_by_id(my_pool_id),
-            #           crypto.readable_pk(pk).hex())
-
-
-            # verify sigs and save them
-            is_verified = crypto.verify_sig(group_pk, config.TEST_EPOCH_MSG, group_sig)
-            epoch.save_aggregated_sig(my_pool_id, group_sig, ids, is_verified)
+            # save
+            epoch.save_participant_shares(last_epoch_shares, self.id)
             self.node.state.save_epoch(epoch)
 
+            # reconstruct group pk and sig
+            group_pk = self.node.state.pool_info_by_id(my_pool_id)["pk"]
+            ids, group_sig = self.reconstruct_group_sig(epoch.number)
+            if group_sig is not None:
+                group_sig = crypto.readable_sig(group_sig)
+
+                # verify sigs and save them
+                is_verified = crypto.verify_sig(group_pk, config.TEST_EPOCH_MSG, group_sig)
+                epoch.save_aggregated_sig(my_pool_id, group_sig, ids, is_verified)
+                self.node.state.save_epoch(epoch)
+
+        # cleanup collected sigs
         with self.collected_sigs_lock:
-            self.collected_sigs = []
+            self.collected_sigs = [s for s in self.collected_sigs if s["epoch"].number > epoch.number]
 
         self.reconstruct_group_sk(self.node.state.get_epoch(epoch.number + 1))  # reconstruct keys for next epoch
 
