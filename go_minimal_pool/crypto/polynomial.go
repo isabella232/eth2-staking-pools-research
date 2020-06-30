@@ -1,0 +1,87 @@
+package crypto
+
+import (
+	"github.com/herumi/bls-eth-go-binary/bls"
+	"strconv"
+)
+
+type Polynomial struct {
+	secret bls.Fr
+	Degree uint8
+	interpolationPoints [][]bls.Fr
+
+	Coefficients []bls.Fr
+}
+
+func NewPolynomial(secret bls.Fr, degree uint8) (*Polynomial,error) {
+	ret := &Polynomial{
+		secret: secret,
+		Degree: degree,
+		Coefficients: make([]bls.Fr, degree),
+	}
+
+	err := ret.GenerateRandom()
+	if err != nil {
+		return nil,err
+	}
+
+	return ret,nil
+}
+
+func NewLagrangeInterpolation(points [][]bls.Fr) *Polynomial {
+	return &Polynomial{
+		interpolationPoints:points,
+	}
+}
+
+func (p *Polynomial) GenerateRandom() error {
+	p.Coefficients[0] = p.secret  // important the free coefficient is in index 0
+	for i := uint8(1) ; i < p.Degree ; i++ {
+		sk := bls.Fr{}
+		sk.SetByCSPRNG()
+		p.Coefficients[i] = sk
+	}
+	return nil
+}
+
+func (p  *Polynomial) toString() string {
+	ret := "y = "
+	for i := int(p.Degree) - 1 ; i >= 0 ; i-- {
+		ret += p.Coefficients[i].GetString(10) + "x^" + strconv.Itoa(int(i)) + " "
+		if i > 0 {
+			ret += "+ "
+		}
+	}
+	return ret
+}
+
+func (p *Polynomial) Evaluate(point uint32) (*bls.Fr,error) {
+	res := &bls.Fr{}
+
+	pointX := &bls.Fr{}
+	pointX.SetInt64(int64(point))
+
+	err := bls.FrEvaluatePolynomial(res, p.Coefficients,pointX)
+	if err != nil {
+		return nil,err
+	}
+
+	return res,nil
+}
+
+func (p *Polynomial) interpolate() (*bls.Fr, error) {
+	x := make([]bls.Fr, len(p.interpolationPoints))
+	y := make([]bls.Fr, len(p.interpolationPoints))
+	for i := range p.interpolationPoints {
+		point := p.interpolationPoints[i]
+		x[i] = point[0]
+		y[i] = point[1]
+	}
+
+	res := &bls.Fr{}
+	err := bls.FrLagrangeInterpolation(res, x, y)
+	if err != nil {
+		return nil, err
+	}
+	return res,nil
+}
