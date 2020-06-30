@@ -12,6 +12,12 @@ func frFromInt(i int64) bls.Fr {
 	return p
 }
 
+func frPointerFromInt(i int64) *bls.Fr {
+	p := &bls.Fr{}
+	p.SetInt64(i)
+	return p
+}
+
 func TestEvaluation(t *testing.T) {
 	initBLS()
 
@@ -26,13 +32,13 @@ func TestEvaluation(t *testing.T) {
 
 	//fmt.Printf("%s\n", p.toString())
 
-	res1, err := p.Evaluate(1)
+	res1, err := p.Evaluate(frPointerFromInt(1))
 	require.NoError(t,err)
-	res2, err := p.Evaluate(2)
+	res2, err := p.Evaluate(frPointerFromInt(2))
 	require.NoError(t,err)
-	res3, err := p.Evaluate(3)
+	res3, err := p.Evaluate(frPointerFromInt(3))
 	require.NoError(t,err)
-	res4, err := p.Evaluate(4)
+	res4, err := p.Evaluate(frPointerFromInt(4))
 	require.NoError(t,err)
 
 	// interpolate back

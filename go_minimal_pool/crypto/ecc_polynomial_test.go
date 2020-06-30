@@ -36,11 +36,11 @@ func TestG2Interpolation(t *testing.T) {
 	}
 
 	// evaluate it and transform to g1 results
-	res1,err := poly.Evaluate(1)
+	res1,err := poly.Evaluate(frPointerFromInt(int64(1)))
 	require.NoError(t, err)
-	res2,err := poly.Evaluate(2)
+	res2,err := poly.Evaluate(frPointerFromInt(int64(2)))
 	require.NoError(t, err)
-	res3,err := poly.Evaluate(3)
+	res3,err := poly.Evaluate(frPointerFromInt(int64(3)))
 	require.NoError(t, err)
 	p1 := g2FromFr(*res1)
 	p2 := g2FromFr(*res2)
@@ -69,17 +69,17 @@ func TestG1Interpolation(t *testing.T) {
 		Degree:              2,
 		Coefficients:        []bls.Fr{
 			frFromInt(6), // free coefficient
-			frFromInt(1), // x^2
 			frFromInt(0), // x^1
+			frFromInt(1), // x^2
 		},
 	}
 
 	// evaluate it and transform to g1 results
-	res1,err := poly.Evaluate(1)
+	res1,err := poly.Evaluate(frPointerFromInt(int64(1)))
 	require.NoError(t, err)
-	res2,err := poly.Evaluate(2)
+	res2,err := poly.Evaluate(frPointerFromInt(int64(2)))
 	require.NoError(t, err)
-	res3,err := poly.Evaluate(3)
+	res3,err := poly.Evaluate(frPointerFromInt(int64(3)))
 	require.NoError(t, err)
 	p1 := g1FromFr(*res1)
 	p2 := g1FromFr(*res2)

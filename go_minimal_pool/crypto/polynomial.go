@@ -55,13 +55,10 @@ func (p  *Polynomial) toString() string {
 	return ret
 }
 
-func (p *Polynomial) Evaluate(point uint32) (*bls.Fr,error) {
+func (p *Polynomial) Evaluate(point *bls.Fr) (*bls.Fr,error) {
 	res := &bls.Fr{}
 
-	pointX := &bls.Fr{}
-	pointX.SetInt64(int64(point))
-
-	err := bls.FrEvaluatePolynomial(res, p.Coefficients,pointX)
+	err := bls.FrEvaluatePolynomial(res, p.Coefficients, point)
 	if err != nil {
 		return nil,err
 	}
