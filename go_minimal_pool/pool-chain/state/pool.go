@@ -1,4 +1,4 @@
-package pool_chain
+package state
 
 type Pool struct {
 
