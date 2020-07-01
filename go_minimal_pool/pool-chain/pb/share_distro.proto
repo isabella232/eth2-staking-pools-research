@@ -1,0 +1,27 @@
+syntax = "proto3";
+package v1;
+
+import "participant.proto";
+import "response.proto";
+import "google/api/annotations.proto";
+
+option go_package = "/pool-chain/pb";
+
+service ShareDistributionService {
+    rpc NewShare(ShareDistribution) returns (StatusResponse) {
+        option (google.api.http) = {
+          get: "/v1/signer/sign"
+        };
+    }
+}
+
+message ShareDistribution {
+    bytes id = 1;
+    Participant from_participant = 2;
+    Participant to_participant = 3;
+    bytes share = 4;
+    repeated bytes commitments = 5;
+    int32 pool_id = 6;
+    int32 epoch = 7;
+}
+
