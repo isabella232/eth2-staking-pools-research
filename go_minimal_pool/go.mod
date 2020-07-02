@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/golang/protobuf v1.4.1
+	github.com/google/uuid v1.1.1
 	github.com/hashicorp/go-memdb v1.2.1 // indirect
 	github.com/herumi/bls v0.0.0-20200625022801-30fdb2875ad3 // indirect
 	github.com/herumi/bls-eth-go-binary v0.0.0-20200624084043-9b7da5962ccb
