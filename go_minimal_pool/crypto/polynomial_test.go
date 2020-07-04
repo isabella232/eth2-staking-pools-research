@@ -19,7 +19,7 @@ func frPointerFromInt(i int64) *bls.Fr {
 }
 
 func TestEvaluation(t *testing.T) {
-	initBLS()
+	InitBLS()
 
 	sk := bls.Fr{}
 	sk.SetByCSPRNG()
@@ -56,7 +56,7 @@ func TestEvaluation(t *testing.T) {
 }
 
 func TestInterpolation(t *testing.T) {
-	initBLS()
+	InitBLS()
 
 	points := [][]bls.Fr {
 		{frFromInt(1), frFromInt(7)},

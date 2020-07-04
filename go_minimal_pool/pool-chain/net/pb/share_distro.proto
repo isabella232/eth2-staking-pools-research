@@ -25,12 +25,12 @@ enum ShareType {
 
 message ShareDistribution {
     ShareType type = 1;
-    bytes id = 2;
+    string id = 2;
     Participant from_participant = 3;
     Participant to_participant = 4;
     bytes share = 5;
     repeated bytes commitments = 6;
-    int32 pool_id = 7;
-    int32 epoch = 8;
+    uint32 pool_id = 7;
+    uint32 epoch = 8;
 }
 

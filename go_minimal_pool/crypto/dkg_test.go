@@ -7,7 +7,7 @@ import (
 )
 
 func TestDKG(t *testing.T) {
-	initBLS()
+	InitBLS()
 
 	// generate a polynomial
 	poly1 := &Polynomial{

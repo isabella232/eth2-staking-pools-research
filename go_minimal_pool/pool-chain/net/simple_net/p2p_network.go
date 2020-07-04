@@ -7,18 +7,32 @@ import (
 )
 
 type SimpleP2PNetwork struct {
+	myPeer *net.Peer
 	peers []*net.Peer
 	peersLock sync.Mutex
+	receiver net.P2PReceiver
 }
 
 func NewSimpleP2P() *SimpleP2PNetwork {
-	return &SimpleP2PNetwork{}
+	return &SimpleP2PNetwork{
+		myPeer: net.NewPeer(),
+	}
+}
+
+func (p *SimpleP2PNetwork) RegisterReceiver(r net.P2PReceiver) {
+	p.receiver = r
+}
+
+// returns this p2p network own peer
+func (p *SimpleP2PNetwork) OwnPeer() *net.Peer {
+	return p.myPeer
 }
 
 func (p *SimpleP2PNetwork) AddPeer(peer *net.Peer) error {
 	p.peersLock.Lock()
 	defer p.peersLock.Unlock()
 
+	peer.RegisterReceiver(p.receiver)
 	p.peers = append(p.peers, peer)
 	return nil
 }

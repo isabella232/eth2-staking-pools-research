@@ -4,5 +4,5 @@ package v1;
 option go_package = "/pool-chain/pb";
 
 message Participant {
-    bytes id = 1;
+    uint32 id = 1;
 }

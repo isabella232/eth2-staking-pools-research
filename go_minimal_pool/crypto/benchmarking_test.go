@@ -8,7 +8,7 @@ import (
 )
 
 func TestBenchmarkingSigning(t *testing.T) {
-	initBLS()
+	InitBLS()
 
 	amount_of_sigs := 1000
 
@@ -26,7 +26,7 @@ func TestBenchmarkingSigning(t *testing.T) {
 }
 
 func TestBenchmarkingPkReconstruction(t *testing.T) {
-	initBLS()
+	InitBLS()
 
 	size := 1028
 

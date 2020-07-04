@@ -23,7 +23,7 @@ func g2FromFr(fr bls.Fr) *bls.G2 {
 }
 
 func TestG2Interpolation(t *testing.T) {
-	initBLS()
+	InitBLS()
 
 	// generate a polynomial
 	poly := Polynomial{
@@ -62,7 +62,7 @@ func TestG2Interpolation(t *testing.T) {
 }
 
 func TestG1Interpolation(t *testing.T) {
-	initBLS()
+	InitBLS()
 
 	// generate a polynomial
 	poly := Polynomial{
