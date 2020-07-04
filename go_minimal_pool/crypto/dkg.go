@@ -6,12 +6,12 @@ import "github.com/herumi/bls-eth-go-binary/bls"
 	This builds a polynomial for a particular secret and generates shares for distribution
  */
 type DKG struct {
-	polynomials map[*bls.Fr]*Polynomial
+	polynomials map[uint32]*Polynomial
 	degree uint8
 }
 
-func NewDKG(degree uint8, indexes []*bls.Fr) (*DKG,error) {
-	polynomials := make(map[*bls.Fr]*Polynomial)
+func NewDKG(degree uint8, indexes []uint32) (*DKG,error) {
+	polynomials := make(map[uint32]*Polynomial)
 	for _, idx := range indexes {
 		secret := &bls.Fr{}
 		secret.SetByCSPRNG()
@@ -26,12 +26,14 @@ func NewDKG(degree uint8, indexes []*bls.Fr) (*DKG,error) {
 	return &DKG{polynomials:polynomials, degree:degree}, nil
 }
 
-func (dkg *DKG) GroupSecrets(indexes []*bls.Fr) (map[*bls.Fr]*bls.Fr, error) {
-	ret := make(map[*bls.Fr][]*bls.Fr)
+func (dkg *DKG) GroupSecrets(indexes []uint32) (map[uint32]*bls.Fr, error) {
+	ret := make(map[uint32][]*bls.Fr)
 	for p_idx := range dkg.polynomials {
 		poly := dkg.polynomials[p_idx]
 		for _, share_idx := range indexes {
-			p,err := poly.Evaluate(share_idx)
+			share_idx_fr := &bls.Fr{}
+			share_idx_fr.SetInt64(int64(share_idx))
+			p,err := poly.Evaluate(share_idx_fr)
 			if err != nil {
 				return nil, err
 			}
@@ -43,9 +45,12 @@ func (dkg *DKG) GroupSecrets(indexes []*bls.Fr) (map[*bls.Fr]*bls.Fr, error) {
 	return dkg.sumShares(ret), nil
 }
 
-func (dkg *DKG) sumShares(shares map[*bls.Fr][]*bls.Fr) map[*bls.Fr]*bls.Fr {
-	ret := make(map[*bls.Fr]*bls.Fr)
+func (dkg *DKG) sumShares(shares map[uint32][]*bls.Fr) map[uint32]*bls.Fr {
+	ret := make(map[uint32]*bls.Fr)
 	for pIdx, shares := range shares {
+		pIdx_fr := &bls.Fr{}
+		pIdx_fr.SetInt64(int64(pIdx))
+
 		sum := &bls.Fr{}
 		sum.SetInt64(0)
 		for _, s := range shares {

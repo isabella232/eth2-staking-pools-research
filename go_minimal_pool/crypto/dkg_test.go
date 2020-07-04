@@ -35,25 +35,22 @@ func TestDKG(t *testing.T) {
 		},
 	}
 
-	dkg := DKG{polynomials:map[*bls.Fr]*Polynomial{
-		frPointerFromInt(1): poly1,
-		frPointerFromInt(2): poly2,
-		frPointerFromInt(3): poly3,
+	dkg := DKG{polynomials:map[uint32]*Polynomial{
+		1: poly1,
+		2: poly2,
+		3: poly3,
 	}, degree:2}
 
 	// gete sks
-	idx1 := frPointerFromInt(1)
-	idx2 := frPointerFromInt(2)
-	idx3 := frPointerFromInt(3)
-	sks,err := dkg.GroupSecrets([]*bls.Fr{
-		idx1,
-		idx2,
-		idx3,
+	sks,err := dkg.GroupSecrets([]uint32{
+		1,
+		2,
+		3,
 	})
 	require.NoError(t, err)
 	// verify
 	require.Len(t, sks, 3)
-	require.Equal(t, "21", sks[idx1].GetString(10))
-	require.Equal(t, "30", sks[idx2].GetString(10))
-	require.Equal(t, "45", sks[idx3].GetString(10))
+	require.Equal(t, "21", sks[1].GetString(10))
+	require.Equal(t, "30", sks[2].GetString(10))
+	require.Equal(t, "45", sks[3].GetString(10))
 }
