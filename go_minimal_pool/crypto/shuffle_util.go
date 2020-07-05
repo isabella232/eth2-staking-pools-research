@@ -14,6 +14,26 @@ const totalSize = seedSize + roundSize + positionWindowSize
 
 var maxShuffleListSize uint32 = 1 << 31
 
+func MixSeed(seed [32]byte, epoch uint32) ([32]byte,error) {
+	var ret [32]byte
+
+	// convert epoch number to bytes
+	epochBytes := make([]byte, 32)
+	binary.LittleEndian.PutUint32(epochBytes, epoch)
+
+	// hash both for a new seed
+	h := sha256.New()
+	_,err := h.Write(append(epochBytes, seed[:]...))
+	if err != nil {
+		return ret,err
+	}
+
+	// copy back to ret
+	copy(ret[:], h.Sum(nil))
+
+	return ret,nil
+}
+
 // ShuffledIndex returns `p(index)` in a pseudorandom permutation `p` of `0...list_size - 1` with ``seed`` as entropy.
 // We utilize 'swap or not' shuffling in this implementation; we are allocating the memory with the seed that stays
 // constant between iterations instead of reallocating it each iteration as in the spec. This implementation is based
