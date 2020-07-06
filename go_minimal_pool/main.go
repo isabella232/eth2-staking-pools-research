@@ -26,14 +26,15 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 	// DKG for pools
-	for _, participants := range poolData {
+	for pool_id, participants := range poolData {
 		sks,err := runDKGForParticipant(config.PoolThreshold - 1, participants)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
 
+		log.Printf("pool %d:", pool_id)
 		for k, v := range sks {
-			log.Printf("p %d, sk: %s", k, v.GetString(10))
+			log.Printf("		p %d, sk: %s", k, v.GetString(10))
 		}
 	}
 
@@ -68,22 +69,3 @@ func runDKGForParticipant(degree uint8, indexes []uint32) (map[uint32]*bls.Fr, e
 
 	return dkg.GroupSecrets(indexes)
 }
-
-
-//func shufflePools(seed [32]byte) (map[uint8][]uint32, error) {
-//	config := main.NewTestNetworkConfig()
-//
-//	shuffled, err := ShuffleList(config.ParticipantIndexesList(), seed)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	ret := make(map[uint8][]uint32)
-//	for p_id := uint8(0) ; p_id < config.NumberOfPools ; p_id ++ {
-//		start := p_id * config.PoolSize
-//		end := start + config.PoolSize
-//		ret[p_id] = shuffled[start: end]
-//	}
-//
-//	return ret, nil
-//}
