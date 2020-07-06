@@ -11,7 +11,7 @@ type PoolChainNode struct {
 	State       *state.State
 	Net         net2.P2P
 	epochTicker *EpochTicker
-	Config      *NetworkConfig
+	Config      *net2.NetworkConfig
 
 	// just holds all messages for convenience
 	SharesPerEpoch map[uint32][]*pb.ShareDistribution
@@ -20,7 +20,7 @@ type PoolChainNode struct {
 }
 
 func NewTestChainNode() *PoolChainNode {
-	config := NewTestNetworkConfig()
+	config := net2.NewTestNetworkConfig()
 	state := state.NewInMemoryState()
 	ticker := NewEpochTicker(config.EpochSpanSec)
 	net := simple_net.NewSimpleP2P()

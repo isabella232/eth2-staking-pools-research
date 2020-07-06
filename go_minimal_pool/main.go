@@ -2,7 +2,8 @@ package main
 
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/crypto"
-	pool_chain "github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain"
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net"
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/state"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"log"
 )
@@ -11,20 +12,21 @@ func main() {
 	crypto.InitBLS()
 	log.SetFlags(log.Lmicroseconds)
 
-	config := pool_chain.NewTestNetworkConfig()
+	config := net.NewTestNetworkConfig()
 
-	indxs := config.ParticipantIndexesList()
-	shuffled,err := crypto.ShuffleList(indxs, config.GenesisSeed, config.SeedShuffleRoudnCount)
+	seed,err := crypto.MixSeed(config.GenesisSeed, 0)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	// DKG for pools
-	for p_id := uint8(0) ; p_id < config.NumberOfPools ; p_id++ {
-		start := p_id * config.PoolSize
-		end := start + config.PoolSize
-		participants := shuffled[start: end]
+	epoch := state.NewEpochInstance(0, seed)
 
+	poolData,err := epoch.PoolsParticipantIds()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	// DKG for pools
+	for _, participants := range poolData {
 		sks,err := runDKGForParticipant(config.PoolThreshold - 1, participants)
 		if err != nil {
 			log.Fatalf(err.Error())
@@ -66,3 +68,22 @@ func runDKGForParticipant(degree uint8, indexes []uint32) (map[uint32]*bls.Fr, e
 
 	return dkg.GroupSecrets(indexes)
 }
+
+
+//func shufflePools(seed [32]byte) (map[uint8][]uint32, error) {
+//	config := main.NewTestNetworkConfig()
+//
+//	shuffled, err := ShuffleList(config.ParticipantIndexesList(), seed)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	ret := make(map[uint8][]uint32)
+//	for p_id := uint8(0) ; p_id < config.NumberOfPools ; p_id ++ {
+//		start := p_id * config.PoolSize
+//		end := start + config.PoolSize
+//		ret[p_id] = shuffled[start: end]
+//	}
+//
+//	return ret, nil
+//}
