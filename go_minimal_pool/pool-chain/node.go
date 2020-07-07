@@ -21,7 +21,7 @@ type PoolChainNode struct {
 
 func NewTestChainNode() *PoolChainNode {
 	config := net2.NewTestNetworkConfig()
-	state := state.NewInMemoryState()
+	state := state.NewInMemoryState(config.GenesisSeed)
 	ticker := NewEpochTicker(config.EpochSpanSec)
 	net := simple_net.NewSimpleP2P()
 

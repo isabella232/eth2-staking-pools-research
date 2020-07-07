@@ -3,6 +3,7 @@ package state
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/crypto"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net"
+	"github.com/herumi/bls-eth-go-binary/bls"
 )
 
 func shufflePools(input []uint32, seed [32]byte, roundCount uint8, numberOfPools uint8, poolSize uint8) (map[uint8][]uint32, error) {
@@ -24,6 +25,9 @@ func shufflePools(input []uint32, seed [32]byte, roundCount uint8, numberOfPools
 type Epoch struct {
 	Number uint32
 	epochSeed [32]byte
+
+	// every participant will use this var to store his epoch's secret.
+	ParticipantShare *bls.Fr
 }
 
 func NewEpochInstance(number uint32, seed [32]byte) *Epoch {
