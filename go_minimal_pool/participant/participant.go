@@ -55,7 +55,7 @@ func (p *Participant) timeEpoch(epoch *state.Epoch) {
 		p.EpochStart(epoch)
 	}()
 
-	// start happens at 1/2 of the epoch
+	// mid happens at 1/2 of the epoch
 	go func() {
 		d := time.Duration(p.node.Config.EpochSpanSec / 2)
 		<- time.After(d)
@@ -63,7 +63,7 @@ func (p *Participant) timeEpoch(epoch *state.Epoch) {
 		p.EpochMid(epoch)
 	}()
 
-	// start happens at 1/2 of the epoch
+	// end happens at 2/3 of the epoch
 	go func() {
 		d := time.Duration((p.node.Config.EpochSpanSec / 3) * 2)
 		<- time.After(d)
@@ -74,7 +74,7 @@ func (p *Participant) timeEpoch(epoch *state.Epoch) {
 
 // start happens at 1/3 of the epoch
 func (p *Participant) EpochStart(epoch *state.Epoch) {
-	log.Println("epoch ", epoch.Number, "start")
+	log.Printf("P %d, epoch %d start", p.Id, epoch.Number)
 
 	//share := &pb.ShareDistribution{
 	//	Type:            pb.ShareType_EPOCH,
@@ -116,10 +116,10 @@ func (p *Participant) EpochStart(epoch *state.Epoch) {
 
 // start happens at 1/2 of the epoch
 func (p *Participant) EpochMid(epoch *state.Epoch) {
-	log.Printf("epoch %d mid with %d shares", epoch.Number, len(p.node.SharesPerEpoch[epoch.Number]))
+	log.Printf("P %d, epoch %d mid with %d shares", p.Id, epoch.Number, len(p.node.SharesPerEpoch[epoch.Number]))
 }
 
 // start happens at 2/3 of the epoch
 func (p *Participant) EpochEnd(epoch *state.Epoch) {
-	log.Printf("epoch %d end", epoch.Number)
+	log.Printf("P %d, epoch %d end", p.Id,epoch.Number)
 }

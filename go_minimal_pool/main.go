@@ -32,8 +32,30 @@ func main() {
 	}
 
 	// initial DKG for pools
+	participants = runDKGForPools(poolData, config.PoolThreshold)
+
+	// start epoch processing
+	for _, p := range participants {
+		p.StartEpochProcessing()
+	}
+
+	fmt.Printf("")
+
+	for {
+		select {
+		case sig := <- participants[0].KillC():
+			if sig == true {
+				fmt.Printf("killed")
+				return
+			}
+		}
+	}
+}
+
+func runDKGForPools(poolData map[uint8][]uint32, threshold uint8) []*participant.Participant {
+	ret := make([]*participant.Participant,0)
 	for poolId, poolParticipants := range poolData {
-		sks,err := runDKGForParticipant(config.PoolThreshold - 1, poolParticipants)
+		sks,err := runDKGForParticipants(threshold - 1, poolParticipants)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -51,36 +73,14 @@ func main() {
 			e.ParticipantShare = v
 			n.State.SaveEpoch(e)
 
-			participants[k-1] = p
+			ret = append(ret, p)
 		}
 	}
 
-	fmt.Printf("")
-
-	//n1 := pool_chain.NewTestChainNode()
-	//n2 := pool_chain.NewTestChainNode()
-	//net.BiDirectionalConnection(n1.Net, n2.Net)
-	//
-	//p1 := participant.NewParticipant(1)
-	//p1.SetNode(n1)
-	//p2 := participant.NewParticipant(2)
-	//p2.SetNode(n2)
-	//
-	//p1.StartEpochProcessing()
-	//p2.StartEpochProcessing()
-	//
-	//for {
-	//	select {
-	//	case sig := <- p1.KillC():
-	//		if sig == true {
-	//			fmt.Printf("killed")
-	//			return
-	//		}
-	//	}
-	//}
+	return ret
 }
 
-func runDKGForParticipant(degree uint8, indexes []uint32) (map[uint32]*bls.Fr, error) {
+func runDKGForParticipants(degree uint8, indexes []uint32) (map[uint32]*bls.Fr, error) {
 	dkg,err := crypto.NewDKG(degree, indexes)
 	if err != nil {
 		return nil, err
