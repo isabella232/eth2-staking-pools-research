@@ -11,6 +11,7 @@ This repo aims to have in one place all the research around decentralized stakin
 	- [coordinate rotation and assignment of participants between pools](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_rotation.md)
 	- [coordinate the execution of the validator's epoch duties by the pool](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_duties.md)
 	- coordinate participants exit from the protocol
+	- epoch processing
 - [bilinear pairings and BLS12-381 keys](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/BLS_keys_and_pairings.pdf)
 - Networking  
 
