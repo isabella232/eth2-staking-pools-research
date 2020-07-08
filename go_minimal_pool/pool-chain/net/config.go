@@ -26,7 +26,7 @@ func NewTestNetworkConfig() *NetworkConfig {
 	return &NetworkConfig{
 		PoolSize:      3,
 		PoolThreshold: 3,
-		NumberOfPools: 2,
+		NumberOfPools: 1,
 		SeedShuffleRoudnCount: 10,
 		EpochSpanSec:  time.Second * 8,
 		GenesisSeed:   seed,

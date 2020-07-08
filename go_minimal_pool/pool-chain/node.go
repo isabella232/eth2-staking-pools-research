@@ -14,7 +14,9 @@ type PoolChainNode struct {
 	Config      *net2.NetworkConfig
 
 	// just holds all messages for convenience
-	SharesPerEpoch map[uint32][]*pb.ShareDistribution
+	SharesPerEpoch map[uint32]map[string]*pb.ShareDistribution
+	// messages will be saved only for the specific Id
+	FilterId uint32
 
 	Killed 		chan bool
 }
@@ -31,7 +33,7 @@ func NewTestChainNode() *PoolChainNode {
 		epochTicker:    ticker,
 		Config:         config,
 		Killed:         make(chan bool),
-		SharesPerEpoch: make(map[uint32][]*pb.ShareDistribution),
+		SharesPerEpoch: make(map[uint32]map[string]*pb.ShareDistribution),
 	}
 
 	net.RegisterReceiver(ret)
@@ -49,8 +51,14 @@ func (p *PoolChainNode) StartEpochProcessing() {
 
 func (p *PoolChainNode) ReceiveShare(share *pb.ShareDistribution) {
 	if p.SharesPerEpoch[share.Epoch] == nil {
-		p.SharesPerEpoch[share.Epoch] = make([]*pb.ShareDistribution, 0)
+		p.SharesPerEpoch[share.Epoch] = make(map[string]*pb.ShareDistribution)
 	}
 
-	p.SharesPerEpoch[share.Epoch] = append(p.SharesPerEpoch[share.Epoch], share)
+	// filter only relevant messages
+	if share.ToParticipant.Id == p.FilterId {
+		// do not insert duplicates
+		if p.SharesPerEpoch[share.Epoch][share.Id] == nil {
+			p.SharesPerEpoch[share.Epoch][share.Id] = share
+		}
+	}
 }

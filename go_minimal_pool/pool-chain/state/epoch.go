@@ -1,6 +1,7 @@
 package state
 
 import (
+	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/crypto"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net"
 	"github.com/herumi/bls-eth-go-binary/bls"
@@ -35,6 +36,24 @@ func NewEpochInstance(number uint32, seed [32]byte) *Epoch {
 		Number:number,
 		epochSeed: seed,
 	}
+}
+
+func (epoch *Epoch) ParticipantPoolAssignment(participantId uint32) (uint8,error) {
+	// TODO make more efficient
+	pools,err := epoch.PoolsParticipantIds()
+	if err != nil {
+		return 0,err
+	}
+
+	for poolId, pool := range pools {
+		for _, _pId := range pool {
+			if _pId == participantId {
+				return poolId, nil
+			}
+		}
+	}
+
+	return 0,fmt.Errorf("can't find %d", participantId)
 }
 
 func (epoch *Epoch) PoolsParticipantIds() (map[uint8][]uint32,error) {

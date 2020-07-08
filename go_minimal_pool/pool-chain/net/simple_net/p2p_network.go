@@ -10,7 +10,6 @@ type SimpleP2PNetwork struct {
 	myPeer *net.Peer
 	peers []*net.Peer
 	peersLock sync.Mutex
-	receiver net.P2PReceiver
 }
 
 func NewSimpleP2P() *SimpleP2PNetwork {
@@ -20,7 +19,7 @@ func NewSimpleP2P() *SimpleP2PNetwork {
 }
 
 func (p *SimpleP2PNetwork) RegisterReceiver(r net.P2PReceiver) {
-	p.receiver = r
+	p.myPeer.RegisterReceiver(r)
 }
 
 // returns this p2p network own peer
@@ -32,7 +31,7 @@ func (p *SimpleP2PNetwork) AddPeer(peer *net.Peer) error {
 	p.peersLock.Lock()
 	defer p.peersLock.Unlock()
 
-	peer.RegisterReceiver(p.receiver)
+	//peer.RegisterReceiver(p.receiver)
 	p.peers = append(p.peers, peer)
 	return nil
 }

@@ -34,12 +34,18 @@ func main() {
 	// initial DKG for pools
 	participants = runDKGForPools(poolData, config.PoolThreshold)
 
+	// connect pools to each other
+	for i, p1 := range participants {
+		p1.Node.Net.AddPeer(p1.Node.Net.OwnPeer()) // add to self to receive shares
+		for j := i+1 ; j < len(participants) ; j ++  {
+			p2 := participants[j]
+			net.BiDirectionalConnection(p1.Node.Net,p2.Node.Net)
+		}
+	}
 	// start epoch processing
 	for _, p := range participants {
 		p.StartEpochProcessing()
 	}
-
-	fmt.Printf("")
 
 	for {
 		select {
