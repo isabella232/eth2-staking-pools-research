@@ -66,7 +66,7 @@ func (p *Polynomial) Evaluate(point *bls.Fr) (*bls.Fr,error) {
 	return res,nil
 }
 
-func (p *Polynomial) interpolate() (*bls.Fr, error) {
+func (p *Polynomial) Interpolate() (*bls.Fr, error) {
 	x := make([]bls.Fr, len(p.interpolationPoints))
 	y := make([]bls.Fr, len(p.interpolationPoints))
 	for i := range p.interpolationPoints {

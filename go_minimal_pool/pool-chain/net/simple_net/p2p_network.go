@@ -64,3 +64,14 @@ func (p *SimpleP2PNetwork) BroadcastShare(share *pb.ShareDistribution) error {
 
 	return nil
 }
+
+func (p *SimpleP2PNetwork) BroadcastSignature(sig *pb.SignatureDistribution) error {
+	p.peersLock.Lock()
+	defer p.peersLock.Unlock()
+
+	for _, p := range p.peers {
+		p.ReceiveSignature(sig)
+	}
+
+	return nil
+}

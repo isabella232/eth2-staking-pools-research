@@ -88,13 +88,13 @@ func TestRedistribuition(t *testing.T) {
 
 			// reconstruct individual group sk for 1,2,3
 			p1 := NewLagrangeInterpolation(shares1)
-			sk1Interpolated,err := p1.interpolate()
+			sk1Interpolated,err := p1.Interpolate()
 			require.NoError(t,err)
 			p2 := NewLagrangeInterpolation(shares2)
-			sk2Interpolated,err := p2.interpolate()
+			sk2Interpolated,err := p2.Interpolate()
 			require.NoError(t,err)
 			p3 := NewLagrangeInterpolation(shares3)
-			sk3Interpolated,err := p3.interpolate()
+			sk3Interpolated,err := p3.Interpolate()
 			require.NoError(t,err)
 
 			// reconstruct group secret from the 3 re-distributed shares
@@ -104,7 +104,7 @@ func TestRedistribuition(t *testing.T) {
 				{frFromInt(3), *sk3Interpolated},
 			}
 			p := NewLagrangeInterpolation(group)
-			groupSk, err := p.interpolate()
+			groupSk, err := p.Interpolate()
 			require.NoError(t,err)
 
 			require.Equal(t, test.skStr, groupSk.GetString(10))

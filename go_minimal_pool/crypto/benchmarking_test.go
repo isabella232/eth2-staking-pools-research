@@ -49,7 +49,7 @@ func TestBenchmarkingPkReconstruction(t *testing.T) {
 		}
 	}
 
-	// interpolate back
+	// Interpolate back
 	l := NewG1LagrangeInterpolation(g1s)
 	res,err := l.interpolate()
 	require.NoError(t, err)

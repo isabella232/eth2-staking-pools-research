@@ -5,6 +5,7 @@ import (
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net/pb"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net/simple_net"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/state"
+	"sync"
 )
 
 type PoolChainNode struct {
@@ -15,6 +16,9 @@ type PoolChainNode struct {
 
 	// just holds all messages for convenience
 	SharesPerEpoch map[uint32]map[string]*pb.ShareDistribution
+	sharesLock sync.Mutex
+	SigsPerEpoch map[uint32]map[string]*pb.SignatureDistribution
+	sigsLock sync.Mutex
 	// messages will be saved only for the specific Id
 	FilterId uint32
 
@@ -34,6 +38,7 @@ func NewTestChainNode() *PoolChainNode {
 		Config:         config,
 		Killed:         make(chan bool),
 		SharesPerEpoch: make(map[uint32]map[string]*pb.ShareDistribution),
+		SigsPerEpoch: make(map[uint32]map[string]*pb.SignatureDistribution),
 	}
 
 	net.RegisterReceiver(ret)
@@ -50,6 +55,9 @@ func (p *PoolChainNode) StartEpochProcessing() {
 }
 
 func (p *PoolChainNode) ReceiveShare(share *pb.ShareDistribution) {
+	p.sharesLock.Lock()
+	defer p.sharesLock.Unlock()
+
 	if p.SharesPerEpoch[share.Epoch] == nil {
 		p.SharesPerEpoch[share.Epoch] = make(map[string]*pb.ShareDistribution)
 	}
@@ -60,5 +68,19 @@ func (p *PoolChainNode) ReceiveShare(share *pb.ShareDistribution) {
 		if p.SharesPerEpoch[share.Epoch][share.Id] == nil {
 			p.SharesPerEpoch[share.Epoch][share.Id] = share
 		}
+	}
+}
+
+func (p *PoolChainNode) ReceiveSignature(sig *pb.SignatureDistribution) {
+	p.sigsLock.Lock()
+	defer p.sigsLock.Unlock()
+
+	if p.SigsPerEpoch[sig.Epoch] == nil {
+		p.SigsPerEpoch[sig.Epoch] = make(map[string]*pb.SignatureDistribution)
+	}
+
+	// do not insert duplicates
+	if p.SigsPerEpoch[sig.Epoch][sig.Id] == nil {
+		p.SigsPerEpoch[sig.Epoch][sig.Id] = sig
 	}
 }

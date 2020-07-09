@@ -7,6 +7,7 @@ import (
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net/pb"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/state"
 	"github.com/google/uuid"
+	"github.com/herumi/bls-eth-go-binary/bls"
 	"log"
 	"sync"
 	"time"
@@ -60,7 +61,7 @@ func (p *Participant) timeEpoch(epoch *state.Epoch) {
 		d := time.Duration(p.Node.Config.EpochSpanSec / 4)
 		<- time.After(d)
 
-		p.EpochInit(epoch)
+		p.epochInit(epoch)
 	}()
 
 	// mid happens at 1/2 of the epoch
@@ -68,7 +69,7 @@ func (p *Participant) timeEpoch(epoch *state.Epoch) {
 		d := time.Duration(p.Node.Config.EpochSpanSec / 2)
 		<- time.After(d)
 
-		p.EpochMid(epoch)
+		p.epochMid(epoch)
 	}()
 
 	// end happens at 3/4 of the epoch
@@ -76,13 +77,13 @@ func (p *Participant) timeEpoch(epoch *state.Epoch) {
 		d := time.Duration((p.Node.Config.EpochSpanSec / 4) * 3)
 		<- time.After(d)
 
-		p.EpochEnd(epoch)
+		p.epochEnd(epoch)
 	}()
 }
 
 // start happens at 1/4 of the epoch
 // https://github.com/bloxapp/eth2-staking-pools-research/blob/master/epoch_processing.md
-func (p *Participant) EpochInit(epoch *state.Epoch) {
+func (p *Participant) epochInit(epoch *state.Epoch) {
 	log.Printf("P %d, epoch %d init", p.Id, epoch.Number)
 
 	p.epochProcessingLock.Lock()
@@ -115,13 +116,12 @@ func (p *Participant) EpochInit(epoch *state.Epoch) {
 	// broadcast
 	for k,v := range shares {
 		share := &pb.ShareDistribution{
-			Type:            pb.ShareType_EPOCH,
 			Id:              uuid.New().String(),
 			FromParticipant: &pb.Participant{Id: p.Id},
 			ToParticipant:   &pb.Participant{Id: k},
 			Share:           v.Serialize(),
 			Commitments:     nil,
-			PoolId:          1,
+			PoolId:          uint32(currentPool),
 			Epoch:           epoch.Number,
 		}
 
@@ -134,12 +134,66 @@ func (p *Participant) EpochInit(epoch *state.Epoch) {
 
 // start happens at 1/2 of the epoch
 // https://github.com/bloxapp/eth2-staking-pools-research/blob/master/epoch_processing.md
-func (p *Participant) EpochMid(epoch *state.Epoch) {
+func (p *Participant) epochMid(epoch *state.Epoch) {
 	log.Printf("P %d, epoch %d mid with %d shares", p.Id, epoch.Number, len(p.Node.SharesPerEpoch[epoch.Number]))
+
+	currentPool,err := epoch.ParticipantPoolAssignment(p.Id)
+	if err != nil {
+		log.Fatalf("P %d err fetching current epoch's pool: %s", p.Id, err.Error())
+	}
+
+	config := net.NewTestNetworkConfig()
+	sigInG2 := crypto.Sign(epoch.ParticipantShare, config.EpochTestMessage)
+	sig := &pb.SignatureDistribution{
+		Id:              uuid.New().String(),
+		FromParticipant: &pb.Participant{Id: p.Id},
+		Sig:           	 sigInG2.Serialize(),
+		PoolId:          uint32(currentPool),
+		Epoch:           epoch.Number,
+	}
+	err = p.Node.Net.BroadcastSignature(sig)
+	if err != nil {
+		log.Printf("broadcasting error: %s", err.Error())
+	}
 }
 
 // start happens at 2/3 of the epoch
 // https://github.com/bloxapp/eth2-staking-pools-research/blob/master/epoch_processing.md
-func (p *Participant) EpochEnd(epoch *state.Epoch) {
-	log.Printf("P %d, epoch %d end", p.Id,epoch.Number)
+func (p *Participant) epochEnd(epoch *state.Epoch) {
+	log.Printf("P %d, epoch %d end with %d sigs", p.Id,epoch.Number, len(p.Node.SigsPerEpoch[epoch.Number]))
+
+	p.reconstructGroupSecretForNextEpoch(epoch)
+}
+
+func (p *Participant) reconstructGroupSecretForNextEpoch(epoch *state.Epoch) {
+	shares := p.Node.SharesPerEpoch[epoch.Number]
+	points := make([][]bls.Fr,0)
+	for _,v := range shares {
+		if v.ToParticipant.Id != p.Id {
+			continue
+		}
+
+		from := &bls.Fr{}
+		from.SetInt64(int64(v.FromParticipant.Id))
+
+		point := &bls.Fr{}
+		point.Deserialize(v.Share)
+
+		points = append(points, []bls.Fr{*from, *point})
+	}
+
+	// reconstruct the group secret from the shares
+	l := crypto.NewLagrangeInterpolation(points)
+	groupSk, err := l.Interpolate()
+	if err != nil {
+		log.Printf("could not reconstruct group secret for next epoch: %s", err.Error())
+	}
+
+	// save for next epoch
+	nextEpoch := p.Node.State.GetEpoch(epoch.Number + 1)
+	nextEpoch.ParticipantShare = groupSk
+	err = p.Node.State.SaveEpoch(nextEpoch)
+	if err != nil {
+		log.Printf("could not save group secret for next epoch: %s", err.Error())
+	}
 }

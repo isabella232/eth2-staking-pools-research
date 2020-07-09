@@ -15,22 +15,13 @@ service ShareDistributionService {
     }
 }
 
-enum ShareType {
-    // Share type for initial DKG for creating a pool
-    DKG = 0;
-
-    // Share type for distributing during an epoch
-    EPOCH = 1;
-}
-
 message ShareDistribution {
-    ShareType type = 1;
-    string id = 2;
-    Participant from_participant = 3;
-    Participant to_participant = 4;
-    bytes share = 5;
-    repeated bytes commitments = 6;
-    uint32 pool_id = 7;
-    uint32 epoch = 8;
+    string id = 1;
+    Participant from_participant = 2;
+    Participant to_participant = 3;
+    bytes share = 4;
+    repeated bytes commitments = 5;
+    uint32 pool_id = 6;
+    uint32 epoch = 7;
 }
 

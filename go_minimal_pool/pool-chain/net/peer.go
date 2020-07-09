@@ -23,3 +23,7 @@ func (peer *Peer) RegisterReceiver(r P2PReceiver) {
 func (peer *Peer) ReceiveShare(share *pb.ShareDistribution) {
 	peer.receiver.ReceiveShare(share)
 }
+
+func (peer *Peer) ReceiveSignature(sig *pb.SignatureDistribution) {
+	peer.receiver.ReceiveSignature(sig)
+}

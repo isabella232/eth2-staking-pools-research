@@ -46,7 +46,7 @@ func TestG2Interpolation(t *testing.T) {
 	p2 := g2FromFr(*res2)
 	p3 := g2FromFr(*res3)
 
-	// interpolate back to a polynomial
+	// Interpolate back to a polynomial
 	points := [][]interface{} {
 		{frFromInt(1),p1},
 		{frFromInt(2),p2},
@@ -85,7 +85,7 @@ func TestG1Interpolation(t *testing.T) {
 	p2 := g1FromFr(*res2)
 	p3 := g1FromFr(*res3)
 
-	// interpolate back to a polynomial
+	// Interpolate back to a polynomial
 	points := [][]interface{} {
 		{frFromInt(1),p1},
 		{frFromInt(2),p2},

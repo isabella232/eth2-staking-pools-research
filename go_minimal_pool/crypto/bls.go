@@ -15,3 +15,9 @@ func InitBLS() error {
 	}
 	return nil
 }
+
+func Sign(secret *bls.Fr, msg []byte) *bls.G2 {
+	sk := bls.CastToSecretKey(secret)
+	sig := sk.SignByte(msg)
+	return bls.CastFromSign(sig)
+}

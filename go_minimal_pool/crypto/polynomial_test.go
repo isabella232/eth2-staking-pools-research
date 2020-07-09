@@ -41,7 +41,7 @@ func TestEvaluation(t *testing.T) {
 	res4, err := p.Evaluate(frPointerFromInt(4))
 	require.NoError(t,err)
 
-	// interpolate back
+	// Interpolate back
 	points := [][]bls.Fr {
 		{frFromInt(1), *res1},
 		{frFromInt(2), *res2},
@@ -49,7 +49,7 @@ func TestEvaluation(t *testing.T) {
 		{frFromInt(4), *res4},
 	}
 	pInter := NewLagrangeInterpolation(points)
-	res, err := pInter.interpolate()
+	res, err := pInter.Interpolate()
 	require.NoError(t,err)
 
 	require.Equal(t, sk.GetString(10), res.GetString(10))
@@ -65,7 +65,7 @@ func TestInterpolation(t *testing.T) {
 	}
 
 	p := NewLagrangeInterpolation(points)
-	res, err := p.interpolate()
+	res, err := p.Interpolate()
 	require.NoError(t,err)
 
 	require.Equal(t, "6", res.GetString(10))

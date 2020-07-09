@@ -41,6 +41,11 @@ func (p *ECCG1Polynomial) interpolate() (*bls.G1,error) {
 
 
 
+
+
+
+
+
 type ECCG2Polynomial struct {
 	G2Points []bls.G2
 	XPoints []bls.Fr

@@ -13,6 +13,7 @@ type NetworkConfig struct {
 	SeedShuffleRoudnCount uint8
 
 	EpochSpanSec time.Duration
+	EpochTestMessage []byte
 
 	GenesisSeed [32]byte // used for random beacon
 }
@@ -23,12 +24,15 @@ func NewTestNetworkConfig() *NetworkConfig {
 	copy(seed[:], _seed)
 
 
+	_testMsg, _ := hex.DecodeString("292ea14188b703cbd3efde48f0952b15c4cc6c254f221e5669709888ccfbf8bf") // sha256 of 'test epoch msg'
+
 	return &NetworkConfig{
 		PoolSize:      3,
 		PoolThreshold: 3,
 		NumberOfPools: 1,
 		SeedShuffleRoudnCount: 10,
 		EpochSpanSec:  time.Second * 8,
+		EpochTestMessage: _testMsg,
 		GenesisSeed:   seed,
 	}
 }

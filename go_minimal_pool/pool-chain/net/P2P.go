@@ -6,6 +6,7 @@ import (
 
 type P2PReceiver interface {
 	ReceiveShare(share *pb.ShareDistribution)
+	ReceiveSignature(sig *pb.SignatureDistribution)
 }
 
 type P2P interface {
@@ -15,6 +16,7 @@ type P2P interface {
 	AddPeer(peer *Peer) error
 	RemovePeer(peer *Peer) error
 	BroadcastShare(share *pb.ShareDistribution) error
+	BroadcastSignature(sig *pb.SignatureDistribution) error
 }
 
 
