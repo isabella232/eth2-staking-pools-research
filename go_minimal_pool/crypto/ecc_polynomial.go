@@ -66,7 +66,7 @@ func NewG2LagrangeInterpolation(points [][]interface{}) *ECCG2Polynomial {
 	}
 }
 
-func (p *ECCG2Polynomial) interpolate() (*bls.G2,error) {
+func (p *ECCG2Polynomial) Interpolate() (*bls.G2,error) {
 	res := &bls.G2{}
 	err := bls.G2LagrangeInterpolation(res, p.XPoints, p.G2Points)
 	if err != nil {

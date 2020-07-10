@@ -9,18 +9,18 @@ type DB interface {
 }
 
 type State struct {
-	db DB
+	db           DB
 	currentEpoch uint32
-	pools []*Pool
-	seed [32]byte
+	Pools        map[uint8]*Pool
+	seed         [32]byte
 }
 
 func NewInMemoryState(seed [32]byte) *State {
 	return & State{
 		db:           NewInMemoryDb(),
 		currentEpoch: 0,
-		pools:        make([]*Pool, 0),
-		seed: seed,
+		Pools:        make(map[uint8]*Pool),
+		seed:         seed,
 	}
 }
 
@@ -53,4 +53,12 @@ func (s *State) GetEpoch(number uint32) *Epoch {
 
 func (s *State) GetCurrentEpoch() *Epoch {
 	return s.GetEpoch(s.currentEpoch)
+}
+
+func (s *State) GetPool(poolId uint8) *Pool {
+	return s.Pools[poolId]
+}
+
+func (s *State) SavePool(pool *Pool) {
+	s.Pools[pool.Id] = pool
 }

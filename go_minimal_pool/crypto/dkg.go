@@ -45,6 +45,27 @@ func (dkg *DKG) GroupSecrets(indexes []uint32) (map[uint32]*bls.Fr, error) {
 	return dkg.sumShares(ret), nil
 }
 
+func (dkg *DKG) GroupPK(sks map[uint32]*bls.Fr) (*bls.PublicKey,error) {
+	points := make([][]interface{},len(sks))
+	i := 0
+	for k,v := range sks {
+		key := &bls.Fr{}
+		key.SetInt64(int64(k))
+
+		sk := bls.CastToSecretKey(v)
+		pkG1 := bls.CastFromPublicKey(sk.GetPublicKey())
+		points[i] = []interface{}{*key,pkG1}
+		i ++
+	}
+
+	l := NewG1LagrangeInterpolation(points)
+	pkG1,err := l.interpolate()
+	if err != nil {
+		return nil,err
+	}
+	return bls.CastToPublicKey(pkG1),nil
+}
+
 func (dkg *DKG) sumShares(shares map[uint32][]*bls.Fr) map[uint32]*bls.Fr {
 	ret := make(map[uint32]*bls.Fr)
 	for pIdx, shares := range shares {

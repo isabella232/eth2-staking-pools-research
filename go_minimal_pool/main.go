@@ -58,10 +58,14 @@ func main() {
 	}
 }
 
+// will run a DKG for every pool inputed, creates the participant and it's node, generated pool shared secret
+// and sets pool data as well
 func runDKGForPools(poolData map[uint8][]uint32, threshold uint8) []*participant.Participant {
 	ret := make([]*participant.Participant,0)
+	pools := make([]*state.Pool, len(poolData))
+	i := 0
 	for poolId, poolParticipants := range poolData {
-		sks,err := runDKGForParticipants(threshold - 1, poolParticipants)
+		sks, pk, err := runDKGForParticipants(threshold - 1, poolParticipants)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -81,16 +85,36 @@ func runDKGForPools(poolData map[uint8][]uint32, threshold uint8) []*participant
 
 			ret = append(ret, p)
 		}
+
+		// create pool data
+		pools[i] = state.NewPool(poolId, pk)
+		i++
+	}
+
+	// for each participant save pool data
+	for _, p := range ret {
+		for _, pool := range pools {
+			p.Node.State.SavePool(pool)
+		}
 	}
 
 	return ret
 }
 
-func runDKGForParticipants(degree uint8, indexes []uint32) (map[uint32]*bls.Fr, error) {
+func runDKGForParticipants(degree uint8, indexes []uint32) (map[uint32]*bls.Fr, *bls.PublicKey, error) {
 	dkg,err := crypto.NewDKG(degree, indexes)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return dkg.GroupSecrets(indexes)
+	sks, err := dkg.GroupSecrets(indexes)
+	if err != nil {
+		return nil, nil, err
+	}
+	pk,err := dkg.GroupPK(sks)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return sks, pk, nil
 }

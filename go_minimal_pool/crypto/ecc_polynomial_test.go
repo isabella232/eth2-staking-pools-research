@@ -53,7 +53,7 @@ func TestG2Interpolation(t *testing.T) {
 		{frFromInt(3),p3},
 	}
 	l := NewG2LagrangeInterpolation(points)
-	res,err := l.interpolate()
+	res,err := l.Interpolate()
 	require.NoError(t, err)
 
 	// compare results

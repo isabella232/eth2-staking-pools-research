@@ -53,4 +53,16 @@ func TestDKG(t *testing.T) {
 	require.Equal(t, "21", sks[1].GetString(10))
 	require.Equal(t, "30", sks[2].GetString(10))
 	require.Equal(t, "45", sks[3].GetString(10))
+
+
+	// group pk
+	pk,err := dkg.GroupPK(sks)
+	require.NoError(t, err)
+
+	// verify
+	expectedGroupSecret := &bls.Fr{}
+	expectedGroupSecret.SetInt64(18)
+	expectedGroupSk := bls.CastToSecretKey(expectedGroupSecret)
+
+	require.Equal(t, expectedGroupSk.GetPublicKey().GetHexString(), pk.GetHexString())
 }

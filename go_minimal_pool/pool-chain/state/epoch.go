@@ -29,12 +29,17 @@ type Epoch struct {
 
 	// every participant will use this var to store his epoch's secret.
 	ParticipantShare *bls.Fr
+	// used to store the epoch's reconstructed signature (that will get broadcasted to eth2)
+	ReconstructedSignature *bls.G2
+	//
+	EpochSigVerified bool
 }
 
 func NewEpochInstance(number uint32, seed [32]byte) *Epoch {
 	return &Epoch{
 		Number:number,
 		epochSeed: seed,
+		EpochSigVerified: false,
 	}
 }
 
@@ -65,4 +70,8 @@ func (epoch *Epoch) PoolsParticipantIds() (map[uint8][]uint32,error) {
 		config.NumberOfPools,
 		config.PoolSize,
 		)
+}
+
+func (epoch *Epoch)StatusString() string {
+	return fmt.Sprintf("Epoch number: %d, Sig Verified: %t",epoch.Number,epoch.EpochSigVerified)
 }
