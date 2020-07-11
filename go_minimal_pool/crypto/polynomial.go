@@ -7,13 +7,13 @@ import (
 
 type Polynomial struct {
 	secret bls.Fr
-	Degree uint8
+	Degree uint32
 	interpolationPoints [][]bls.Fr
 
 	Coefficients []bls.Fr
 }
 
-func NewPolynomial(secret bls.Fr, degree uint8) (*Polynomial,error) {
+func NewPolynomial(secret bls.Fr, degree uint32) (*Polynomial,error) {
 	ret := &Polynomial{
 		secret: secret,
 		Degree: degree,
@@ -36,7 +36,7 @@ func NewLagrangeInterpolation(points [][]bls.Fr) *Polynomial {
 
 func (p *Polynomial) GenerateRandom() error {
 	p.Coefficients[0] = p.secret  // important the free coefficient is in index 0
-	for i := uint8(1) ; i < p.Degree ; i++ {
+	for i := uint32(1) ; i < p.Degree ; i++ {
 		sk := bls.Fr{}
 		sk.SetByCSPRNG()
 		p.Coefficients[i] = sk

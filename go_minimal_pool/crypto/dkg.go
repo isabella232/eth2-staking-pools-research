@@ -7,10 +7,10 @@ import "github.com/herumi/bls-eth-go-binary/bls"
  */
 type DKG struct {
 	polynomials map[uint32]*Polynomial
-	degree uint8
+	degree uint32
 }
 
-func NewDKG(degree uint8, indexes []uint32) (*DKG,error) {
+func NewDKG(degree uint32, indexes []uint32) (*DKG,error) {
 	polynomials := make(map[uint32]*Polynomial)
 	for _, idx := range indexes {
 		secret := &bls.Fr{}

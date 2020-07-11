@@ -5,12 +5,12 @@ import "github.com/herumi/bls-eth-go-binary/bls"
 // responsible for generating shares for redistribution
 // https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_rotation.md
 type Redistribuition struct {
-	degree uint8
+	degree uint32
 	originalSk *bls.Fr
 	polynomial *Polynomial
 }
 
-func NewRedistribuition(degree uint8, originalSk *bls.Fr) (*Redistribuition,error) {
+func NewRedistribuition(degree uint32, originalSk *bls.Fr) (*Redistribuition,error) {
 	p, err := NewPolynomial(*originalSk, degree)
 	if err != nil {
 		return nil, err
