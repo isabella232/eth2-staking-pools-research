@@ -7,6 +7,7 @@ import (
 	pool_chain "github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/state"
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"log"
 )
@@ -32,7 +33,7 @@ func main() {
 	}
 
 	// initial DKG for pools
-	participants = runDKGForPools(poolData, config.PoolThreshold)
+	participants = runDKGForPools(poolData, config.PoolThreshold - 1)
 
 	// connect pools to each other
 	for i, p1 := range participants {
@@ -60,7 +61,7 @@ func main() {
 
 // will run a DKG for every pool inputed, creates the participant and it's node, generated pool shared secret
 // and sets pool data as well
-func runDKGForPools(poolData map[uint8][]uint32, threshold uint8) []*participant.Participant {
+func runDKGForPools(poolData map[shared.PoolId][]shared.ParticipantId, threshold shared.PoolSize) []*participant.Participant {
 	ret := make([]*participant.Participant,0)
 	pools := make([]*state.Pool, len(poolData))
 	i := 0
@@ -87,7 +88,7 @@ func runDKGForPools(poolData map[uint8][]uint32, threshold uint8) []*participant
 		}
 
 		// create pool data
-		pools[i] = state.NewPool(poolId, pk)
+		pools[i] = state.NewPool(poolId, threshold, pk)
 		i++
 	}
 
@@ -101,7 +102,7 @@ func runDKGForPools(poolData map[uint8][]uint32, threshold uint8) []*participant
 	return ret
 }
 
-func runDKGForParticipants(degree uint8, indexes []uint32) (map[uint32]*bls.Fr, *bls.PublicKey, error) {
+func runDKGForParticipants(degree shared.PoolSize, indexes []shared.ParticipantId) (map[shared.ParticipantId]*bls.Fr, *bls.PublicKey, error) {
 	dkg,err := crypto.NewDKG(degree, indexes)
 	if err != nil {
 		return nil, nil, err

@@ -59,7 +59,7 @@ func (p *Participant) reconstructEpochSignature(epoch *state.Epoch) error {
 	// filter out relevant sigs
 	points := make([][]interface{},0)
 	for _,v := range p.Node.SigsPerEpoch[epoch.Number] {
-		if uint8(v.PoolId) == currentPool {
+		if v.PoolId == currentPool {
 			sig := &bls.G2{}
 			err := sig.Deserialize(v.Sig)
 			if err != nil {

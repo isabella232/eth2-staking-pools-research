@@ -1,12 +1,14 @@
 package state
 
+import "github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
+
 type InMemStateDb struct {
-	epochs map[uint32]*Epoch
+	epochs map[shared.EpochNumber]*Epoch
 }
 
 func NewInMemoryDb() *InMemStateDb {
 	return &InMemStateDb{
-		epochs: make(map[uint32]*Epoch),
+		epochs: make(map[shared.EpochNumber]*Epoch),
 	}
 }
 
@@ -15,7 +17,7 @@ func (db *InMemStateDb) SaveEpoch(epoch *Epoch) error {
 	return nil
 }
 
-func (db *InMemStateDb) GetEpoch(number uint32) (*Epoch,error) {
+func (db *InMemStateDb) GetEpoch(number shared.EpochNumber) (*Epoch,error) {
 	if val, ok := db.epochs[number]; ok {
 		return val, nil
 	}

@@ -4,19 +4,20 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/crypto"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net"
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 )
 
-func shufflePools(input []uint32, seed [32]byte, roundCount uint8, numberOfPools uint8, poolSize uint8) (map[uint8][]uint32, error) {
+func shufflePools(input []shared.ParticipantId, seed [32]byte, roundCount uint8, numberOfPools shared.PoolId, poolSize shared.PoolSize) (map[shared.PoolId][]shared.ParticipantId, error) {
 	shuffled, err := crypto.ShuffleList(input, seed, roundCount)
 	if err != nil {
 		return nil, err
 	}
 
-	ret := make(map[uint8][]uint32)
-	for p_id := uint8(1) ; p_id <= numberOfPools ; p_id ++ {
-		start := (p_id - 1) * poolSize
-		end := start + poolSize
+	ret := make(map[shared.PoolId][]shared.ParticipantId)
+	for p_id := shared.PoolId(1) ; p_id <= numberOfPools ; p_id ++ {
+		start := int(p_id - 1) * int(poolSize)
+		end := start + int(poolSize)
 		ret[p_id] = shuffled[start: end]
 	}
 
@@ -24,7 +25,7 @@ func shufflePools(input []uint32, seed [32]byte, roundCount uint8, numberOfPools
 }
 
 type Epoch struct {
-	Number uint32
+	Number shared.EpochNumber
 	epochSeed [32]byte
 
 	// every participant will use this var to store his epoch's secret.
@@ -43,7 +44,7 @@ func NewEpochInstance(number uint32, seed [32]byte) *Epoch {
 	}
 }
 
-func (epoch *Epoch) ParticipantPoolAssignment(participantId uint32) (uint8,error) {
+func (epoch *Epoch) ParticipantPoolAssignment(id shared.ParticipantId) (shared.PoolId,error) {
 	// TODO make more efficient
 	pools,err := epoch.PoolsParticipantIds()
 	if err != nil {
@@ -52,16 +53,16 @@ func (epoch *Epoch) ParticipantPoolAssignment(participantId uint32) (uint8,error
 
 	for poolId, pool := range pools {
 		for _, _pId := range pool {
-			if _pId == participantId {
+			if _pId == id {
 				return poolId, nil
 			}
 		}
 	}
 
-	return 0,fmt.Errorf("can't find %d", participantId)
+	return 0,fmt.Errorf("can't find %d", id)
 }
 
-func (epoch *Epoch) PoolsParticipantIds() (map[uint8][]uint32,error) {
+func (epoch *Epoch) PoolsParticipantIds() (map[shared.PoolId][]shared.ParticipantId,error) {
 	config := net.NewTestNetworkConfig()
 	return shufflePools(
 		config.ParticipantIndexesList(),

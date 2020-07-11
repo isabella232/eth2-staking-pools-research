@@ -2,13 +2,14 @@ package net
 
 import (
 	"encoding/hex"
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
 	"time"
 )
 
 type NetworkConfig struct {
-	PoolSize uint8
-	NumberOfPools uint8
-	PoolThreshold uint8
+	PoolSize shared.PoolSize
+	NumberOfPools shared.PoolId
+	PoolThreshold shared.PoolSize
 
 	SeedShuffleRoudnCount uint8
 
@@ -29,7 +30,7 @@ func NewTestNetworkConfig() *NetworkConfig {
 	return &NetworkConfig{
 		PoolSize:      3,
 		PoolThreshold: 3,
-		NumberOfPools: 2,
+		NumberOfPools: 5,
 		SeedShuffleRoudnCount: 10,
 		EpochSpanSec:  time.Second * 8,
 		EpochTestMessage: _testMsg,
@@ -37,13 +38,13 @@ func NewTestNetworkConfig() *NetworkConfig {
 	}
 }
 
-func (c *NetworkConfig) TotalNumberOfParticipants() uint32 {
-	return uint32(c.NumberOfPools * c.PoolSize)
+func (c *NetworkConfig) TotalNumberOfParticipants() shared.ParticipantId {
+	return shared.ParticipantId(int(c.NumberOfPools) * int(c.PoolSize))
 }
 
-func (c *NetworkConfig) ParticipantIndexesList() []uint32 {
-	s := make([]uint32, c.TotalNumberOfParticipants())
-	start := uint32(1)
+func (c *NetworkConfig) ParticipantIndexesList() []shared.ParticipantId {
+	s := make([]shared.ParticipantId, c.TotalNumberOfParticipants())
+	start := shared.ParticipantId(1)
 	for i := range s {
 		s[i] = start
 		start += 1

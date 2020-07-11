@@ -1,25 +1,26 @@
 package state
 
-import "github.com/bloxapp/eth2-staking-pools-research/minimal_pool/crypto"
+import (
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/crypto"
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
+)
 
 type DB interface {
 	// will return nil,nil if epoch not found
-	GetEpoch(number uint32) (*Epoch,error)
+	GetEpoch(number shared.EpochNumber) (*Epoch,error)
 	SaveEpoch(epoch *Epoch) error
 }
 
 type State struct {
 	db           DB
-	currentEpoch uint32
-	Pools        map[uint8]*Pool
+	Pools        map[shared.PoolId]*Pool
 	seed         [32]byte
 }
 
 func NewInMemoryState(seed [32]byte) *State {
 	return & State{
 		db:           NewInMemoryDb(),
-		currentEpoch: 0,
-		Pools:        make(map[uint8]*Pool),
+		Pools:        make(map[shared.PoolId]*Pool),
 		seed:         seed,
 	}
 }
@@ -28,7 +29,7 @@ func (s *State) SaveEpoch(epoch *Epoch) error {
 	return s.db.SaveEpoch(epoch)
 }
 
-func (s *State) GetEpoch(number uint32) *Epoch {
+func (s *State) GetEpoch(number shared.EpochNumber) *Epoch {
 	e, err := s.db.GetEpoch(number)
 	if err != nil {
 		return nil
@@ -51,11 +52,7 @@ func (s *State) GetEpoch(number uint32) *Epoch {
 	return e
 }
 
-func (s *State) GetCurrentEpoch() *Epoch {
-	return s.GetEpoch(s.currentEpoch)
-}
-
-func (s *State) GetPool(poolId uint8) *Pool {
+func (s *State) GetPool(poolId shared.PoolId) *Pool {
 	return s.Pools[poolId]
 }
 

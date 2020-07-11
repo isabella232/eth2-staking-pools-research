@@ -1,14 +1,15 @@
 package pool_chain
 
 import (
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
 	"time"
 )
 
 type EpochTicker struct {
 	ticker *time.Ticker
 	interval time.Duration
-	number int
-	tickerChan chan int
+	number shared.EpochNumber
+	tickerChan chan shared.EpochNumber
 	done chan bool
 }
 
@@ -16,7 +17,7 @@ func NewEpochTicker(interval time.Duration) *EpochTicker {
 	return &EpochTicker{
 		interval: interval,
 		number:    0,
-		tickerChan: make(chan int),
+		tickerChan: make(chan shared.EpochNumber),
 		done: make(chan bool),
 	}
 }
@@ -45,6 +46,10 @@ func (t *EpochTicker) Stop () {
 	t.done <- true
 }
 
-func (t *EpochTicker) C() <-chan int  {
+func (t *EpochTicker) C() <-chan shared.EpochNumber  {
 	return t.tickerChan
+}
+
+func (t *EpochTicker) CurrentEpochNumber() shared.EpochNumber {
+	return t.number
 }

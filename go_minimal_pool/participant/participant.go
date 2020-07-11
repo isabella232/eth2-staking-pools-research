@@ -3,19 +3,20 @@ package participant
 import (
 	pool_chain "github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/state"
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
 	"log"
 	"sync"
 	"time"
 )
 
 type Participant struct {
-	Id   uint32
+	Id   shared.ParticipantId
 	Node *pool_chain.PoolChainNode
 
 	epochProcessingLock sync.Mutex
 }
 
-func NewParticipant(id uint32) *Participant {
+func NewParticipant(id shared.ParticipantId) *Participant {
 	return &Participant{
 		Id:   id,
 	}
@@ -31,10 +32,6 @@ func (p *Participant) StartEpochProcessing() {
 		for {
 			select {
 			case epoch := <- p.Node.EpochC():
-				if epoch == -1 {
-					return
-				}
-
 				e := p.Node.State.GetEpoch(uint32(epoch))
 				go p.timeEpoch(e)
 			}

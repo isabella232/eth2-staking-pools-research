@@ -5,6 +5,7 @@ import (
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net/pb"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/net/simple_net"
 	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/pool-chain/state"
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
 	"sync"
 )
 
@@ -15,12 +16,12 @@ type PoolChainNode struct {
 	Config      *net2.NetworkConfig
 
 	// just holds all messages for convenience
-	SharesPerEpoch map[uint32]map[string]*pb.ShareDistribution
+	SharesPerEpoch map[shared.EpochNumber]map[string]*pb.ShareDistribution
 	sharesLock sync.Mutex
-	SigsPerEpoch map[uint32]map[string]*pb.SignatureDistribution
+	SigsPerEpoch map[shared.EpochNumber]map[string]*pb.SignatureDistribution
 	sigsLock sync.Mutex
 	// messages will be saved only for the specific Id
-	FilterId uint32
+	FilterId shared.ParticipantId
 
 	Killed 		chan bool
 }
@@ -46,8 +47,12 @@ func NewTestChainNode() *PoolChainNode {
 	return ret
 }
 
-func (p *PoolChainNode) EpochC () <- chan int {
+func (p *PoolChainNode) EpochC () <- chan shared.EpochNumber {
 	return p.epochTicker.C()
+}
+
+func (p *PoolChainNode) GetCurrentEpoch() *state.Epoch {
+	return p.State.GetEpoch(p.epochTicker.CurrentEpochNumber())
 }
 
 func (p *PoolChainNode) StartEpochProcessing() {
