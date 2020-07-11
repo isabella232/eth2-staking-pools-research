@@ -12,7 +12,7 @@ This repo aims to have in one place all the research around decentralized stakin
 	- [coordinate the execution of the validator's epoch duties by the pool](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_duties.md)
 	- coordinate participants exit from the protocol
 	- [epoch processing](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/epoch_processing.md)
-- [bilinear pairings and BLS12-381 keys](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/BLS_keys_and_pairings.pdf)
+- bilinear pairings and BLS12-381 keys [part 1](https://medium.com/@alonmuroch_65570/bls-signatures-part-1-overview-47d9eebf1c75), [part 2](https://medium.com/@alonmuroch_65570/bls-signatures-part-2-key-concepts-of-pairings-27a8a9533d0c)
 - Networking  
 
 ### Overview
@@ -34,5 +34,5 @@ A way this could work is to continously rotate all participants between the pool
 This repository aims to explore all those challenges (and others) towards a formal protocol definition.
 
 ### Minimal Pool
-This is a research project towards emulating key concepts in staking pools like creation of new pools, rotation, withdrawal, networking and more.\
-[Minimal Pool](https://github.com/bloxapp/eth2-staking-pools-research/tree/master/minimal_pool)
+A research project towards establishing key concepts in staking pools like creation of new pools, rotation, withdrawal, networking and more.\
+[Minimal Pool](https://github.com/bloxapp/eth2-staking-pools-research/tree/master/go_minimal_pool)
