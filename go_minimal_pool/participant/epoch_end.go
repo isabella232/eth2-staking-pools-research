@@ -12,6 +12,9 @@ import (
 // start happens at 2/3 of the epoch
 // https://github.com/bloxapp/eth2-staking-pools-research/blob/master/epoch_processing.md
 func (p *Participant) epochEnd(epoch *state.Epoch) {
+	p.epochProcessingLock.Lock()
+	defer p.epochProcessingLock.Unlock()
+
 	log.Printf("P %d, epoch %d end with %d sigs", p.Id,epoch.Number, len(p.Node.SigsPerEpoch[epoch.Number]))
 
 	err := p.reconstructEpochSignature(epoch)

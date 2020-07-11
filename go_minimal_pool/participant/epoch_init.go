@@ -12,10 +12,10 @@ import (
 // start happens at 1/4 of the epoch
 // https://github.com/bloxapp/eth2-staking-pools-research/blob/master/epoch_processing.md
 func (p *Participant) epochInit(epoch *state.Epoch) {
-	log.Printf("P %d, epoch %d init", p.Id, epoch.Number)
-
 	p.epochProcessingLock.Lock()
 	defer p.epochProcessingLock.Unlock()
+
+	log.Printf("P %d, epoch %d init", p.Id, epoch.Number)
 
 	// find share distro target
 	nextEpoch := p.Node.State.GetEpoch(epoch.Number + 1)

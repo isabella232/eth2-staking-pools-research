@@ -12,6 +12,9 @@ import (
 // start happens at 1/2 of the epoch
 // https://github.com/bloxapp/eth2-staking-pools-research/blob/master/epoch_processing.md
 func (p *Participant) epochMid(epoch *state.Epoch) {
+	p.epochProcessingLock.Lock()
+	defer p.epochProcessingLock.Unlock()
+
 	log.Printf("P %d, epoch %d mid with %d shares", p.Id, epoch.Number, len(p.Node.SharesPerEpoch[epoch.Number]))
 
 	currentPool,err := epoch.ParticipantPoolAssignment(p.Id)
