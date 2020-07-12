@@ -21,3 +21,18 @@ func Sign(secret *bls.Fr, msg []byte) *bls.G2 {
 	sig := sk.SignByte(msg)
 	return bls.CastFromSign(sig)
 }
+
+
+func agg_g1(a *bls.G1, b *bls.G1) *bls.G1 {
+	out := &bls.G1{}
+	bls.G1Add(out, a, b)
+
+	return out
+}
+
+func agg_g2(a *bls.G2, b *bls.G2) *bls.G2 {
+	out := &bls.G2{}
+	bls.G2Add(out, a, b)
+
+	return out
+}

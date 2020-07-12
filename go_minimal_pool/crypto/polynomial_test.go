@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"github.com/bloxapp/eth2-staking-pools-research/minimal_pool/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -23,7 +24,7 @@ func TestEvaluation(t *testing.T) {
 
 	sk := bls.Fr{}
 	sk.SetByCSPRNG()
-	degree := uint8(3)
+	degree := shared.PoolSize(3)
 
 	p, err := NewPolynomial(sk, degree)
 	require.NoError(t,err)
