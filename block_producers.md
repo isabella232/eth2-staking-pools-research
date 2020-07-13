@@ -26,7 +26,7 @@ Becoming a block producer requires staking CDT in an eth1 contract.
 The staked CDT acts as collateral for the BP's actions. 
 
 ## Recieving Rewards
-As the BP gains CDT rewards on the pool chain (seperate from eth) he can decide to withdraw them back to eth (for the reasoninng behind keeping CDT on eth see cdt2 page). `
+As the BP gains CDT rewards on the pool chain (seperate from eth) he can decide to withdraw them back to eth (for the reasoninng behind keeping CDT on eth see [CDT 2.0](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/cdt2.md) page). 
 withdrawal is a request that can be submitted by any BP on the pools chain (as a block data argument), once that request (and the block it's in) is finalized the BP can submit a request to eth1 with the specific pool chain block hash and the amount to withdraw.
 
 There is a waiting period in which any other BP can dispute this request (on eth1) and potetially slash the requesting BP and get rewarded. 

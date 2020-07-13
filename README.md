@@ -4,9 +4,11 @@
 
 This repo aims to have in one place all the research around decentralized staking pools for eth 2.0.
 
-- Distribuited key generation and redistribuition
+- [Distribuited key generation](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/dkg.md) and [redistribuition](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_rotation.md)
 - Rewards/ penalties
 - Consensus
+	- [CDT 2.0](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/cdt2.md)
+	- [Block producers](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/block_producers.md)
 	- create new pools
 	- [coordinate rotation and assignment of participants between pools](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_rotation.md)
 	- [coordinate the execution of the validator's epoch duties by the pool](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_duties.md)
