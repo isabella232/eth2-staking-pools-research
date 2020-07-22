@@ -24,6 +24,12 @@ As [Ostrovsky and Yung](http://web.cs.ucla.edu/~rafail/PUBLIC/189.pdf) describe 
 In a real-word usecase of eth 2.0 staking pools, m will be set to 2/3 as the base protocol defines.
 Pool assgnments are random as described below and are built in such a way as to guarantee a very low probability that a malicious party could take over a pool.
 
+#### DPSS - Do shares from differenet epochs can reconstruct the seecret?
+If participants get rotated between pools they migh end up having different shares for the same pool from different epochs. Can't they re-construct the secret that way? 
+The answer is no for 2 reasons:
+1) they only get assigned the shares for their index every time, not different indexes (an index is just the value at the index of the re-distribuition polynomial)
+2) shares from different epochs can't re-construct the secret. See [shuffle integrity test](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/go_minimal_pool/crypto/shuffle_integrity_test.go)
+
 ## Pool assgniments - min pool size
 Each participant is assgined to a pool every epoch randomly to prevent malicious participants to coordinate ahead of time or influence the random source to force their majority in a pool.
 With the above in mind, the setup should be very similar to the way eth 2.0 selects committees.
