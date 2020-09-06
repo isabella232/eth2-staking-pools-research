@@ -1,8 +1,8 @@
 package spec
 
 const (
-	POOL_EXECUTORS_NUMBER uint = 128
-	BASE_ETH2_DUTY_REWARD uint64 = 1
+	PoolExecutorsNumber uint   = 128
+	BaseEth2DutyReward  uint64 = 1
 )
 
 

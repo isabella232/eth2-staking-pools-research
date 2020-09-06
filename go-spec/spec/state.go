@@ -15,7 +15,6 @@ type BlockProducer struct {
 
 type Pool struct {
 	Id				[]byte // pubkey
-	ETH2Balance		uint64
 	SortedExecutors		[]uint64 // ids of the block producers which are executors on this pool
 }
 
@@ -54,33 +53,16 @@ func (state *State) DecreaseBlockProducerBalance(bp uint64, change uint64) (newB
 }
 
 // Applies every pool performance to its relevant executors, decreasing and increasing balances.
-func (state *State) ApplyPoolExecutions(pools []*PoolExecutionSummary) error {
-	for _, p := range pools {
-		if !state.IsActivePool(p.Id) {
-			return fmt.Errorf("pool %s not active", hex.EncodeToString(p.Id))
+func (state *State) ApplyPoolExecutions(summaries []*PoolExecutionSummary) error {
+	for _, summary := range summaries {
+		if !state.IsActivePool(summary.PoolId) {
+			return fmt.Errorf("pool %s not active", hex.EncodeToString(summary.PoolId))
 		}
 
-		pool, err := GetPool(p.Id)
-		if err != nil {
+		if err := summary.ApplyOnState(state); err != nil {
 			return err
 		}
-
-		// iterate over duties
-		for duty, whoExecuted := range p.Performance.Execution {
-			switch duty.Type {
-			case 0,1:
-				for i:=0 ; i < int(POOL_EXECUTORS_NUMBER) ; i++ {
-					executor := pool.SortedExecutors[i]
-					if IsBitSet(whoExecuted[:], uint64(i)) {
-						state.IncreaseBlockProducerBalance(executor, BASE_ETH2_DUTY_REWARD)
-					} else {
-						state.DecreaseBlockProducerBalance(executor, BASE_ETH2_DUTY_REWARD)
-					}
-				}
-			}
-		}
 	}
-
 	return nil
 }
 
@@ -94,7 +76,7 @@ func (state *State) ProcessNewBlock(newBlockHeader *BlockHeader) (newState *Stat
 	// copy the state to apply state transition on
 	stateCopy := state.Copy()
 
-	err = stateCopy.ApplyPoolExecutions(newBlock.pools)
+	err = stateCopy.ApplyPoolExecutions(newBlock.PoolsExecutionSummary)
 	if err != nil {
 		return nil, err
 	}

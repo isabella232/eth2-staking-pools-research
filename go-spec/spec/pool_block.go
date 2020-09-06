@@ -22,7 +22,7 @@ package spec
 //}
 
 type BlockBody struct {
-	pools 				[]*PoolExecutionSummary
+	PoolsExecutionSummary []*PoolExecutionSummary
 	//NewPoolReq			[]*CreatePoolRequest
 	//WithdrawReq			[]*WithdrawRequest
 	//LiquidationReq		[]*LiquidatePoolRequest
