@@ -1,5 +1,12 @@
 package src
 
+import (
+	"github.com/herumi/bls-eth-go-binary/bls"
+	"github.com/prysmaticlabs/go-ssz"
+	"github.com/stretchr/testify/require"
+	"testing"
+)
+
 func GenerateRandomState() *State {
 	pools := make([]*Pool, 5)
 
@@ -34,4 +41,39 @@ func GenerateRandomState() *State {
 		BlockProducers:  bps,
 		Seed:            []byte("seed"),
 	}
+}
+
+func TestBlockValidation(t *testing.T) {
+	require.NoError(t, bls.Init(bls.BLS12_381))
+	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
+
+	sk := &bls.SecretKey{}
+	sk.SetByCSPRNG()
+
+	// generate header and body
+	body := &BlockBody{
+		Proposer:              0,
+		PoolsExecutionSummary: []*PoolExecutionSummary{GenerateAttestationSuccessfulSummary()},
+		StateRoot:             []byte("root"),
+		ParentBlockRoot:       []byte("parent"),
+	}
+	root,err := ssz.HashTreeRoot(body)
+	require.NoError(t, err)
+
+	// sign
+	sig := sk.SignByte(root[:])
+
+	head := &BlockHeader{
+		BlockRoot: root[:],
+		Signature: sig.Serialize(),
+	}
+
+	state := GenerateRandomState()
+
+	// set BP
+	bp, err := GetBlockProducer(state, 0)
+	require.NoError(t, err)
+	bp.PubKey = sk.GetPublicKey()
+
+	require.NoError(t, state.ValidateBlock(head, body))
 }

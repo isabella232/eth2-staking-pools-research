@@ -10,12 +10,13 @@ func GenerateAttestationSuccessfulSummary() *PoolExecutionSummary {
 		PoolId:        0,
 		StartingEpoch: 0,
 		EndEpoch:      1,
-		Performance:   map[*BeaconDuty][16]byte{
+		Duties:        []*BeaconDuty{
 			&BeaconDuty{
 				Type:     0,
 				Slot:     0,
 				Included: true,
-			}: [16]byte{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // the first executor index is set to 1
+				Executors: [16]byte{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // the first executor index is set to 1
+			},
 		},
 	}
 }
@@ -26,7 +27,7 @@ func TestAttestationSuccessful(t *testing.T) {
 
 	require.NoError(t, summary.ApplyOnState(state))
 
-	for _, whoExecuted := range summary.Performance {
+	for _, duty := range summary.Duties {
 		pool, err := GetPool(state, summary.PoolId)
 		require.NoError(t, err)
 
@@ -34,7 +35,7 @@ func TestAttestationSuccessful(t *testing.T) {
 			bp,err := GetBlockProducer(state, pool.SortedExecutors[i])
 			require.NoError(t, err)
 
-			if IsBitSet(whoExecuted[:], uint64(i)) {
+			if IsBitSet(duty.Executors[:], uint64(i)) {
 				require.EqualValues(t, 1100, bp.Balance)
 				require.EqualValues(t, 0, i)
 			} else {

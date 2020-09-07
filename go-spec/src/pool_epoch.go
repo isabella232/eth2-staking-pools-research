@@ -4,7 +4,7 @@ type PoolExecutionSummary struct {
 	PoolId        	uint64
 	StartingEpoch 	uint64 // a.k.a previous epoch
 	EndEpoch      	uint64 //
-	Performance   	map[*BeaconDuty][16]byte // for every duty specify an array of 128 bits (16 bytes) of who participated in the execution of that duty
+	Duties   		[]*BeaconDuty
 }
 
 // will calculate rewards/ penalties and apply them onto the state
@@ -14,7 +14,7 @@ func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
 		return err
 	}
 
-	for duty, whoExecuted := range summary.Performance {
+	for _, duty := range summary.Duties {
 		switch duty.Type {
 		case 0: // attestation
 			for i:=0 ; i < int(TestConfig().PoolExecutorsNumber) ; i++ {
@@ -25,7 +25,7 @@ func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
 						return err
 					}
 				} else {
-					if IsBitSet(whoExecuted[:], uint64(i)) {
+					if IsBitSet(duty.Executors[:], uint64(i)) {
 						_,err := state.IncreaseBlockProducerBalance(executor, TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
@@ -47,7 +47,7 @@ func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
 						return err
 					}
 				} else {
-					if IsBitSet(whoExecuted[:], uint64(i)) {
+					if IsBitSet(duty.Executors[:], uint64(i)) {
 						_,err = state.IncreaseBlockProducerBalance(executor, 2*TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err

@@ -8,6 +8,7 @@ import (
 
 type BlockProducer struct {
 	Id				uint64
+	PubKey			*bls.PublicKey
 	Balance			uint64 // balance on the pool chain (rewards earned)
 	Stake			uint64 // stake
 	Slashed			bool
@@ -15,7 +16,7 @@ type BlockProducer struct {
 
 type Pool struct {
 	Id					uint64 // id
-	PubKey				bls.PublicKey // eth2 validation pubkey
+	PubKey				*bls.PublicKey // eth2 validation pubkey
 	SortedExecutors		[]uint64 // ids of the block producers which are executors on this pool
 }
 
@@ -61,6 +62,25 @@ func (state *State) DecreaseBlockProducerBalance(id uint64, change uint64) (newB
 
 	bp.Balance -= change
 	return bp.Balance, nil
+}
+
+func (state *State) ValidateBlock(header *BlockHeader, body *BlockBody) error {
+	bp, err := GetBlockProducer(state, body.Proposer)
+	if err != nil {
+		return err
+	}
+
+	err = header.Validate(bp)
+	if err != nil {
+		return err
+	}
+
+	err = body.Validate()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Applies every pool performance to its relevant executors, decreasing and increasing balances.
