@@ -1,4 +1,4 @@
-package spec
+package src
 
 //// A request struct for creating new pool credentials
 //// will trigger random selection of 128 executors to DKG new pool credentials and wait for deposit

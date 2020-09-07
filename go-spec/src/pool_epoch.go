@@ -1,4 +1,4 @@
-package spec
+package src
 
 type PoolExecutionSummary struct {
 	PoolId        	[]byte // eth2 validator pubkey

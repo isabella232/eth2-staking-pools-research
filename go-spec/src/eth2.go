@@ -1,4 +1,4 @@
-package spec
+package src
 
 type BeaconDuty struct {
 	Type				uint8 // 0 - attestation, 1 - block proposal

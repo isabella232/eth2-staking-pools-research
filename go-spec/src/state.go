@@ -1,4 +1,4 @@
-package spec
+package src
 
 import (
 	"encoding/hex"
@@ -22,7 +22,7 @@ type State struct {
 	Pools			[]*Pool
 	BlockRoots		[]byte
 	HeadBlockHeader	[]*BlockHeader
-	BlockProducers  map[uint64]*BlockProducer
+	BlockProducers  []*BlockProducer
 	Seed			[]byte
 }
 
@@ -38,18 +38,28 @@ func (state *State) IsActivePool(pool []byte) bool {
 	return true // TODO
 }
 
-func (state *State) IncreaseBlockProducerBalance(bp uint64, change uint64) (newBalance uint64, error error) {
-	state.BlockProducers[bp].Balance += change
-	return state.BlockProducers[bp].Balance, nil
-}
-
-func (state *State) DecreaseBlockProducerBalance(bp uint64, change uint64) (newBalance uint64, error error) {
-	if state.BlockProducers[bp].Balance < change {
-		return 0, fmt.Errorf("BP %d dosen't have enonugh balance (%d) to decrease (%d)", bp, state.BlockProducers[bp].Balance, change)
+func (state *State) IncreaseBlockProducerBalance(id uint64, change uint64) (newBalance uint64, error error) {
+	bp,err := GetBlockProducer(id)
+	if err != nil {
+		return 0, err
 	}
 
-	state.BlockProducers[bp].Balance -= change
-	return state.BlockProducers[bp].Balance, nil
+	bp.Balance += change
+	return bp.Balance, nil
+}
+
+func (state *State) DecreaseBlockProducerBalance(id uint64, change uint64) (newBalance uint64, error error) {
+	bp,err := GetBlockProducer(id)
+	if err != nil {
+		return 0, err
+	}
+
+	if bp.Balance < change {
+		return 0, fmt.Errorf("BP %d dosen't have enonugh balance (%d) to decrease (%d)", bp, bp.Balance, change)
+	}
+
+	bp.Balance -= change
+	return bp.Balance, nil
 }
 
 // Applies every pool performance to its relevant executors, decreasing and increasing balances.
