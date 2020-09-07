@@ -39,7 +39,7 @@ func (state *State) IsActivePool(pool []byte) bool {
 }
 
 func (state *State) IncreaseBlockProducerBalance(id uint64, change uint64) (newBalance uint64, error error) {
-	bp,err := GetBlockProducer(id)
+	bp,err := GetBlockProducer(state, id)
 	if err != nil {
 		return 0, err
 	}
@@ -49,13 +49,13 @@ func (state *State) IncreaseBlockProducerBalance(id uint64, change uint64) (newB
 }
 
 func (state *State) DecreaseBlockProducerBalance(id uint64, change uint64) (newBalance uint64, error error) {
-	bp,err := GetBlockProducer(id)
+	bp,err := GetBlockProducer(state, id)
 	if err != nil {
 		return 0, err
 	}
 
 	if bp.Balance < change {
-		return 0, fmt.Errorf("BP %d dosen't have enonugh balance (%d) to decrease (%d)", bp, bp.Balance, change)
+		return 0, fmt.Errorf("BP %d dosen't have enonugh balance (%d) to decrease (%d)", bp.Id, bp.Balance, change)
 	}
 
 	bp.Balance -= change

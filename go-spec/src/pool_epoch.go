@@ -9,7 +9,7 @@ type PoolExecutionSummary struct {
 
 // will calculate rewards/ penalties and apply them onto the state
 func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
-	pool, err := GetPool(summary.PoolId)
+	pool, err := GetPool(state, summary.PoolId)
 	if err != nil {
 		return err
 	}
