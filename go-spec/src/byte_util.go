@@ -17,3 +17,9 @@ func IsBitSet (src []byte, pos uint64) bool {
 	srcNum := binary.LittleEndian.Uint64(src)
 	return (srcNum & mask) != 0
 }
+
+func SliceToByte32(slice []byte) [32]byte {
+	var arr [32]byte
+	copy(arr[:], slice[:32])
+	return arr
+}

@@ -30,10 +30,7 @@ func GeneratePoolSummary(
 	helperFunc NonSpecFunctions,
 	) (*PoolExecutionSummary, error) {
 	// get pool and its info
-	pool, err := state.GetPool(poolId)
-	if err != nil {
-		return nil, err
-	}
+	pool := state.GetPool(poolId)
 
 	// build duties and their execution summary
 	duties, err := helperFunc.FetchExecutedDuties(pool.PubKey, epoch)
@@ -61,10 +58,7 @@ func GeneratePoolSummary(
 
 // will calculate rewards/ penalties and apply them onto the state
 func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
-	pool, err := state.GetPool(summary.PoolId)
-	if err != nil {
-		return err
-	}
+	pool := state.GetPool(summary.PoolId)
 
 	for _, duty := range summary.Duties {
 		switch duty.Type {
@@ -83,7 +77,7 @@ func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
 							return err
 						}
 					} else {
-						_,err = state.DecreaseBlockProducerBalance(executor, TestConfig().BaseEth2DutyReward)
+						_,err := state.DecreaseBlockProducerBalance(executor, TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}
@@ -94,18 +88,18 @@ func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
 			for i:=0 ; i < int(TestConfig().PoolExecutorsNumber) ; i++ {
 				executor := pool.SortedExecutors[i]
 				if !duty.Included {
-					_,err = state.DecreaseBlockProducerBalance(executor, 4*TestConfig().BaseEth2DutyReward)
+					_,err := state.DecreaseBlockProducerBalance(executor, 4*TestConfig().BaseEth2DutyReward)
 					if err != nil {
 						return err
 					}
 				} else {
 					if IsBitSet(duty.Executors[:], uint64(i)) {
-						_,err = state.IncreaseBlockProducerBalance(executor, 2*TestConfig().BaseEth2DutyReward)
+						_,err := state.IncreaseBlockProducerBalance(executor, 2*TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}
 					} else {
-						_,err = state.DecreaseBlockProducerBalance(executor, 2*TestConfig().BaseEth2DutyReward)
+						_,err := state.DecreaseBlockProducerBalance(executor, 2*TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}

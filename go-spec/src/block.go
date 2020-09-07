@@ -88,7 +88,7 @@ func BuildBlockBody(
 		return nil, err
 	}
 
-	headBlockBody, err := helperFunc.GetBlockBody(state.HeadBlockHeader.BlockRoot)
+	headBlockBody := helperFunc.GetBlockBody(state.HeadBlockHeader.BlockRoot)
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +121,27 @@ func (body *BlockBody) Root() ([]byte,error) {
 type BlockHeader struct {
 	BlockRoot 			[]byte
 	Signature			[]byte // TODO - checking validity + how many voted?
+}
+
+func (header *BlockHeader) Copy() *BlockHeader {
+	return &BlockHeader{
+		BlockRoot: header.BlockRoot,
+		Signature: header.Signature,
+	}
+}
+
+func NewBlockHeader(sk *bls.SecretKey, body *BlockBody) (*BlockHeader,error) {
+	root,err := body.Root()
+	if err != nil {
+		return nil, err
+	}
+
+	sig := sk.SignByte(root)
+
+	return &BlockHeader{
+		BlockRoot: root,
+		Signature: sig.Serialize(),
+	}, nil
 }
 
 func (header *BlockHeader) Validate(bp *BlockProducer) error {

@@ -21,14 +21,13 @@ func GenerateAttestationSuccessfulSummary() *PoolExecutionSummary {
 }
 
 func TestAttestationSuccessful(t *testing.T) {
-	state := GenerateRandomState()
+	state := GenerateRandomState(t)
 	summary := GenerateAttestationSuccessfulSummary()
 
 	require.NoError(t, summary.ApplyOnState(state))
 
 	for _, duty := range summary.Duties {
-		pool, err := state.GetPool(summary.PoolId)
-		require.NoError(t, err)
+		pool := state.GetPool(summary.PoolId)
 
 		for i:=0 ; i < int(TestConfig().PoolExecutorsNumber) ; i++ {
 			bp,err := state.GetBlockProducer(pool.SortedExecutors[i])

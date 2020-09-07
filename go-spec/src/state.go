@@ -14,6 +14,24 @@ type BlockProducer struct {
 	Balance			uint64 // balance on the pool chain (rewards earned)
 	Stake			uint64 // stake
 	Slashed			bool
+	Active 			bool
+}
+
+func (bp *BlockProducer) Copy() (*BlockProducer, error) {
+	pk := &bls.PublicKey{}
+	err := pk.Deserialize(bp.PubKey.Serialize())
+	if err != nil {
+		return nil, err
+	}
+
+	return &BlockProducer{
+		Id:      bp.Id,
+		PubKey:  pk,
+		Balance: bp.Balance,
+		Stake:   bp.Stake,
+		Slashed: bp.Slashed,
+		Active:  bp.Active,
+	}, nil
 }
 
 type Pool struct {
@@ -21,17 +39,54 @@ type Pool struct {
 	PubKey				*bls.PublicKey // eth2 validation pubkey
 	SortedExecutors		[]uint64 // ids of the block producers which are executors on this pool
 }
+func (pool *Pool) Copy() (*Pool, error) {
+	pk := &bls.PublicKey{}
+	err := pk.Deserialize(pool.PubKey.Serialize())
+	if err != nil {
+		return nil, err
+	}
+
+	return &Pool{
+		Id:              pool.Id,
+		PubKey:          pk,
+		SortedExecutors: pool.SortedExecutors,
+	}, nil
+}
 
 type State struct {
 	Pools			[]*Pool
 	BlockRoots		[]byte
 	HeadBlockHeader	*BlockHeader
 	BlockProducers  []*BlockProducer
-	Seed			[]byte
+	Seed			[32]byte
 }
 
-func (state *State) Copy() *State {
-	return nil
+func (state *State) Copy() (*State, error) {
+	copiedPools := make([]*Pool, len(state.Pools))
+	for i, p := range state.Pools {
+		newP, err := p.Copy()
+		if err != nil {
+			return nil, err
+		}
+		copiedPools[i] = newP
+	}
+
+	copiedBps := make([]*BlockProducer, len(state.BlockProducers))
+	for i, bp := range state.BlockProducers {
+		newBP, err := bp.Copy()
+		if err != nil {
+			return nil, err
+		}
+		copiedBps[i] = newBP
+	}
+
+	return &State{
+		Pools:           copiedPools,
+		BlockRoots:      state.BlockRoots,
+		HeadBlockHeader: state.HeadBlockHeader.Copy(),
+		BlockProducers:  copiedBps,
+		Seed:            state.Seed,
+	}, nil
 }
 
 func (state *State) Root() ([32]byte,error) {
@@ -66,9 +121,22 @@ func (state *State) PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error)
 		return nil, fmt.Errorf("pool not active")
 	}
 
+	// get active BPs
+	var activeBps []uint64
+	for _, bp := range state.BlockProducers {
+		if bp.Active {
+			activeBps = append(activeBps, bp.Id)
+		}
+	}
+
+	shuffled,err := ShuffleList(activeBps, state.Seed, 10)
+	if err != nil {
+		return nil, err
+	}
+
 	ret := make([]uint64, TestConfig().PoolExecutorsNumber)
 	for i := uint64(0) ; i < TestConfig().PoolExecutorsNumber ; i++ {
-		ret[i] = state.BlockProducers[poolId * TestConfig().PoolExecutorsNumber + i].Id
+		ret[i] = shuffled[poolId * TestConfig().PoolExecutorsNumber + i]
 	}
 
 	return ret, nil
@@ -145,27 +213,36 @@ func (state *State) ApplyPoolExecutions(summaries []*PoolExecutionSummary) error
 }
 
 func (state *State) ProcessNewPoolRequests(requests []*CreatePoolRequest, currentBP *BlockProducer) error {
-	for _, req := range requests {
-
-	}
+	//for _, req := range requests {
+	//
+	//}
+	return nil
 }
 
 // called when a new block was proposed
-func (state *State) ProcessNewBlock(newBlockHeader *BlockHeader) (newState *State, error error) {
-	newBlock,err := helperFunc.GetBlockBody(newBlockHeader.BlockRoot)
-	if err != nil {
-		return nil, err
-	}
-
-	if state.GetBlockProposer(newBlock.Number) != newBlock.Proposer {
+func (state *State) ProcessNewBlock(newBlockHeader *BlockHeader, newBlockBody *BlockBody) (newState *State, error error) {
+	if state.GetBlockProposer(newBlockBody.Number) != newBlockBody.Proposer {
 		return nil, fmt.Errorf("block proposer is worng")
 	}
 
 
 	// copy the state to apply state transition on
-	stateCopy := state.Copy()
+	stateCopy, err := state.Copy()
+	if err != nil {
+		return nil, err
+	}
 
-	err = stateCopy.ApplyPoolExecutions(newBlock.PoolsExecutionSummary)
+	err = stateCopy.ApplyPoolExecutions(newBlockBody.PoolsExecutionSummary)
+	if err != nil {
+		return nil, err
+	}
+
+	stateCopy.Seed, err = MixSeed(stateCopy.Seed, SliceToByte32(newBlockHeader.Signature[:32])) // TODO - use something else than the sig
+	if err != nil {
+		return nil, err
+	}
+
+	err = helperFunc.SaveBlockBody(newBlockBody)
 	if err != nil {
 		return nil, err
 	}
