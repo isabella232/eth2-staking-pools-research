@@ -71,7 +71,7 @@ func TestBlockValidation(t *testing.T) {
 	state := GenerateRandomState()
 
 	// set BP
-	bp, err := GetBlockProducer(state, 0)
+	bp, err := state.GetBlockProducer(0)
 	require.NoError(t, err)
 	bp.PubKey = sk.GetPublicKey()
 

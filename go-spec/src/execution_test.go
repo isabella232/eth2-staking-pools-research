@@ -8,8 +8,7 @@ import (
 func GenerateAttestationSuccessfulSummary() *PoolExecutionSummary {
 	return &PoolExecutionSummary{
 		PoolId:        0,
-		StartingEpoch: 0,
-		EndEpoch:      1,
+		Epoch:         1,
 		Duties:        []*BeaconDuty{
 			&BeaconDuty{
 				Type:     0,
@@ -28,11 +27,11 @@ func TestAttestationSuccessful(t *testing.T) {
 	require.NoError(t, summary.ApplyOnState(state))
 
 	for _, duty := range summary.Duties {
-		pool, err := GetPool(state, summary.PoolId)
+		pool, err := state.GetPool(summary.PoolId)
 		require.NoError(t, err)
 
 		for i:=0 ; i < int(TestConfig().PoolExecutorsNumber) ; i++ {
-			bp,err := GetBlockProducer(state, pool.SortedExecutors[i])
+			bp,err := state.GetBlockProducer(pool.SortedExecutors[i])
 			require.NoError(t, err)
 
 			if IsBitSet(duty.Executors[:], uint64(i)) {

@@ -1,7 +1,7 @@
 package src
 
 type Config struct {
-	PoolExecutorsNumber uint
+	PoolExecutorsNumber uint64
 	BaseEth2DutyReward  uint64
 }
 

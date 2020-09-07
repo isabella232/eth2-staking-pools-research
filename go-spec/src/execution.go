@@ -2,21 +2,57 @@ package src
 
 type BeaconDuty struct {
 	Type				uint8 // 0 - attestation, 1 - block proposal
+	Committee 			uint64
 	Slot				uint64
 	Included			bool // whether or not it was included in the beacon chain (the pool earned reward from it)
 	Executors			[16]byte // 128 bit of the executors (by order) which executed this duty
 }
 
 type PoolExecutionSummary struct {
-	PoolId        	uint64
-	StartingEpoch 	uint64 // a.k.a previous epoch
-	EndEpoch      	uint64 //
-	Duties   		[]*BeaconDuty
+	PoolId uint64
+	Epoch  uint64 //
+	Duties []*BeaconDuty
+}
+
+func GeneratePoolSummary(
+	poolId uint64,
+	epoch uint64,
+	state *State,
+	helperFunc NonSpecFunctions,
+	) (*PoolExecutionSummary, error) {
+	// get pool and its info
+	pool, err := state.GetPool(poolId)
+	if err != nil {
+		return nil, err
+	}
+
+	// build duties and their execution summary
+	duties, err := helperFunc.FetchExecutedDuties(pool.PubKey, epoch)
+	if err != nil {
+		return nil, err
+	}
+	for _, duty := range duties {
+		duty.Included, err = helperFunc.WasDutyIncluded(pool.PubKey, epoch, duty)
+		if err != nil {
+			return nil, err
+		}
+
+		duty.Executors,err = helperFunc.PoolExecutionStats(poolId, epoch, duty)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &PoolExecutionSummary{
+		PoolId: poolId,
+		Epoch:  epoch,
+		Duties: duties,
+	}, nil
 }
 
 // will calculate rewards/ penalties and apply them onto the state
 func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
-	pool, err := GetPool(state, summary.PoolId)
+	pool, err := state.GetPool(summary.PoolId)
 	if err != nil {
 		return err
 	}

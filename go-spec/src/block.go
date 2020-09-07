@@ -3,6 +3,7 @@ package src
 import (
 	"fmt"
 	"github.com/herumi/bls-eth-go-binary/bls"
+	"github.com/prysmaticlabs/go-ssz"
 )
 
 //// A request struct for creating new pool credentials
@@ -27,18 +28,57 @@ import (
 //}
 
 type BlockBody struct {
-	Proposer 			uint64
-	PoolsExecutionSummary []*PoolExecutionSummary
+	Proposer 				uint64
+	Number					uint64
+	PoolsExecutionSummary 	[]*PoolExecutionSummary
 	//NewPoolReq			[]*CreatePoolRequest
 	//WithdrawReq			[]*WithdrawRequest
 	//LiquidationReq		[]*LiquidatePoolRequest
 	//Slashing			[]*Slashing
-	StateRoot			[]byte
-	ParentBlockRoot		[]byte
+	StateRoot				[]byte
+	ParentBlockRoot			[]byte
 }
 
-func (header *BlockBody) Validate() error {
+func BuildBlockBody(
+	Proposer uint64,
+	number uint64,
+	state *State,
+	summary []*PoolExecutionSummary,
+	helperFunc NonSpecFunctions,
+	) (*BlockBody, error) {
+	stateRoot,err := state.Root()
+	if err != nil {
+		return nil, err
+	}
+
+	headBlockBody, err := helperFunc.GetBlockBody(state.HeadBlockHeader.BlockRoot)
+	if err != nil {
+		return nil, err
+	}
+	parentRoot,err := headBlockBody.Root()
+	if err != nil {
+		return nil, err
+	}
+
+	return &BlockBody{
+		Proposer:              Proposer,
+		Number:                number,
+		PoolsExecutionSummary: summary,
+		StateRoot:             stateRoot[:],
+		ParentBlockRoot:       parentRoot,
+	}, nil
+}
+
+func (body *BlockBody) Validate() error {
 	return nil
+}
+
+func (body *BlockBody) Root() ([]byte,error) {
+	ret, err := ssz.HashTreeRoot(body)
+	if err != nil {
+		return nil, err
+	}
+	return ret[:],nil
 }
 
 type BlockHeader struct {

@@ -6,6 +6,8 @@ import (
 	"github.com/prysmaticlabs/go-ssz"
 )
 
+var helperFunc NonSpecFunctions
+
 type BlockProducer struct {
 	Id				uint64
 	PubKey			*bls.PublicKey
@@ -23,7 +25,7 @@ type Pool struct {
 type State struct {
 	Pools			[]*Pool
 	BlockRoots		[]byte
-	HeadBlockHeader	[]*BlockHeader
+	HeadBlockHeader	*BlockHeader
 	BlockProducers  []*BlockProducer
 	Seed			[]byte
 }
@@ -40,8 +42,40 @@ func (state *State) IsActivePool(id uint64) bool {
 	return true // TODO
 }
 
+func (state *State)  GetPool(id uint64) (*Pool, error) {
+	for _, p := range state.Pools {
+		if p.Id == id {
+			return p, nil
+		}
+	}
+	return nil, fmt.Errorf("pool not found")
+}
+
+func (state *State)  GetBlockProducer(id uint64) (*BlockProducer, error) {
+	for _, bp := range state.BlockProducers {
+		if bp.Id == id {
+			return bp, nil
+		}
+	}
+	return nil, fmt.Errorf("block producer not found")
+}
+
+// TODO - should be randomly choosen depending on epoch
+func (state *State) PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error) {
+	if !state.IsActivePool(poolId) {
+		return nil, fmt.Errorf("pool not active")
+	}
+
+	ret := make([]uint64, TestConfig().PoolExecutorsNumber)
+	for i := uint64(0) ; i < TestConfig().PoolExecutorsNumber ; i++ {
+		ret[i] = state.BlockProducers[poolId * TestConfig().PoolExecutorsNumber + i].Id
+	}
+
+	return ret, nil
+}
+
 func (state *State) IncreaseBlockProducerBalance(id uint64, change uint64) (newBalance uint64, error error) {
-	bp,err := GetBlockProducer(state, id)
+	bp,err := state.GetBlockProducer(id)
 	if err != nil {
 		return 0, err
 	}
@@ -51,7 +85,7 @@ func (state *State) IncreaseBlockProducerBalance(id uint64, change uint64) (newB
 }
 
 func (state *State) DecreaseBlockProducerBalance(id uint64, change uint64) (newBalance uint64, error error) {
-	bp,err := GetBlockProducer(state, id)
+	bp,err := state.GetBlockProducer(id)
 	if err != nil {
 		return 0, err
 	}
@@ -65,7 +99,7 @@ func (state *State) DecreaseBlockProducerBalance(id uint64, change uint64) (newB
 }
 
 func (state *State) ValidateBlock(header *BlockHeader, body *BlockBody) error {
-	bp, err := GetBlockProducer(state, body.Proposer)
+	bp, err := state.GetBlockProducer(body.Proposer)
 	if err != nil {
 		return err
 	}
@@ -99,7 +133,7 @@ func (state *State) ApplyPoolExecutions(summaries []*PoolExecutionSummary) error
 
 // called when a new block was proposed
 func (state *State) ProcessNewBlock(newBlockHeader *BlockHeader) (newState *State, error error) {
-	newBlock,err := GetBlockBody(newBlockHeader.BlockRoot)
+	newBlock,err := helperFunc.GetBlockBody(newBlockHeader.BlockRoot)
 	if err != nil {
 		return nil, err
 	}
