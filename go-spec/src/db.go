@@ -2,16 +2,15 @@ package src
 
 import (
 	"fmt"
-	"reflect"
 )
 
 func GetBlockBody(root []byte) (*BlockBody, error) {
 	return nil, nil
 }
 
-func GetPool(state *State, id []byte) (*Pool, error) {
+func GetPool(state *State, id uint64) (*Pool, error) {
 	for _, p := range state.Pools {
-		if reflect.DeepEqual(p.Id, id) {
+		if p.Id == id {
 			return p, nil
 		}
 	}

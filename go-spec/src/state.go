@@ -1,8 +1,8 @@
 package src
 
 import (
-	"encoding/hex"
 	"fmt"
+	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-ssz"
 )
 
@@ -14,7 +14,8 @@ type BlockProducer struct {
 }
 
 type Pool struct {
-	Id				[]byte // pubkey
+	Id					uint64 // id
+	PubKey				bls.PublicKey // eth2 validation pubkey
 	SortedExecutors		[]uint64 // ids of the block producers which are executors on this pool
 }
 
@@ -34,7 +35,7 @@ func (state *State) Root() ([32]byte,error) {
 	return ssz.HashTreeRoot(state)
 }
 
-func (state *State) IsActivePool(pool []byte) bool {
+func (state *State) IsActivePool(id uint64) bool {
 	return true // TODO
 }
 
@@ -66,7 +67,7 @@ func (state *State) DecreaseBlockProducerBalance(id uint64, change uint64) (newB
 func (state *State) ApplyPoolExecutions(summaries []*PoolExecutionSummary) error {
 	for _, summary := range summaries {
 		if !state.IsActivePool(summary.PoolId) {
-			return fmt.Errorf("pool %s not active", hex.EncodeToString(summary.PoolId))
+			return fmt.Errorf("pool %d not active", summary.PoolId)
 		}
 
 		if err := summary.ApplyOnState(state); err != nil {

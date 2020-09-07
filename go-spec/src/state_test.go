@@ -1,7 +1,5 @@
 package src
 
-import "fmt"
-
 func GenerateRandomState() *State {
 	pools := make([]*Pool, 5)
 
@@ -10,7 +8,7 @@ func GenerateRandomState() *State {
 	for i := 0 ; i < len(bps) ; i++ {
 		bps[i] = &BlockProducer{
 			Id:      uint64(i),
-			Balance: 0,
+			Balance: 1000,
 			Stake:   0,
 			Slashed: false,
 		}
@@ -24,7 +22,7 @@ func GenerateRandomState() *State {
 		} // no need to sort as they are already
 
 		pools[i] = &Pool{
-			Id:              []byte(fmt.Sprintf("%d", i)),
+			Id:              uint64(i),
 			SortedExecutors: executors,
 		}
 	}

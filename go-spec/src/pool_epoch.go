@@ -1,7 +1,7 @@
 package src
 
 type PoolExecutionSummary struct {
-	PoolId        	[]byte // eth2 validator pubkey
+	PoolId        	uint64
 	StartingEpoch 	uint64 // a.k.a previous epoch
 	EndEpoch      	uint64 //
 	Performance   	map[*BeaconDuty][16]byte // for every duty specify an array of 128 bits (16 bytes) of who participated in the execution of that duty

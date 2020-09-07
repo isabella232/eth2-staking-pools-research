@@ -5,24 +5,41 @@ import (
 	"testing"
 )
 
-func GenerateSummary() *PoolExecutionSummary {
+func GenerateAttestationSuccessfulSummary() *PoolExecutionSummary {
 	return &PoolExecutionSummary{
-		PoolId:        []byte("0"),
+		PoolId:        0,
 		StartingEpoch: 0,
 		EndEpoch:      1,
 		Performance:   map[*BeaconDuty][16]byte{
 			&BeaconDuty{
 				Type:     0,
 				Slot:     0,
-				Included: false,
-			}: [16]byte{},
+				Included: true,
+			}: [16]byte{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // the first executor index is set to 1
 		},
 	}
 }
 
-func TestSuccessful(t *testing.T) {
+func TestAttestationSuccessful(t *testing.T) {
 	state := GenerateRandomState()
-	summary := GenerateSummary()
+	summary := GenerateAttestationSuccessfulSummary()
 
 	require.NoError(t, summary.ApplyOnState(state))
+
+	for _, whoExecuted := range summary.Performance {
+		pool, err := GetPool(state, summary.PoolId)
+		require.NoError(t, err)
+
+		for i:=0 ; i < int(TestConfig().PoolExecutorsNumber) ; i++ {
+			bp,err := GetBlockProducer(state, pool.SortedExecutors[i])
+			require.NoError(t, err)
+
+			if IsBitSet(whoExecuted[:], uint64(i)) {
+				require.EqualValues(t, 1100, bp.Balance)
+				require.EqualValues(t, 0, i)
+			} else {
+				require.EqualValues(t, 900, bp.Balance)
+			}
+		}
+	}
 }
