@@ -8,6 +8,9 @@ import (
 )
 
 func GenerateRandomState(t *testing.T) *State {
+	require.NoError(t, bls.Init(bls.BLS12_381))
+	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
+
 	pools := make([]*Pool, 5)
 
 	//

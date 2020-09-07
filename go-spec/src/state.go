@@ -212,12 +212,12 @@ func (state *State) ApplyPoolExecutions(summaries []*PoolExecutionSummary) error
 	return nil
 }
 
-func (state *State) ProcessNewPoolRequests(requests []*CreatePoolRequest, currentBP *BlockProducer) error {
-	//for _, req := range requests {
-	//
-	//}
-	return nil
-}
+//func (state *State) ProcessNewPoolRequests(requests []*CreatePoolRequest, currentBP *BlockProducer) error {
+//	//for _, req := range requests {
+//	//
+//	//}
+//	return nil
+//}
 
 // called when a new block was proposed
 func (state *State) ProcessNewBlock(newBlockHeader *BlockHeader, newBlockBody *BlockBody) (newState *State, error error) {

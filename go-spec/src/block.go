@@ -19,33 +19,33 @@ import (
 //
 // A successful DKG will reward the leader and DKG participants
 // A non-successful DKG will penalized the DKG participants
-type CreatePoolRequest struct {
-	Id					uint64 // primary key
-	Status 				uint64 // 0 for not completed, 1 for completed, 2 for cancelled, 3 for retry
-	LeaderBlockProducer	uint64 // should be the next block producer
-	CreatedPubKey		bls.PublicKey // populated after DKG is successful
-}
-func (req *CreatePoolRequest) Validate(state *State, currentBP *BlockProducer) error {
-	switch req.Status {
-	case 0:
-	case 1:
-		if req.LeaderBlockProducer != currentBP.Id {
-			return fmt.Errorf("new pool leader should be the current block producer")
-		}
-		state.AddNewPool(&Pool{
-			Id:              uint64(len(state.Pools) + 1),
-			PubKey:          nil,
-			SortedExecutors: nil,
-		})
-		return nil
-	case 2:
-	case 3:
-
-	default:
-		return fmt.Errorf("status unknown")
-	}
-	return nil
-}
+//type CreatePoolRequest struct {
+//	Id					uint64 // primary key
+//	Status 				uint64 // 0 for not completed, 1 for completed, 2 for cancelled, 3 for retry
+//	LeaderBlockProducer	uint64 // should be the next block producer
+//	CreatedPubKey		bls.PublicKey // populated after DKG is successful
+//}
+//func (req *CreatePoolRequest) Validate(state *State, currentBP *BlockProducer) error {
+//	switch req.Status {
+//	case 0:
+//	case 1:
+//		if req.LeaderBlockProducer != currentBP.Id {
+//			return fmt.Errorf("new pool leader should be the current block producer")
+//		}
+//		state.AddNewPool(&Pool{
+//			Id:              uint64(len(state.Pools) + 1),
+//			PubKey:          nil,
+//			SortedExecutors: nil,
+//		})
+//		return nil
+//	case 2:
+//	case 3:
+//
+//	default:
+//		return fmt.Errorf("status unknown")
+//	}
+//	return nil
+//}
 
 
 //
@@ -68,7 +68,7 @@ type BlockBody struct {
 	Proposer 				uint64
 	Number					uint64
 	PoolsExecutionSummary 	[]*PoolExecutionSummary
-	NewPoolReq				[]*CreatePoolRequest
+	//NewPoolReq				[]*CreatePoolRequest
 	//WithdrawReq			[]*WithdrawRequest
 	//LiquidationReq		[]*LiquidatePoolRequest
 	//Slashing			[]*Slashing
