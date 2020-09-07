@@ -42,13 +42,13 @@ func (state *State) IsActivePool(id uint64) bool {
 	return true // TODO
 }
 
-func (state *State)  GetPool(id uint64) (*Pool, error) {
+func (state *State)  GetPool(id uint64) *Pool {
 	for _, p := range state.Pools {
 		if p.Id == id {
-			return p, nil
+			return p
 		}
 	}
-	return nil, fmt.Errorf("pool not found")
+	return nil
 }
 
 func (state *State)  GetBlockProducer(id uint64) (*BlockProducer, error) {
@@ -72,6 +72,10 @@ func (state *State) PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error)
 	}
 
 	return ret, nil
+}
+
+func (state *State) GetBlockProposer(epoch uint64) uint64 {
+	return 0
 }
 
 func (state *State) IncreaseBlockProducerBalance(id uint64, change uint64) (newBalance uint64, error error) {
@@ -117,6 +121,15 @@ func (state *State) ValidateBlock(header *BlockHeader, body *BlockBody) error {
 	return nil
 }
 
+func (state *State) AddNewPool(pool *Pool) error {
+	if found := state.GetPool(pool.Id); found != nil {
+		return fmt.Errorf("pool already exists")
+	}
+
+	state.Pools = append(state.Pools, pool)
+	return nil
+}
+
 // Applies every pool performance to its relevant executors, decreasing and increasing balances.
 func (state *State) ApplyPoolExecutions(summaries []*PoolExecutionSummary) error {
 	for _, summary := range summaries {
@@ -131,12 +144,23 @@ func (state *State) ApplyPoolExecutions(summaries []*PoolExecutionSummary) error
 	return nil
 }
 
+func (state *State) ProcessNewPoolRequests(requests []*CreatePoolRequest, currentBP *BlockProducer) error {
+	for _, req := range requests {
+
+	}
+}
+
 // called when a new block was proposed
 func (state *State) ProcessNewBlock(newBlockHeader *BlockHeader) (newState *State, error error) {
 	newBlock,err := helperFunc.GetBlockBody(newBlockHeader.BlockRoot)
 	if err != nil {
 		return nil, err
 	}
+
+	if state.GetBlockProposer(newBlock.Number) != newBlock.Proposer {
+		return nil, fmt.Errorf("block proposer is worng")
+	}
+
 
 	// copy the state to apply state transition on
 	stateCopy := state.Copy()

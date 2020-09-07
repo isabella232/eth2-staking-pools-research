@@ -8,6 +8,15 @@ type BeaconDuty struct {
 	Executors			[16]byte // 128 bit of the executors (by order) which executed this duty
 }
 
+/**
+	This object is crucial for the honest operation of executors assigned to a pool.
+	It does 2 things:
+	1) checks which duties the pool had in a specific epoch
+	2) submits an array of 16 bytes (128 bits) which represents a 1 for each executor that participated in executing the duty
+	   and 0 for each that didn't.
+
+	This helps assigning rewards/ penalties for executors.
+ */
 type PoolExecutionSummary struct {
 	PoolId uint64
 	Epoch  uint64 //
