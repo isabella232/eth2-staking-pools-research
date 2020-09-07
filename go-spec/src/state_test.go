@@ -164,11 +164,59 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	require.Equal(t, 6, len(state.Pools))
 
 	// check new balances
+	currentBP, err = state.GetBlockProducer(currentBP.Id)
+	require.NoError(t, err)
+	require.EqualValues(t, 4000, currentBP.Balance)
+
 	bp, err := state.GetBlockProducer(participants[0])
 	require.NoError(t, err)
 	require.EqualValues(t, 2000, bp.Balance)
 
 	for i := 1 ; i < len(participants) ; i++ {
+		bp, err := state.GetBlockProducer(participants[i])
+		require.NoError(t, err)
+		require.EqualValues(t, 0, bp.Balance)
+	}
+}
+
+func TestFailedToCreateNewPool(t *testing.T) {
+	require.NoError(t, bls.Init(bls.BLS12_381))
+	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
+
+	sk := &bls.SecretKey{}
+	sk.SetByCSPRNG()
+
+	reqs := []*CreatePoolRequest{
+		&CreatePoolRequest{
+			Id:                  0,
+			Status:              2,
+			StartEpoch:          0,
+			EndEpoch:            1,
+			LeaderBlockProducer: 0,
+			CreatedPubKey:       sk.GetPublicKey().Serialize(),
+			Participation:       [16]byte{1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0}, // pos 0 is set only
+		},
+	}
+
+	helperFunc = NewSimpleFunctions()
+	state := GenerateRandomState(t)
+	currentBP, err := state.GetBlockProducer(0)
+	require.NoError(t, err)
+
+	// save current state for fetching
+	require.NoError(t, helperFunc.SaveState(state, 0))
+
+	participants,err := state.DKGParticipants(0)
+
+	require.NoError(t, state.ProcessNewPoolRequests(reqs, currentBP))
+	require.Equal(t, 5, len(state.Pools))
+
+	// check new balances
+	currentBP, err = state.GetBlockProducer(currentBP.Id)
+	require.NoError(t, err)
+	require.EqualValues(t, 1000, currentBP.Balance)
+
+	for i := 0 ; i < len(participants) ; i++ {
 		bp, err := state.GetBlockProducer(participants[i])
 		require.NoError(t, err)
 		require.EqualValues(t, 0, bp.Balance)

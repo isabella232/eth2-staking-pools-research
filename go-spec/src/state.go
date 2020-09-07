@@ -291,7 +291,7 @@ func (state *State) ProcessNewPoolRequests(requests []*CreatePoolRequest, curren
 			}
 
 			// special reward for leader
-			_, err = state.IncreaseBlockProducerBalance(currentBP.Id, TestConfig().DKGReward)
+			_, err = state.IncreaseBlockProducerBalance(currentBP.Id, 3*TestConfig().DKGReward)
 			if err != nil {
 				return err
 			}
