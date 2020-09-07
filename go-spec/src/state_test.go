@@ -2,7 +2,6 @@ package src
 
 import (
 	"github.com/herumi/bls-eth-go-binary/bls"
-	"github.com/prysmaticlabs/go-ssz"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -24,6 +23,7 @@ func GenerateRandomState(t *testing.T) *State {
 			Balance: 1000,
 			Stake:   0,
 			Slashed: false,
+			Active: true,
 			PubKey: sk.GetPublicKey(),
 		}
 	}
@@ -47,7 +47,6 @@ func GenerateRandomState(t *testing.T) *State {
 
 	return &State{
 		Pools:           pools,
-		BlockRoots:      nil,
 		HeadBlockHeader: &BlockHeader{
 			BlockRoot: nil,
 			Signature: nil,
@@ -97,10 +96,21 @@ func TestBlockValidation(t *testing.T) {
 	body := &BlockBody{
 		Proposer:              0,
 		PoolsExecutionSummary: []*PoolExecutionSummary{GenerateAttestationSuccessfulSummary()},
+		NewPoolReq:			   []*CreatePoolRequest{
+			&CreatePoolRequest{
+				Id:                  0,
+				Status:              0,
+				StartEpoch:          0,
+				EndEpoch:            1,
+				LeaderBlockProducer: 0,
+				CreatedPubKey:       nil,
+				Participation:       [16]byte{},
+			},
+		},
 		StateRoot:             []byte("root"),
 		ParentBlockRoot:       []byte("parent"),
 	}
-	root,err := ssz.HashTreeRoot(body)
+	root,err := body.Root()
 	require.NoError(t, err)
 
 	// sign
@@ -119,4 +129,48 @@ func TestBlockValidation(t *testing.T) {
 	bp.PubKey = sk.GetPublicKey()
 
 	require.NoError(t, state.ValidateBlock(head, body))
+}
+
+func TestCreatedNewPoolReq(t *testing.T) {
+	require.NoError(t, bls.Init(bls.BLS12_381))
+	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
+
+	sk := &bls.SecretKey{}
+	sk.SetByCSPRNG()
+
+	reqs := []*CreatePoolRequest{
+		&CreatePoolRequest{
+			Id:                  0,
+			Status:              1,
+			StartEpoch:          0,
+			EndEpoch:            1,
+			LeaderBlockProducer: 0,
+			CreatedPubKey:       sk.GetPublicKey().Serialize(),
+			Participation:       [16]byte{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // pos 0 is set only
+		},
+	}
+
+	helperFunc = NewSimpleFunctions()
+	state := GenerateRandomState(t)
+	currentBP, err := state.GetBlockProducer(0)
+	require.NoError(t, err)
+
+	// save current state for fetching
+	require.NoError(t, helperFunc.SaveState(state, 0))
+
+	participants,err := state.DKGParticipants(0)
+
+	require.NoError(t, state.ProcessNewPoolRequests(reqs, currentBP))
+	require.Equal(t, 6, len(state.Pools))
+
+	// check new balances
+	bp, err := state.GetBlockProducer(participants[0])
+	require.NoError(t, err)
+	require.EqualValues(t, 2000, bp.Balance)
+
+	for i := 1 ; i < len(participants) ; i++ {
+		bp, err := state.GetBlockProducer(participants[i])
+		require.NoError(t, err)
+		require.EqualValues(t, 0, bp.Balance)
+	}
 }

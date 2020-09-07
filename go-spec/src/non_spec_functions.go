@@ -14,14 +14,21 @@ type NonSpecFunctions interface {
 	FetchExecutedDuties (pubKey *bls.PublicKey, epoch uint64) ([]*BeaconDuty, error)
 	WasDutyIncluded (pubKey *bls.PublicKey, epoch uint64, duty *BeaconDuty) (bool, error)
 	PoolExecutionStats (poolId uint64, epoch uint64, duty *BeaconDuty) ([16]byte, error)
+	SaveState(state *State, epoch uint64) error
+	GetState(epoch uint64) *State
+	SeedForEpoch(epoch uint64) [32]byte
 }
 
 type SimpleFunctions struct {
 	blockBodies map[string]*BlockBody
+	states map[uint64]*State
 }
 
 func NewSimpleFunctions() *SimpleFunctions {
-	return &SimpleFunctions{blockBodies:make(map[string]*BlockBody)}
+	return &SimpleFunctions{
+		blockBodies: make(map[string]*BlockBody),
+		states: make(map[uint64]*State),
+	}
 }
 
 func (s *SimpleFunctions) GetBlockBody(root []byte) *BlockBody {
@@ -49,3 +56,16 @@ func (s *SimpleFunctions) PoolExecutionStats (poolId uint64, epoch uint64, duty 
 	return [16]byte{}, nil
 }
 
+func (s *SimpleFunctions) SaveState(state *State, epoch uint64) error {
+	s.states[epoch] = state
+	return nil
+}
+
+func (s *SimpleFunctions) GetState(epoch uint64) *State {
+	return s.states[epoch]
+}
+
+func (s *SimpleFunctions) SeedForEpoch(epoch uint64) [32]byte {
+	state := s.GetState(epoch)
+	return state.Seed
+}

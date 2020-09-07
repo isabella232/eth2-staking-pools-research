@@ -1,13 +1,17 @@
 package src
 
 type Config struct {
-	PoolExecutorsNumber uint64
-	BaseEth2DutyReward  uint64
+	PoolExecutorsNumber 			uint64
+	DKGParticipantsNumber 			uint64
+	BaseEth2DutyReward  			uint64
+	DKGReward 						uint64
 }
 
 func TestConfig() *Config {
 	return &Config{
-		PoolExecutorsNumber: 128,
-		BaseEth2DutyReward:  100,
+		PoolExecutorsNumber: 		128,
+		DKGParticipantsNumber: 		128,
+		BaseEth2DutyReward:  		100,
+		DKGReward:					1000,
 	}
 }
