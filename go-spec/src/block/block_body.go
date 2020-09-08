@@ -62,7 +62,9 @@ func (body *BlockBody) GetParentBlockRoot() []byte {
 }
 
 func (body *BlockBody) Root() ([]byte, error) {
-	ret, err := ssz.HashTreeRoot(body)
+	// TODO - complete body serialization
+
+	ret, err := ssz.HashTreeRoot("body to serialize")
 	if err != nil {
 		return nil, err
 	}

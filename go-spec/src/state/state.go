@@ -31,7 +31,9 @@ func NewState(
 }
 
 func (state *State) Root() ([32]byte,error) {
-	return ssz.HashTreeRoot(state)
+	// TODO - complete state serialization
+
+	return ssz.HashTreeRoot("to serialize")
 }
 
 func (state *State) GetPools() []core.IPool {

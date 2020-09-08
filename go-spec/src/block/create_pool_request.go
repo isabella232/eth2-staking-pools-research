@@ -84,5 +84,7 @@ func (req *CreatePoolRequest) Validate(state core.IState, currentBP core.IBlockP
 	// TODO - req id is primary (non duplicate and incremental)
 
 	// TODO - check that network has enough capitalization
+
+	// TODO - check leader is not part of DKG committee
 	return nil
 }
