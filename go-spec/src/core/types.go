@@ -79,6 +79,7 @@ type IBlockProducer interface {
 	Copy() (IBlockProducer, error)
 	GetId() uint64
 	GetPubKey() *bls.PublicKey
+	SetPubKey(pk *bls.PublicKey)
 	GetBalance() uint64
 	GetStake() uint64
 	IsSlashed() bool

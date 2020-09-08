@@ -28,6 +28,26 @@ type CreatePoolRequest struct {
 	participation		[16]byte // 128 bit of the executors (by order) which executed this duty
 }
 
+func NewCreatePoolRequest(
+	id					uint64,
+	status 				uint64,
+	startEpoch			uint64,
+	endEpoch			uint64,
+	leaderBlockProducer	uint64,
+	createdPubKey		[]byte,
+	participation		[16]byte,
+	) *CreatePoolRequest {
+	return &CreatePoolRequest{
+		id:                  id,
+		status:              status,
+		startEpoch:          startEpoch,
+		endEpoch:            endEpoch,
+		leaderBlockProducer: leaderBlockProducer,
+		createdPubKey:       createdPubKey,
+		participation:       participation,
+	}
+}
+
 func (req *CreatePoolRequest) GetId() uint64 {
 	return req.id
 }

@@ -40,6 +40,10 @@ func (bp *BlockProducer) GetPubKey() *bls.PublicKey {
 	return bp.pubKey
 }
 
+func (bp *BlockProducer) SetPubKey(pk *bls.PublicKey) {
+	bp.pubKey = pk
+}
+
 func (bp *BlockProducer) GetBalance() uint64 {
 	return bp.balance
 }

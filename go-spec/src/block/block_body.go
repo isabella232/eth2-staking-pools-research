@@ -20,6 +20,7 @@ func NewBlockBody(
 	number uint64,
 	state *state.State,
 	summary []core.IExecutionSummary,
+	newPoolReq []core.ICreatePoolRequest,
 	parentBlockRoot []byte,
 ) (*BlockBody, error) {
 	stateRoot,err := state.Root()
@@ -31,6 +32,7 @@ func NewBlockBody(
 		proposer:           Proposer,
 		epochNumber:        number,
 		executionSummaries: summary,
+		newPoolReq:			newPoolReq,
 		stateRoot:          stateRoot[:],
 		parentBlockRoot:    parentBlockRoot,
 	}, nil
