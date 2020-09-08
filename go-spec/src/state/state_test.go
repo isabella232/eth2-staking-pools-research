@@ -1,6 +1,7 @@
-package src
+package state
 
 import (
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -13,7 +14,7 @@ func GenerateRandomState(t *testing.T) *State {
 	pools := make([]*Pool, 5)
 
 	//
-	bps := make([]*BlockProducer, len(pools) * int(TestConfig().PoolExecutorsNumber))
+	bps := make([]*BlockProducer, len(pools) * int(src.TestConfig().PoolExecutorsNumber))
 	for i := 0 ; i < len(bps) ; i++ {
 		sk := &bls.SecretKey{}
 		sk.SetByCSPRNG()
@@ -30,29 +31,29 @@ func GenerateRandomState(t *testing.T) *State {
 
 	//
 	for i := 0 ; i < len(pools) ; i++ {
-		executors := make([]uint64, TestConfig().PoolExecutorsNumber)
-		for j := 0 ; j < int(TestConfig().PoolExecutorsNumber) ; j++ {
-			executors[j] = bps[i*int(TestConfig().PoolExecutorsNumber) + j].Id
+		executors := make([]uint64, src.TestConfig().PoolExecutorsNumber)
+		for j := 0 ; j < int(src.TestConfig().PoolExecutorsNumber) ; j++ {
+			executors[j] = bps[i*int(src.TestConfig().PoolExecutorsNumber) + j].Id
 		} // no need to sort as they are already
 
 		sk := &bls.SecretKey{}
 		sk.SetByCSPRNG()
 
 		pools[i] = &Pool{
-			Id:              uint64(i),
-			SortedExecutors: executors,
-			PubKey: sk.GetPublicKey(),
+			id:              uint64(i),
+			sortedExecutors: executors,
+			pubKey:          sk.GetPublicKey(),
 		}
 	}
 
 	return &State{
-		Pools:           pools,
-		HeadBlockHeader: &BlockHeader{
+		pools: pools,
+		HeadBlockHeader: &src.BlockHeader{
 			BlockRoot: nil,
 			Signature: nil,
 		},
-		BlockProducers:  bps,
-		Seed:            SliceToByte32([]byte("seedseedseedseedseedseedseedseed")),
+		blockProducers: bps,
+		seed:           src.SliceToByte32([]byte("seedseedseedseedseedseedseedseed")),
 	}
 }
 
@@ -65,23 +66,23 @@ func TestRandaoSeedMix(t *testing.T) {
 
 	state := GenerateRandomState(t)
 
-	body := &BlockBody{
+	body := &src.BlockBody{
 		Proposer:              0,
 		Number:                1,
-		PoolsExecutionSummary: make([]*PoolExecutionSummary, 0),
+		PoolsExecutionSummary: make([]*src.PoolExecutionSummary, 0),
 		StateRoot:             []byte("state"),
 		ParentBlockRoot:       []byte("parent"),
 	}
-	header,err := NewBlockHeader(sk, body)
+	header,err := src.NewBlockHeader(sk, body)
 	require.NoError(t, err)
 
-	helperFunc = NewSimpleFunctions()
+	helperFunc = src.NewSimpleFunctions()
 	newState, err := state.ProcessNewBlock(header, body)
 	require.NoError(t, err)
 
-	expectedSeed,err := MixSeed(state.Seed, SliceToByte32(header.Signature))
+	expectedSeed,err := src.MixSeed(state.seed, src.SliceToByte32(header.Signature))
 	require.NoError(t, err)
-	require.EqualValues(t, expectedSeed, newState.Seed)
+	require.EqualValues(t, expectedSeed, newState.seed)
 }
 
 
@@ -93,11 +94,11 @@ func TestBlockValidation(t *testing.T) {
 	sk.SetByCSPRNG()
 
 	// generate header and body
-	body := &BlockBody{
+	body := &src.BlockBody{
 		Proposer:              0,
-		PoolsExecutionSummary: []*PoolExecutionSummary{GenerateAttestationSuccessfulSummary()},
-		NewPoolReq:			   []*CreatePoolRequest{
-			&CreatePoolRequest{
+		PoolsExecutionSummary: []*src.PoolExecutionSummary{src.GenerateAttestationSuccessfulSummary()},
+		NewPoolReq:			   []*src.CreatePoolRequest{
+			&src.CreatePoolRequest{
 				Id:                  0,
 				Status:              0,
 				StartEpoch:          0,
@@ -116,7 +117,7 @@ func TestBlockValidation(t *testing.T) {
 	// sign
 	sig := sk.SignByte(root[:])
 
-	head := &BlockHeader{
+	head := &src.BlockHeader{
 		BlockRoot: root[:],
 		Signature: sig.Serialize(),
 	}
@@ -138,8 +139,8 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	sk := &bls.SecretKey{}
 	sk.SetByCSPRNG()
 
-	reqs := []*CreatePoolRequest{
-		&CreatePoolRequest{
+	reqs := []*src.CreatePoolRequest{
+		&src.CreatePoolRequest{
 			Id:                  0,
 			Status:              1,
 			StartEpoch:          0,
@@ -150,7 +151,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 		},
 	}
 
-	helperFunc = NewSimpleFunctions()
+	helperFunc = src.NewSimpleFunctions()
 	state := GenerateRandomState(t)
 	currentBP, err := state.GetBlockProducer(0)
 	require.NoError(t, err)
@@ -161,7 +162,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	participants,err := state.DKGParticipants(0)
 
 	require.NoError(t, state.ProcessNewPoolRequests(reqs, currentBP))
-	require.Equal(t, 6, len(state.Pools))
+	require.Equal(t, 6, len(state.pools))
 
 	// check new balances
 	currentBP, err = state.GetBlockProducer(currentBP.Id)
@@ -186,8 +187,8 @@ func TestFailedToCreateNewPool(t *testing.T) {
 	sk := &bls.SecretKey{}
 	sk.SetByCSPRNG()
 
-	reqs := []*CreatePoolRequest{
-		&CreatePoolRequest{
+	reqs := []*src.CreatePoolRequest{
+		&src.CreatePoolRequest{
 			Id:                  0,
 			Status:              2,
 			StartEpoch:          0,
@@ -198,7 +199,7 @@ func TestFailedToCreateNewPool(t *testing.T) {
 		},
 	}
 
-	helperFunc = NewSimpleFunctions()
+	helperFunc = src.NewSimpleFunctions()
 	state := GenerateRandomState(t)
 	currentBP, err := state.GetBlockProducer(0)
 	require.NoError(t, err)
@@ -209,7 +210,7 @@ func TestFailedToCreateNewPool(t *testing.T) {
 	participants,err := state.DKGParticipants(0)
 
 	require.NoError(t, state.ProcessNewPoolRequests(reqs, currentBP))
-	require.Equal(t, 5, len(state.Pools))
+	require.Equal(t, 5, len(state.pools))
 
 	// check new balances
 	currentBP, err = state.GetBlockProducer(currentBP.Id)

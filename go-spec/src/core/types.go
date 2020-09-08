@@ -7,12 +7,13 @@ type IState interface {
 	Root() ([32]byte,error)
 	GetPools() []IPool
 	GetPool(id uint64) IPool
+	AddNewPool(pool IPool) error
 	GetBlockProducers() []IBlockProducer
 	GetBlockProducer(id uint64) IBlockProducer
 	GetCurrentEpoch() uint64
 	GetSeed() [32]byte
+	SetSeed(seed [32]byte)
 	GetPastSeed(epoch uint64) [32]byte
-	AddNewPool(pool IPool) error
 
 	// For a given epoch and pool id, return the pool's committee
 	PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error)
@@ -32,9 +33,11 @@ type IState interface {
 type IPool interface {
 	Copy() (IPool, error)
 	IsActive() bool
+	SetActive(status bool)
 	GetId() uint64
 	GetPubKey() *bls.PublicKey
 	GetSortedExecutors() [16]uint64
+	SetSortedExecutors(executors [16]uint64)
 }
 
 type IBlockBody interface {
@@ -51,6 +54,8 @@ type IBlockBody interface {
 type IBlockHeader interface {
 	Copy() IBlockHeader
 	Validate(bp IBlockProducer) error
+	GetBlockRoot() []byte
+	GetSignature() []byte
 }
 
 type IBeaconDuty interface {
@@ -76,8 +81,8 @@ type IBlockProducer interface {
 	GetStake() uint64
 	IsSlashed() bool
 	IsActive() bool
-	IncreaseBalance(id uint64, change uint64) (newBalance uint64, error error)
-	DecreaseBalance(id uint64, change uint64) (newBalance uint64, error error)
+	IncreaseBalance(change uint64) (newBalance uint64, error error)
+	DecreaseBalance(change uint64) (newBalance uint64, error error)
 }
 
 type ICreatePoolRequest interface {

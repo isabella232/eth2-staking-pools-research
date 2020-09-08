@@ -2,6 +2,7 @@ package src
 
 import (
 	"fmt"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/state"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-ssz"
 )
@@ -28,7 +29,7 @@ type CreatePoolRequest struct {
 	CreatedPubKey		[]byte // populated after DKG is successful
 	Participation		[16]byte // 128 bit of the executors (by order) which executed this duty
 }
-func (req *CreatePoolRequest) Validate(state *State, currentBP *BlockProducer) error {
+func (req *CreatePoolRequest) Validate(state *state.State, currentBP *state.BlockProducer) error {
 	if req.LeaderBlockProducer != currentBP.Id {
 		return fmt.Errorf("pool leader should be the current block producer")
 	}
@@ -71,7 +72,7 @@ type BlockBody struct {
 func BuildBlockBody(
 	Proposer uint64,
 	number uint64,
-	state *State,
+	state *state.State,
 	summary []*PoolExecutionSummary,
 	helperFunc NonSpecFunctions,
 	) (*BlockBody, error) {
@@ -136,7 +137,7 @@ func NewBlockHeader(sk *bls.SecretKey, body *BlockBody) (*BlockHeader,error) {
 	}, nil
 }
 
-func (header *BlockHeader) Validate(bp *BlockProducer) error {
+func (header *BlockHeader) Validate(bp *state.BlockProducer) error {
 	sig := &bls.Sign{}
 	err := sig.Deserialize(header.Signature)
 	if err != nil {

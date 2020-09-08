@@ -1,6 +1,7 @@
 package src
 
 import (
+	state2 "github.com/bloxapp/eth2-staking-pools-research/go-spec/src/state"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -21,7 +22,7 @@ func GenerateAttestationSuccessfulSummary() *PoolExecutionSummary {
 }
 
 func TestAttestationSuccessful(t *testing.T) {
-	state := GenerateRandomState(t)
+	state := state2.GenerateRandomState(t)
 	summary := GenerateAttestationSuccessfulSummary()
 
 	require.NoError(t, summary.ApplyOnState(state))

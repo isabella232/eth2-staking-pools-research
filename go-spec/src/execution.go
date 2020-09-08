@@ -1,5 +1,7 @@
 package src
 
+import "github.com/bloxapp/eth2-staking-pools-research/go-spec/src/state"
+
 type BeaconDuty struct {
 	Type				uint8 // 0 - attestation, 1 - block proposal
 	Committee 			uint64
@@ -26,7 +28,7 @@ type PoolExecutionSummary struct {
 func GeneratePoolSummary(
 	poolId uint64,
 	epoch uint64,
-	state *State,
+	state *state.State,
 	helperFunc NonSpecFunctions,
 	) (*PoolExecutionSummary, error) {
 	// get pool and its info
@@ -57,7 +59,7 @@ func GeneratePoolSummary(
 }
 
 // will calculate rewards/ penalties and apply them onto the state
-func (summary *PoolExecutionSummary) ApplyOnState(state *State) error {
+func (summary *PoolExecutionSummary) ApplyOnState(state *state.State) error {
 	pool := state.GetPool(summary.PoolId)
 
 	for _, duty := range summary.Duties {

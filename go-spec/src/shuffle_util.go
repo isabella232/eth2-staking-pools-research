@@ -87,7 +87,7 @@ func computeShuffledIndex(index uint32, indexCount uint32, seed [32]byte, shuffl
 	posBuffer := make([]byte, 8, 8)
 	hashfunc := sha256.Sum256
 
-	// Seed is always the first 32 bytes of the hash input, we never have to change this part of the buffer.
+	// seed is always the first 32 bytes of the hash input, we never have to change this part of the buffer.
 	copy(buf[:32], seed[:])
 	for {
 		buf[seedSize] = round
