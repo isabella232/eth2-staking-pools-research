@@ -9,7 +9,7 @@ type Pool struct {
 	id              uint64         // id
 	active 			bool
 	pubKey          *bls.PublicKey // eth2 validation pubkey
-	sortedExecutors [16]uint64       // ids of the block producers which are executors on this pool
+	sortedExecutors []uint64       // ids of the block producers which are executors on this pool
 }
 
 func (pool *Pool) Copy() (core.IPool, error) {
@@ -42,10 +42,10 @@ func (pool *Pool) GetPubKey() *bls.PublicKey {
 	return pool.pubKey
 }
 
-func (pool *Pool) GetSortedExecutors() [16]uint64 {
+func (pool *Pool) GetSortedExecutors() []uint64 {
 	return pool.sortedExecutors
 }
 
-func (pool *Pool) SetSortedExecutors(executors [16]uint64) {
+func (pool *Pool) SetSortedExecutors(executors []uint64) {
 	pool.sortedExecutors = executors
 }

@@ -1,18 +1,12 @@
-package src
+package block
 
 import (
+	"fmt"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/state"
 )
-
-type BeaconDuty struct {
-	Type				uint8 // 0 - attestation, 1 - block proposal
-	Committee 			uint64
-	Slot				uint64
-	Included			bool // whether or not it was included in the beacon chain (the pool earned reward from it)
-	Executors			[16]byte // 128 bit of the executors (by order) which executed this duty
-}
 
 /**
 	This object is crucial for the honest operation of executors assigned to a pool.
@@ -26,30 +20,30 @@ type BeaconDuty struct {
 type PoolExecutionSummary struct {
 	PoolId uint64
 	Epoch  uint64 //
-	Duties []*BeaconDuty
+	Duties []core.IBeaconDuty
 }
 
 func GeneratePoolSummary(
 	poolId uint64,
 	epoch uint64,
 	state *state.State,
-	helperFunc NonSpecFunctions,
+	helperFunc src.NonSpecFunctions,
 	) (*PoolExecutionSummary, error) {
 	// get pool and its info
 	pool := state.GetPool(poolId)
 
 	// build duties and their execution summary
-	duties, err := helperFunc.FetchExecutedDuties(pool.PubKey, epoch)
+	duties, err := helperFunc.FetchExecutedDuties(pool.GetPubKey(), epoch)
 	if err != nil {
 		return nil, err
 	}
 	for _, duty := range duties {
-		duty.Included, err = helperFunc.WasDutyIncluded(pool.PubKey, epoch, duty)
+		duty.finalized, err = helperFunc.WasDutyIncluded(pool.GetPubKey(), epoch, duty)
 		if err != nil {
 			return nil, err
 		}
 
-		duty.Executors,err = helperFunc.PoolExecutionStats(poolId, epoch, duty)
+		duty.participation,err = helperFunc.PoolExecutionStats(poolId, epoch, duty)
 		if err != nil {
 			return nil, err
 		}
@@ -62,28 +56,45 @@ func GeneratePoolSummary(
 	}, nil
 }
 
-// will calculate rewards/ penalties and apply them onto the state
-func (summary *PoolExecutionSummary) ApplyOnState(state *state.State) error {
+func (summary *PoolExecutionSummary) GetPoolId() uint64 {
+	return summary.PoolId
+}
+
+func (summary *PoolExecutionSummary) GetEpoch() uint64 {
+	return summary.Epoch
+}
+
+func (summary *PoolExecutionSummary) GetDuties() []core.IBeaconDuty {
+	return summary.Duties
+}
+
+func (summary *PoolExecutionSummary) ApplyOnState(state core.IState) error {
 	pool := state.GetPool(summary.PoolId)
 
 	for _, duty := range summary.Duties {
-		switch duty.Type {
+		switch duty.GetType() {
 		case 0: // attestation
 			for i:=0 ; i < int(core.TestConfig().PoolExecutorsNumber) ; i++ {
-				executor := pool.SortedExecutors[i]
-				if !duty.Included {
-					_,err := state.DecreaseBlockProducerBalance(executor, 2*core.TestConfig().BaseEth2DutyReward)
+				executor := pool.GetSortedExecutors()[i]
+				bp := state.GetBlockProducer(executor)
+				if bp == nil {
+					return fmt.Errorf("BP %d not found", executor)
+				}
+
+				if !duty.IsFinalized() {
+					_,err := bp.DecreaseBalance(2*core.TestConfig().BaseEth2DutyReward)
 					if err != nil {
 						return err
 					}
 				} else {
-					if shared.IsBitSet(duty.Executors[:], uint64(i)) {
-						_,err := state.IncreaseBlockProducerBalance(executor, core.TestConfig().BaseEth2DutyReward)
+					participation := duty.GetParticipation()
+					if shared.IsBitSet(participation[:], uint64(i)) {
+						_,err := bp.IncreaseBalance(core.TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}
 					} else {
-						_,err := state.DecreaseBlockProducerBalance(executor, core.TestConfig().BaseEth2DutyReward)
+						_,err := bp.DecreaseBalance(core.TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}
@@ -92,20 +103,26 @@ func (summary *PoolExecutionSummary) ApplyOnState(state *state.State) error {
 			}
 		case 1: // proposal
 			for i:=0 ; i < int(core.TestConfig().PoolExecutorsNumber) ; i++ {
-				executor := pool.SortedExecutors[i]
-				if !duty.Included {
-					_,err := state.DecreaseBlockProducerBalance(executor, 4*core.TestConfig().BaseEth2DutyReward)
+				executor := pool.GetSortedExecutors()[i]
+				bp := state.GetBlockProducer(executor)
+				if bp == nil {
+					return fmt.Errorf("BP %d not found", executor)
+				}
+
+				if !duty.IsFinalized() {
+					_,err := bp.DecreaseBalance(4*core.TestConfig().BaseEth2DutyReward)
 					if err != nil {
 						return err
 					}
 				} else {
-					if shared.IsBitSet(duty.Executors[:], uint64(i)) {
-						_,err := state.IncreaseBlockProducerBalance(executor, 2*core.TestConfig().BaseEth2DutyReward)
+					participation := duty.GetParticipation()
+					if shared.IsBitSet(participation[:], uint64(i)) {
+						_,err := bp.IncreaseBalance(2*core.TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}
 					} else {
-						_,err := state.DecreaseBlockProducerBalance(executor, 2*core.TestConfig().BaseEth2DutyReward)
+						_,err := bp.DecreaseBalance(2*core.TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}

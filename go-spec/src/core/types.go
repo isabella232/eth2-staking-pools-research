@@ -11,6 +11,8 @@ type IState interface {
 	GetBlockProducers() []IBlockProducer
 	GetBlockProducer(id uint64) IBlockProducer
 	GetCurrentEpoch() uint64
+	GetHeadBlockHeader() IBlockHeader
+	SetHeadBlockHeader(header IBlockHeader)
 	GetSeed() [32]byte
 	SetSeed(seed [32]byte)
 	GetPastSeed(epoch uint64) [32]byte
@@ -36,8 +38,8 @@ type IPool interface {
 	SetActive(status bool)
 	GetId() uint64
 	GetPubKey() *bls.PublicKey
-	GetSortedExecutors() [16]uint64
-	SetSortedExecutors(executors [16]uint64)
+	GetSortedExecutors() []uint64
+	SetSortedExecutors(executors []uint64)
 }
 
 type IBlockBody interface {
@@ -47,7 +49,7 @@ type IBlockBody interface {
 	GetNewPoolRequests() []ICreatePoolRequest
 	GetStateRoot() []byte
 	GetParentBlockRoot() []byte
-	Root() []byte
+	Root() ([]byte, error)
 	Validate() error
 }
 

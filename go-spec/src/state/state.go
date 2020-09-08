@@ -9,6 +9,7 @@ import (
 type State struct {
 	pools          []core.IPool
 	currentEpoch   uint64
+	headBlockHeader core.IBlockHeader
 	blockProducers []core.IBlockProducer
 	seed           [32]byte
 }
@@ -54,6 +55,14 @@ func (state *State) GetBlockProducer(id uint64) core.IBlockProducer {
 
 func (state *State) GetCurrentEpoch() uint64 {
 	return state.currentEpoch
+}
+
+func (state *State) GetHeadBlockHeader() core.IBlockHeader {
+	return state.headBlockHeader
+}
+
+func (state *State) SetHeadBlockHeader(header core.IBlockHeader){
+	state.headBlockHeader = header
 }
 
 func (state *State) GetSeed() [32]byte {

@@ -1,4 +1,4 @@
-package src
+package block
 
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
@@ -14,10 +14,10 @@ func GenerateAttestationSuccessfulSummary() *PoolExecutionSummary {
 		Epoch:         1,
 		Duties:        []*BeaconDuty{
 			&BeaconDuty{
-				Type:     0,
-				Slot:     0,
-				Included: true,
-				Executors: [16]byte{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // the first executor index is set to 1
+				dutyType:      0,
+				slot:          0,
+				finalized:     true,
+				participation: [16]byte{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // the first executor index is set to 1
 			},
 		},
 	}
