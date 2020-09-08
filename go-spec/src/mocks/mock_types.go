@@ -278,19 +278,19 @@ func (mr *MockIStateMockRecorder) SetStateRoot(root, epoch interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetStateRoot", reflect.TypeOf((*MockIState)(nil).SetStateRoot), root, epoch)
 }
 
-// PoolExecutors mocks base method
-func (m *MockIState) PoolExecutors(poolId, epoch uint64) ([]uint64, error) {
+// PoolCommittee mocks base method
+func (m *MockIState) PoolCommittee(poolId, epoch uint64) ([]uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PoolExecutors", poolId, epoch)
+	ret := m.ctrl.Call(m, "PoolCommittee", poolId, epoch)
 	ret0, _ := ret[0].([]uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// PoolExecutors indicates an expected call of PoolExecutors
-func (mr *MockIStateMockRecorder) PoolExecutors(poolId, epoch interface{}) *gomock.Call {
+// PoolCommittee indicates an expected call of PoolCommittee
+func (mr *MockIStateMockRecorder) PoolCommittee(poolId, epoch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PoolExecutors", reflect.TypeOf((*MockIState)(nil).PoolExecutors), poolId, epoch)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PoolCommittee", reflect.TypeOf((*MockIState)(nil).PoolCommittee), poolId, epoch)
 }
 
 // DKGCommittee mocks base method
@@ -1032,6 +1032,32 @@ func (m *MockIBlockProducer) IsActive() bool {
 func (mr *MockIBlockProducerMockRecorder) IsActive() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsActive", reflect.TypeOf((*MockIBlockProducer)(nil).IsActive))
+}
+
+// SetExited mocks base method
+func (m *MockIBlockProducer) SetExited(atEpoch uint64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetExited", atEpoch)
+}
+
+// SetExited indicates an expected call of SetExited
+func (mr *MockIBlockProducerMockRecorder) SetExited(atEpoch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetExited", reflect.TypeOf((*MockIBlockProducer)(nil).SetExited), atEpoch)
+}
+
+// ExitEpoch mocks base method
+func (m *MockIBlockProducer) ExitEpoch() uint64 {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExitEpoch")
+	ret0, _ := ret[0].(uint64)
+	return ret0
+}
+
+// ExitEpoch indicates an expected call of ExitEpoch
+func (mr *MockIBlockProducerMockRecorder) ExitEpoch() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExitEpoch", reflect.TypeOf((*MockIBlockProducer)(nil).ExitEpoch))
 }
 
 // IncreaseBalance mocks base method

@@ -13,6 +13,7 @@ type BlockProducer struct {
 	stake   uint64 // stake
 	slashed bool
 	active  bool
+	exitEpoch uint64
 }
 
 func NewBlockProducer(
@@ -78,6 +79,17 @@ func (bp *BlockProducer) IsActive() bool {
 	return bp.active
 }
 
+func (bp *BlockProducer) SetExited(atEpoch uint64) {
+	bp.active = false
+	bp.exitEpoch = atEpoch
+}
+
+func (bp *BlockProducer) ExitEpoch() uint64 {
+	if bp.IsActive() {
+		return 0
+	}
+	return bp.exitEpoch
+}
 
 func (bp *BlockProducer) IncreaseBalance(change uint64) (newBalance uint64, error error) {
 	bp.balance += change

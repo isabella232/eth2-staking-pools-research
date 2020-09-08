@@ -84,7 +84,7 @@ func TestRandaoSeedMix(t *testing.T) {
 
 	state := GenerateState(t)
 
-	body, err := block.NewBlockBody(0, 1, state, make([]core.IExecutionSummary, 0), nil, []byte("parent"))
+	body, err := block.NewBlockBody(484, 1, state, make([]core.IExecutionSummary, 0), nil, []byte("parent"))
 	require.NoError(t, err)
 	header,err := block.NewBlockHeader(sk, body)
 	require.NoError(t, err)

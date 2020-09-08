@@ -127,12 +127,12 @@ func (state *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBo
 	previousEpoch := state.GetCurrentEpoch()
 	currentEpoch := previousEpoch + 1
 
-	proposer, err := state.GetBlockProposer(newBlockBody.GetEpochNumber())
+	proposer, err := state.GetBlockProposer(previousEpoch) // TODO - should it be the previous?
 	if err != nil {
 		return nil, err
 	}
 	if proposer != newBlockBody.GetProposer() {
-		return nil, fmt.Errorf("block proposer is worng")
+		return nil, fmt.Errorf("block proposer is worng, expected %d but received %d", proposer, newBlockBody.GetProposer())
 	}
 
 	bp := state.GetBlockProducer(newBlockBody.GetProposer())

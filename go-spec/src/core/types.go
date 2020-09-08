@@ -23,7 +23,7 @@ type IState interface {
 	SetStateRoot(root [32]byte, epoch uint64)
 
 	// For a given epoch and pool id, return the pool's committee
-	PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error)
+	PoolCommittee(poolId uint64, epoch uint64) ([]uint64, error)
 	// For a given epoch and create pool request id, return the DKG committee
 	DKGCommittee(reqId uint64, epoch uint64)([]uint64, error)
 	// For a given epoch, return the voting committee
@@ -89,6 +89,8 @@ type IBlockProducer interface {
 	GetStake() uint64
 	IsSlashed() bool
 	IsActive() bool
+	SetExited(atEpoch uint64) // will mark active=false ad exit epoch = atEpoch
+	ExitEpoch() uint64 // will return 0 if is still active
 	IncreaseBalance(change uint64) (newBalance uint64, error error)
 	DecreaseBalance(change uint64) (newBalance uint64, error error)
 }
