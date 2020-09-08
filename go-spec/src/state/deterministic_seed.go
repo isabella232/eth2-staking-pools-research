@@ -2,7 +2,8 @@ package state
 
 import (
 	"crypto/sha1"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 )
 
 // TODO - should be randomly choosen depending on epoch
@@ -14,19 +15,19 @@ func (state *State) PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error)
 	// get active BPs
 	var activeBps []uint64
 	for _, bp := range state.blockProducers {
-		if bp.Active {
-			activeBps = append(activeBps, bp.Id)
+		if bp.IsActive() {
+			activeBps = append(activeBps, bp.GetId())
 		}
 	}
 
-	shuffled,err := src.ShuffleList(activeBps, state.seed, 10)
+	shuffled,err := shared.ShuffleList(activeBps, state.seed, 10)
 	if err != nil {
 		return nil, err
 	}
 
-	ret := make([]uint64, src.TestConfig().PoolExecutorsNumber)
-	for i := uint64(0) ; i < src.TestConfig().PoolExecutorsNumber ; i++ {
-		ret[i] = shuffled[poolId * src.TestConfig().PoolExecutorsNumber + i]
+	ret := make([]uint64, core.TestConfig().PoolExecutorsNumber)
+	for i := uint64(0) ; i < core.TestConfig().PoolExecutorsNumber ; i++ {
+		ret[i] = shuffled[poolId * core.TestConfig().PoolExecutorsNumber + i]
 	}
 
 	return ret, nil
@@ -35,13 +36,13 @@ func (state *State) PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error)
 // Deterministic method to randomly pick DKG participants based on state seed and req number
 // TODO - find better way
 func (state *State) DKGCommittee(reqId uint64, epoch uint64)([]uint64, error) {
-	ret := make([]uint64, src.TestConfig().PoolExecutorsNumber)
+	ret := make([]uint64, core.TestConfig().PoolExecutorsNumber)
 
 	// get active BPs
 	var activeBps []uint64
 	for _, bp := range state.blockProducers {
-		if bp.Active {
-			activeBps = append(activeBps, bp.Id)
+		if bp.IsActive() {
+			activeBps = append(activeBps, bp.GetId())
 		}
 	}
 
@@ -56,13 +57,13 @@ func (state *State) DKGCommittee(reqId uint64, epoch uint64)([]uint64, error) {
 		seed = h.Sum(nil)
 	}
 
-	shuffled,err := src.ShuffleList(activeBps, src.SliceToByte32(seed), 10)
+	shuffled,err := shared.ShuffleList(activeBps, shared.SliceToByte32(seed), 20)
 	if err != nil {
 		return nil, err
 	}
 
 
-	for i := uint64(0) ; i < src.TestConfig().DKGParticipantsNumber ; i++ {
+	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber ; i++ {
 		ret[i] = shuffled[i]
 	}
 
@@ -70,10 +71,10 @@ func (state *State) DKGCommittee(reqId uint64, epoch uint64)([]uint64, error) {
 }
 
 func (state *State) BlockVotingCommittee(epoch uint64)([]uint64, error) {
-
+	return []uint64{},nil
 }
 
 func (state *State) GetBlockProposer(epoch uint64) (uint64, error) {
-	return 0
+	return 0, nil
 }
 

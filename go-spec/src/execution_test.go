@@ -1,6 +1,8 @@
 package src
 
 import (
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	state2 "github.com/bloxapp/eth2-staking-pools-research/go-spec/src/state"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -30,11 +32,11 @@ func TestAttestationSuccessful(t *testing.T) {
 	for _, duty := range summary.Duties {
 		pool := state.GetPool(summary.PoolId)
 
-		for i:=0 ; i < int(TestConfig().PoolExecutorsNumber) ; i++ {
+		for i:=0 ; i < int(core.TestConfig().PoolExecutorsNumber) ; i++ {
 			bp,err := state.GetBlockProducer(pool.SortedExecutors[i])
 			require.NoError(t, err)
 
-			if IsBitSet(duty.Executors[:], uint64(i)) {
+			if shared.IsBitSet(duty.Executors[:], uint64(i)) {
 				require.EqualValues(t, 1100, bp.Balance)
 				require.EqualValues(t, 0, i)
 			} else {

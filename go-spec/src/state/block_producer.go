@@ -2,45 +2,71 @@ package state
 
 import (
 	"fmt"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/herumi/bls-eth-go-binary/bls"
 )
 
 type BlockProducer struct {
-	Id				uint64
-	PubKey			*bls.PublicKey
-	Balance			uint64 // balance on the pool chain (rewards earned)
-	Stake			uint64 // stake
-	Slashed			bool
-	Active 			bool
+	id      uint64
+	pubKey  *bls.PublicKey
+	balance uint64 // balance on the pool chain (rewards earned)
+	stake   uint64 // stake
+	slashed bool
+	active  bool
 }
 
-func (bp *BlockProducer) Copy() (*BlockProducer, error) {
+func (bp *BlockProducer) Copy() (core.IBlockProducer, error) {
 	pk := &bls.PublicKey{}
-	err := pk.Deserialize(bp.PubKey.Serialize())
+	err := pk.Deserialize(bp.pubKey.Serialize())
 	if err != nil {
 		return nil, err
 	}
 
 	return &BlockProducer{
-		Id:      bp.Id,
-		PubKey:  pk,
-		Balance: bp.Balance,
-		Stake:   bp.Stake,
-		Slashed: bp.Slashed,
-		Active:  bp.Active,
+		id:      bp.id,
+		pubKey:  pk,
+		balance: bp.balance,
+		stake:   bp.stake,
+		slashed: bp.slashed,
+		active:  bp.active,
 	}, nil
 }
 
+func (bp *BlockProducer) GetId() uint64 {
+	return bp.id
+}
+
+func (bp *BlockProducer) GetPubKey() *bls.PublicKey {
+	return bp.pubKey
+}
+
+func (bp *BlockProducer) GetBalance() uint64 {
+	return bp.balance
+}
+
+func (bp *BlockProducer) GetStake() uint64 {
+	return bp.stake
+}
+
+func (bp *BlockProducer) IsSlashed() bool {
+	return bp.slashed
+}
+
+func (bp *BlockProducer) IsActive() bool {
+	return bp.active
+}
+
+
 func (bp *BlockProducer) IncreaseBalance(change uint64) (newBalance uint64, error error) {
-	bp.Balance += change
-	return bp.Balance, nil
+	bp.balance += change
+	return bp.balance, nil
 }
 
 func (bp *BlockProducer) DecreaseBalance(change uint64) (newBalance uint64, error error) {
-	if bp.Balance < change {
-		return 0, fmt.Errorf("BP %d dosen't have enonugh balance (%d) to decrease (%d)", bp.Id, bp.Balance, change)
+	if bp.balance < change {
+		return 0, fmt.Errorf("BP %d dosen't have enonugh balance (%d) to decrease (%d)", bp.id, bp.balance, change)
 	}
 
-	bp.Balance -= change
-	return bp.Balance, nil
+	bp.balance -= change
+	return bp.balance, nil
 }

@@ -30,7 +30,7 @@ type CreatePoolRequest struct {
 	Participation		[16]byte // 128 bit of the executors (by order) which executed this duty
 }
 func (req *CreatePoolRequest) Validate(state *state.State, currentBP *state.BlockProducer) error {
-	if req.LeaderBlockProducer != currentBP.Id {
+	if req.LeaderBlockProducer != currentBP.id {
 		return fmt.Errorf("pool leader should be the current block producer")
 	}
 
@@ -144,7 +144,7 @@ func (header *BlockHeader) Validate(bp *state.BlockProducer) error {
 		return err
 	}
 
-	if res := sig.VerifyHash(bp.PubKey, header.BlockRoot); !res {
+	if res := sig.VerifyHash(bp.pubKey, header.BlockRoot); !res {
 		return fmt.Errorf("signatur did not verify")
 	}
 	return nil

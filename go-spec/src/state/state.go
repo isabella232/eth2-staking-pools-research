@@ -2,17 +2,14 @@ package state
 
 import (
 	"fmt"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/prysmaticlabs/go-ssz"
 )
 
-var helperFunc src.NonSpecFunctions
-
 type State struct {
-	pools          []*Pool
+	pools          []core.IPool
 	currentEpoch   uint64
-	blockProducers []*BlockProducer
+	blockProducers []core.IBlockProducer
 	seed           [32]byte
 }
 
@@ -21,12 +18,12 @@ func (state *State) Root() ([32]byte,error) {
 }
 
 func (state *State) GetPools() []core.IPool {
-
+	return state.pools
 }
 
 func (state *State) GetPool(id uint64) core.IPool {
 	for _, p := range state.pools {
-		if p.id == id {
+		if p.GetId() == id {
 			return p
 		}
 	}
@@ -56,7 +53,7 @@ func (state *State) GetBlockProducer(id uint64) core.IBlockProducer {
 }
 
 func (state *State) GetCurrentEpoch() uint64 {
-
+	return state.currentEpoch
 }
 
 func (state *State) GetSeed() [32]byte {
@@ -68,12 +65,12 @@ func (state *State) SetSeed(seed [32]byte) {
 }
 
 func (state *State) GetPastSeed(epoch uint64) [32]byte {
-
+	return [32]byte{}
 }
 
 
 func (state *State) Copy() (core.IState, error) {
-	copiedPools := make([]*Pool, len(state.pools))
+	copiedPools := make([]core.IPool, len(state.pools))
 	for i, p := range state.pools {
 		newP, err := p.Copy()
 		if err != nil {
@@ -82,7 +79,7 @@ func (state *State) Copy() (core.IState, error) {
 		copiedPools[i] = newP
 	}
 
-	copiedBps := make([]*BlockProducer, len(state.blockProducers))
+	copiedBps := make([]core.IBlockProducer, len(state.blockProducers))
 	for i, bp := range state.blockProducers {
 		newBP, err := bp.Copy()
 		if err != nil {

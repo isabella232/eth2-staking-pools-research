@@ -1,6 +1,10 @@
 package src
 
-import "github.com/bloxapp/eth2-staking-pools-research/go-spec/src/state"
+import (
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/state"
+)
 
 type BeaconDuty struct {
 	Type				uint8 // 0 - attestation, 1 - block proposal
@@ -65,21 +69,21 @@ func (summary *PoolExecutionSummary) ApplyOnState(state *state.State) error {
 	for _, duty := range summary.Duties {
 		switch duty.Type {
 		case 0: // attestation
-			for i:=0 ; i < int(TestConfig().PoolExecutorsNumber) ; i++ {
+			for i:=0 ; i < int(core.TestConfig().PoolExecutorsNumber) ; i++ {
 				executor := pool.SortedExecutors[i]
 				if !duty.Included {
-					_,err := state.DecreaseBlockProducerBalance(executor, 2*TestConfig().BaseEth2DutyReward)
+					_,err := state.DecreaseBlockProducerBalance(executor, 2*core.TestConfig().BaseEth2DutyReward)
 					if err != nil {
 						return err
 					}
 				} else {
-					if IsBitSet(duty.Executors[:], uint64(i)) {
-						_,err := state.IncreaseBlockProducerBalance(executor, TestConfig().BaseEth2DutyReward)
+					if shared.IsBitSet(duty.Executors[:], uint64(i)) {
+						_,err := state.IncreaseBlockProducerBalance(executor, core.TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}
 					} else {
-						_,err := state.DecreaseBlockProducerBalance(executor, TestConfig().BaseEth2DutyReward)
+						_,err := state.DecreaseBlockProducerBalance(executor, core.TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}
@@ -87,21 +91,21 @@ func (summary *PoolExecutionSummary) ApplyOnState(state *state.State) error {
 				}
 			}
 		case 1: // proposal
-			for i:=0 ; i < int(TestConfig().PoolExecutorsNumber) ; i++ {
+			for i:=0 ; i < int(core.TestConfig().PoolExecutorsNumber) ; i++ {
 				executor := pool.SortedExecutors[i]
 				if !duty.Included {
-					_,err := state.DecreaseBlockProducerBalance(executor, 4*TestConfig().BaseEth2DutyReward)
+					_,err := state.DecreaseBlockProducerBalance(executor, 4*core.TestConfig().BaseEth2DutyReward)
 					if err != nil {
 						return err
 					}
 				} else {
-					if IsBitSet(duty.Executors[:], uint64(i)) {
-						_,err := state.IncreaseBlockProducerBalance(executor, 2*TestConfig().BaseEth2DutyReward)
+					if shared.IsBitSet(duty.Executors[:], uint64(i)) {
+						_,err := state.IncreaseBlockProducerBalance(executor, 2*core.TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}
 					} else {
-						_,err := state.DecreaseBlockProducerBalance(executor, 2*TestConfig().BaseEth2DutyReward)
+						_,err := state.DecreaseBlockProducerBalance(executor, 2*core.TestConfig().BaseEth2DutyReward)
 						if err != nil {
 							return err
 						}

@@ -2,6 +2,8 @@ package state
 
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -14,26 +16,26 @@ func GenerateRandomState(t *testing.T) *State {
 	pools := make([]*Pool, 5)
 
 	//
-	bps := make([]*BlockProducer, len(pools) * int(src.TestConfig().PoolExecutorsNumber))
+	bps := make([]*BlockProducer, len(pools) * int(core.TestConfig().PoolExecutorsNumber))
 	for i := 0 ; i < len(bps) ; i++ {
 		sk := &bls.SecretKey{}
 		sk.SetByCSPRNG()
 
 		bps[i] = &BlockProducer{
-			Id:      uint64(i),
-			Balance: 1000,
-			Stake:   0,
-			Slashed: false,
-			Active: true,
-			PubKey: sk.GetPublicKey(),
+			id:      uint64(i),
+			balance: 1000,
+			stake:   0,
+			slashed: false,
+			active:  true,
+			pubKey:  sk.GetPublicKey(),
 		}
 	}
 
 	//
 	for i := 0 ; i < len(pools) ; i++ {
-		executors := make([]uint64, src.TestConfig().PoolExecutorsNumber)
-		for j := 0 ; j < int(src.TestConfig().PoolExecutorsNumber) ; j++ {
-			executors[j] = bps[i*int(src.TestConfig().PoolExecutorsNumber) + j].Id
+		executors := make([]uint64, core.TestConfig().PoolExecutorsNumber)
+		for j := 0 ; j < int(core.TestConfig().PoolExecutorsNumber) ; j++ {
+			executors[j] = bps[i*int(core.TestConfig().PoolExecutorsNumber) + j].id
 		} // no need to sort as they are already
 
 		sk := &bls.SecretKey{}
@@ -53,7 +55,7 @@ func GenerateRandomState(t *testing.T) *State {
 			Signature: nil,
 		},
 		blockProducers: bps,
-		seed:           src.SliceToByte32([]byte("seedseedseedseedseedseedseedseed")),
+		seed:           shared.SliceToByte32([]byte("seedseedseedseedseedseedseedseed")),
 	}
 }
 
@@ -80,7 +82,7 @@ func TestRandaoSeedMix(t *testing.T) {
 	newState, err := state.ProcessNewBlock(header, body)
 	require.NoError(t, err)
 
-	expectedSeed,err := src.MixSeed(state.seed, src.SliceToByte32(header.Signature))
+	expectedSeed,err := shared.MixSeed(state.seed, shared.SliceToByte32(header.Signature))
 	require.NoError(t, err)
 	require.EqualValues(t, expectedSeed, newState.seed)
 }

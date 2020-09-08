@@ -2,8 +2,8 @@ package state
 
 import (
 	"fmt"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 )
 
@@ -71,11 +71,16 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 			if err != nil {
 				return err
 			}
-			state.AddNewPool(&Pool{
+
+			err = state.AddNewPool(&Pool{
 				id:              uint64(len(state.pools) + 1),
 				pubKey:          pk,
-				sortedExecutors: nil,
+				sortedExecutors: [16]uint64{}, // TODO - POPULAT
 			})
+			if err != nil {
+				return err
+			}
+
 			// reward/ penalty
 			for i := 0 ; i < len(participants) ; i ++ {
 				bp := state.GetBlockProducer(participants[i])
@@ -83,13 +88,13 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 					return fmt.Errorf("could not find BP %d", participants[i])
 				}
 				partic := req.GetParticipation()
-				if src.IsBitSet(partic[:], uint64(i)) {
-					_, err := bp.IncreaseBalance(src.TestConfig().DKGReward)
+				if shared.IsBitSet(partic[:], uint64(i)) {
+					_, err := bp.IncreaseBalance(core.TestConfig().DKGReward)
 					if err != nil {
 						return err
 					}
 				} else {
-					_, err := bp.DecreaseBalance(src.TestConfig().DKGReward)
+					_, err := bp.DecreaseBalance(core.TestConfig().DKGReward)
 					if err != nil {
 						return err
 					}
@@ -97,7 +102,7 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 			}
 
 			// special reward for leader
-			_, err = currentBP.IncreaseBalance(3*src.TestConfig().DKGReward)
+			_, err = currentBP.IncreaseBalance(3* core.TestConfig().DKGReward)
 			if err != nil {
 				return err
 			}
@@ -107,14 +112,12 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 				if bp == nil {
 					return fmt.Errorf("could not find BP %d", participants[i])
 				}
-				_, err := bp.DecreaseBalance(src.TestConfig().DKGReward)
+				_, err := bp.DecreaseBalance(core.TestConfig().DKGReward)
 				if err != nil {
 					return err
 				}
 			}
 		}
-
-
 	}
 	return nil
 }
@@ -150,16 +153,11 @@ func (state *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBo
 		return nil, err
 	}
 
-	newSeed, err := src.MixSeed(stateCopy.GetSeed(), src.SliceToByte32(newBlockHeader.GetSignature()[:32])) // TODO - use something else than the sig
+	newSeed, err := shared.MixSeed(stateCopy.GetSeed(), shared.SliceToByte32(newBlockHeader.GetSignature()[:32])) // TODO - use something else than the sig
 	if err != nil {
 		return nil, err
 	}
 	stateCopy.SetSeed(newSeed)
-
-	err = helperFunc.SaveBlockBody(newBlockBody)
-	if err != nil {
-		return nil, err
-	}
 
 	return stateCopy, nil
 }

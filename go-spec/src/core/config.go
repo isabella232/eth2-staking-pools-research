@@ -1,4 +1,4 @@
-package src
+package core
 
 type Config struct {
 	PoolExecutorsNumber 			uint64
