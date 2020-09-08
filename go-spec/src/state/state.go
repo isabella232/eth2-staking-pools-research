@@ -14,6 +14,22 @@ type State struct {
 	seed           [32]byte
 }
 
+func NewState(
+	pools          []core.IPool,
+	currentEpoch   uint64,
+	headBlockHeader core.IBlockHeader,
+	blockProducers []core.IBlockProducer,
+	seed           [32]byte,
+	) *State {
+	return &State{
+		pools:           pools,
+		currentEpoch:    currentEpoch,
+		headBlockHeader: headBlockHeader,
+		blockProducers:  blockProducers,
+		seed:            seed,
+	}
+}
+
 func (state *State) Root() ([32]byte,error) {
 	return ssz.HashTreeRoot(state)
 }

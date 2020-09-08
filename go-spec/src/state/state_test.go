@@ -32,20 +32,20 @@ func (s *DummyExecSummary) GetEpoch() uint64 { return s.epoch}
 func (s *DummyExecSummary) GetDuties() []core.IBeaconDuty { return s.duties}
 func (s *DummyExecSummary) ApplyOnState(state core.IState) error { return nil }
 
-func successfulAttestationSummary() core.IExecutionSummary {
-	return &DummyExecSummary{
-		poolId: 0,
-		epoch:  1,
-		duties: []core.IBeaconDuty{
-				&DummyBeaconDuty{
-					t:             0,
-					committee:     0,
-					slot:          0,
-					finalized:     true,
-					participation: [16]byte{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // the first executor index is set to 1,
-				},
+func GenerateAttestationSuccessfulSummary() core.IExecutionSummary {
+	return &DummyExecSummary {
+		poolId:        0,
+		epoch:         1,
+		duties:        []core.IBeaconDuty{
+			&DummyBeaconDuty{
+				t:             0,
+				committee:     0,
+				slot:          0,
+				finalized:     true,
+				participation: [16]byte{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // the first executor index is set to 1
 			},
-		}
+		},
+	}
 }
 
 func GenerateRandomState(t *testing.T) *State {
@@ -135,7 +135,7 @@ func TestBlockValidation(t *testing.T) {
 			0,
 			0,
 			state,
-			[]core.IExecutionSummary{successfulAttestationSummary()},
+			[]core.IExecutionSummary{GenerateAttestationSuccessfulSummary()},
 			[]core.ICreatePoolRequest{
 				block.NewCreatePoolRequest(
 					0,0,0,1,0,nil,[16]byte{},
@@ -185,9 +185,6 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	state := GenerateRandomState(t)
 	currentBP := state.GetBlockProducer(0)
 
-	// save current state for fetching
-	require.NoError(t, helperFunc.SaveState(state, 0))
-
 	participants,err := state.DKGCommittee(0,0)
 
 	require.NoError(t, state.ProcessNewPoolRequests(reqs))
@@ -228,9 +225,6 @@ func TestFailedToCreateNewPool(t *testing.T) {
 
 	state := GenerateRandomState(t)
 	currentBP := state.GetBlockProducer(0)
-
-	// save current state for fetching
-	require.NoError(t, helperFunc.SaveState(state, 0))
 
 	participants,err := state.DKGCommittee(0, 0)
 	require.NoError(t, err)

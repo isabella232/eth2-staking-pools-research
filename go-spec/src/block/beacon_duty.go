@@ -8,6 +8,22 @@ type BeaconDuty struct {
 	participation [16]byte // 128 bit of the executors (by order) which executed this duty
 }
 
+func NewBeaconDuty(
+	dutyType      uint8,
+	committee     uint64,
+	slot          uint64,
+	finalized     bool,
+	participation [16]byte,
+	) *BeaconDuty {
+	return &BeaconDuty{
+		dutyType:      dutyType,
+		committee:     committee,
+		slot:          slot,
+		finalized:     finalized,
+		participation: participation,
+	}
+}
+
 func (duty *BeaconDuty) GetType() uint8 {
 	return duty.dutyType
 }

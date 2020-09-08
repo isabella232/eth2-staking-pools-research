@@ -2,7 +2,6 @@ package block
 
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/state"
 	"github.com/prysmaticlabs/go-ssz"
 )
 
@@ -18,7 +17,7 @@ type BlockBody struct {
 func NewBlockBody(
 	Proposer uint64,
 	number uint64,
-	state *state.State,
+	state core.IState,
 	summary []core.IExecutionSummary,
 	newPoolReq []core.ICreatePoolRequest,
 	parentBlockRoot []byte,

@@ -12,6 +12,20 @@ type Pool struct {
 	sortedExecutors []uint64       // ids of the block producers which are executors on this pool
 }
 
+func NewPool(
+	id              uint64,
+	active 			bool,
+	pubKey          *bls.PublicKey,
+	sortedExecutors []uint64,
+	) *Pool {
+	return &Pool{
+		id:              id,
+		active:          active,
+		pubKey:          pubKey,
+		sortedExecutors: sortedExecutors,
+	}
+}
+
 func (pool *Pool) Copy() (core.IPool, error) {
 	pk := &bls.PublicKey{}
 	err := pk.Deserialize(pool.pubKey.Serialize())

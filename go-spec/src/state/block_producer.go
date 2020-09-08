@@ -15,6 +15,24 @@ type BlockProducer struct {
 	active  bool
 }
 
+func NewBlockProducer(
+	id      uint64,
+	pubKey  *bls.PublicKey,
+	balance uint64,
+	stake   uint64,
+	slashed bool,
+	active  bool,
+	) *BlockProducer {
+	return &BlockProducer{
+		id:      id,
+		pubKey:  pubKey,
+		balance: balance,
+		stake:   stake,
+		slashed: slashed,
+		active:  active,
+	}
+}
+
 func (bp *BlockProducer) Copy() (core.IBlockProducer, error) {
 	pk := &bls.PublicKey{}
 	err := pk.Deserialize(bp.pubKey.Serialize())

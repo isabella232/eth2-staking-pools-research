@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
 	github.com/ferranbt/fastssz v0.0.0-20200826142241-3a913c5a1313 // indirect
+	github.com/golang/mock v1.4.4
 	github.com/herumi/bls-eth-go-binary v0.0.0-20200722032157-41fc56eba7b4
 	github.com/minio/highwayhash v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

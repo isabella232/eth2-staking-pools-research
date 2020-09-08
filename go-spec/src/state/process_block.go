@@ -75,7 +75,7 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 			err = state.AddNewPool(&Pool{
 				id:              uint64(len(state.pools) + 1),
 				pubKey:          pk,
-				sortedExecutors: [16]uint64{}, // TODO - POPULAT
+				sortedExecutors: []uint64{}, // TODO - POPULAT
 			})
 			if err != nil {
 				return err
