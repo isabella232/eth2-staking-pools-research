@@ -1,7 +1,7 @@
 package state
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
@@ -41,7 +41,7 @@ func shuffle(allBPs []core.IBlockProducer, committeeId uint64, epoch uint64, see
 	// nonce is used as different categories for the seed
 	seedToUse := seed
 	if nonce != nil {
-		h := sha1.New()
+		h := sha256.New() // TODO - secure enough?
 		_, err := h.Write(append(seed[:], nonce...))
 		if err != nil {
 			return []uint64{}, err
