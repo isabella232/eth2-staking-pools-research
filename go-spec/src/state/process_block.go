@@ -124,6 +124,9 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 
 // called when a new block was proposed
 func (state *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBody core.IBlockBody) (newState core.IState, error error) {
+	previousEpoch := state.GetCurrentEpoch()
+	currentEpoch := previousEpoch + 1
+
 	proposer, err := state.GetBlockProposer(newBlockBody.GetEpochNumber())
 	if err != nil {
 		return nil, err
@@ -153,11 +156,22 @@ func (state *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBo
 		return nil, err
 	}
 
-	newSeed, err := shared.MixSeed(stateCopy.GetSeed(), shared.SliceToByte32(newBlockHeader.GetSignature()[:32])) // TODO - use something else than the sig
+	// update internal state vars
+	newSeed, err := shared.MixSeed(stateCopy.GetSeed(previousEpoch), shared.SliceToByte32(newBlockHeader.GetSignature()[:32])) // TODO - use something else than the sig
 	if err != nil {
 		return nil, err
 	}
-	stateCopy.SetSeed(newSeed)
+	stateCopy.SetSeed(newSeed, currentEpoch)
+	stateCopy.SetCurrentEpoch(currentEpoch)
+	stateCopy.SetBlockRoot(shared.SliceToByte32(newBlockHeader.GetBlockRoot()), currentEpoch)
+
+	// the currentEpoch's state root is not included inside the stat root as it creates
+	// a recursive dependency.
+	newStateRoot, err := stateCopy.Root()
+	if err != nil {
+		return nil, err
+	}
+	stateCopy.SetStateRoot(newStateRoot, currentEpoch)
 
 	return stateCopy, nil
 }

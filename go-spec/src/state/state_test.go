@@ -71,7 +71,7 @@ func GenerateState(t *testing.T) *State {
 			Signature: nil,
 		},
 		blockProducers: bps,
-		seed:           shared.SliceToByte32([]byte("seedseedseedseedseedseedseedseed")),
+		seeds:          [][32]byte{shared.SliceToByte32([]byte("seedseedseedseedseedseedseedseed"))},
 	}
 }
 
@@ -92,9 +92,9 @@ func TestRandaoSeedMix(t *testing.T) {
 	newState, err := state.ProcessNewBlock(header, body)
 	require.NoError(t, err)
 
-	expectedSeed,err := shared.MixSeed(state.seed, shared.SliceToByte32(header.Signature))
+	expectedSeed,err := shared.MixSeed(state.GetSeed(state.GetCurrentEpoch()), shared.SliceToByte32(header.Signature))
 	require.NoError(t, err)
-	require.EqualValues(t, expectedSeed, newState.GetSeed())
+	require.EqualValues(t, expectedSeed, newState.GetSeed(newState.GetCurrentEpoch()))
 }
 
 // TODO - test block validation
@@ -194,7 +194,7 @@ func TestFailedToCreateNewPool(t *testing.T) {
 	sk := &bls.SecretKey{}
 	sk.SetByCSPRNG()
 
-	reqs := []core.ICreatePoolRequest {
+	reqs := []core.ICreatePoolRequest{
 		block.NewCreatePoolRequest(
 			0,
 			2,
@@ -202,14 +202,14 @@ func TestFailedToCreateNewPool(t *testing.T) {
 			1,
 			0,
 			sk.GetPublicKey().Serialize(),
-			[16]byte{1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0}, // random assignments
+			[16]byte{1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, // random assignments
 		),
 	}
 
 	state := GenerateState(t)
 	currentBP := state.GetBlockProducer(0)
 
-	participants,err := state.DKGCommittee(0, 0)
+	participants, err := state.DKGCommittee(0, 0)
 	require.NoError(t, err)
 
 	require.NoError(t, state.ProcessNewPoolRequests(reqs))
@@ -219,7 +219,7 @@ func TestFailedToCreateNewPool(t *testing.T) {
 	currentBP = state.GetBlockProducer(currentBP.GetId())
 	require.EqualValues(t, 0, currentBP.GetBalance()) // TODO - currentBP is also in the committee, separate it
 
-	for i := 0 ; i < len(participants) ; i++ {
+	for i := 0; i < len(participants); i++ {
 		bp := state.GetBlockProducer(participants[i])
 		require.EqualValues(t, 0, bp.GetBalance())
 	}

@@ -33,38 +33,6 @@ func NewExecutionSummary(
 	}
 }
 
-//func GeneratePoolSummary(
-//	poolId uint64,
-//	epoch uint64,
-//	state *state.State,
-//	) (*PoolExecutionSummary, error) {
-//	// get pool and its info
-//	pool := state.GetPool(poolId)
-//
-//	// build duties and their execution summary
-//	duties, err := helperFunc.FetchExecutedDuties(pool.GetPubKey(), epoch)
-//	if err != nil {
-//		return nil, err
-//	}
-//	for _, duty := range duties {
-//		duty.finalized, err = helperFunc.WasDutyIncluded(pool.GetPubKey(), epoch, duty)
-//		if err != nil {
-//			return nil, err
-//		}
-//
-//		duty.participation,err = helperFunc.PoolExecutionStats(poolId, epoch, duty)
-//		if err != nil {
-//			return nil, err
-//		}
-//	}
-//
-//	return &PoolExecutionSummary{
-//		PoolId: poolId,
-//		Epoch:  epoch,
-//		Duties: duties,
-//	}, nil
-//}
-
 func (summary *PoolExecutionSummary) GetPoolId() uint64 {
 	return summary.poolId
 }

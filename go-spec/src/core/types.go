@@ -11,11 +11,16 @@ type IState interface {
 	GetBlockProducers() []IBlockProducer
 	GetBlockProducer(id uint64) IBlockProducer
 	GetCurrentEpoch() uint64
+	SetCurrentEpoch(epoch uint64)
 	GetHeadBlockHeader() IBlockHeader
 	SetHeadBlockHeader(header IBlockHeader)
-	GetSeed() [32]byte
-	SetSeed(seed [32]byte)
+	GetSeed(epoch uint64) [32]byte
+	SetSeed(seed [32]byte, epoch uint64)
 	GetPastSeed(epoch uint64) [32]byte
+	GetBlockRoot(epoch uint64) [32]byte
+	SetBlockRoot(root [32]byte, epoch uint64)
+	GetStateRoot(epoch uint64) [32]byte
+	SetStateRoot(root [32]byte, epoch uint64)
 
 	// For a given epoch and pool id, return the pool's committee
 	PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error)

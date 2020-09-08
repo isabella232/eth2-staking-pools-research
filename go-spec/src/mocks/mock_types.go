@@ -148,6 +148,18 @@ func (mr *MockIStateMockRecorder) GetCurrentEpoch() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentEpoch", reflect.TypeOf((*MockIState)(nil).GetCurrentEpoch))
 }
 
+// SetCurrentEpoch mocks base method
+func (m *MockIState) SetCurrentEpoch(epoch uint64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetCurrentEpoch", epoch)
+}
+
+// SetCurrentEpoch indicates an expected call of SetCurrentEpoch
+func (mr *MockIStateMockRecorder) SetCurrentEpoch(epoch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentEpoch", reflect.TypeOf((*MockIState)(nil).SetCurrentEpoch), epoch)
+}
+
 // GetHeadBlockHeader mocks base method
 func (m *MockIState) GetHeadBlockHeader() core.IBlockHeader {
 	m.ctrl.T.Helper()
@@ -175,29 +187,29 @@ func (mr *MockIStateMockRecorder) SetHeadBlockHeader(header interface{}) *gomock
 }
 
 // GetSeed mocks base method
-func (m *MockIState) GetSeed() [32]byte {
+func (m *MockIState) GetSeed(epoch uint64) [32]byte {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSeed")
+	ret := m.ctrl.Call(m, "GetSeed", epoch)
 	ret0, _ := ret[0].([32]byte)
 	return ret0
 }
 
 // GetSeed indicates an expected call of GetSeed
-func (mr *MockIStateMockRecorder) GetSeed() *gomock.Call {
+func (mr *MockIStateMockRecorder) GetSeed(epoch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSeed", reflect.TypeOf((*MockIState)(nil).GetSeed))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSeed", reflect.TypeOf((*MockIState)(nil).GetSeed), epoch)
 }
 
 // SetSeed mocks base method
-func (m *MockIState) SetSeed(seed [32]byte) {
+func (m *MockIState) SetSeed(seed [32]byte, epoch uint64) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetSeed", seed)
+	m.ctrl.Call(m, "SetSeed", seed, epoch)
 }
 
 // SetSeed indicates an expected call of SetSeed
-func (mr *MockIStateMockRecorder) SetSeed(seed interface{}) *gomock.Call {
+func (mr *MockIStateMockRecorder) SetSeed(seed, epoch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSeed", reflect.TypeOf((*MockIState)(nil).SetSeed), seed)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSeed", reflect.TypeOf((*MockIState)(nil).SetSeed), seed, epoch)
 }
 
 // GetPastSeed mocks base method
@@ -212,6 +224,58 @@ func (m *MockIState) GetPastSeed(epoch uint64) [32]byte {
 func (mr *MockIStateMockRecorder) GetPastSeed(epoch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPastSeed", reflect.TypeOf((*MockIState)(nil).GetPastSeed), epoch)
+}
+
+// GetBlockRoot mocks base method
+func (m *MockIState) GetBlockRoot(epoch uint64) [32]byte {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBlockRoot", epoch)
+	ret0, _ := ret[0].([32]byte)
+	return ret0
+}
+
+// GetBlockRoot indicates an expected call of GetBlockRoot
+func (mr *MockIStateMockRecorder) GetBlockRoot(epoch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBlockRoot", reflect.TypeOf((*MockIState)(nil).GetBlockRoot), epoch)
+}
+
+// SetBlockRoot mocks base method
+func (m *MockIState) SetBlockRoot(root [32]byte, epoch uint64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetBlockRoot", root, epoch)
+}
+
+// SetBlockRoot indicates an expected call of SetBlockRoot
+func (mr *MockIStateMockRecorder) SetBlockRoot(root, epoch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBlockRoot", reflect.TypeOf((*MockIState)(nil).SetBlockRoot), root, epoch)
+}
+
+// GetStateRoot mocks base method
+func (m *MockIState) GetStateRoot(epoch uint64) [32]byte {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetStateRoot", epoch)
+	ret0, _ := ret[0].([32]byte)
+	return ret0
+}
+
+// GetStateRoot indicates an expected call of GetStateRoot
+func (mr *MockIStateMockRecorder) GetStateRoot(epoch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStateRoot", reflect.TypeOf((*MockIState)(nil).GetStateRoot), epoch)
+}
+
+// SetStateRoot mocks base method
+func (m *MockIState) SetStateRoot(root [32]byte, epoch uint64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetStateRoot", root, epoch)
+}
+
+// SetStateRoot indicates an expected call of SetStateRoot
+func (mr *MockIStateMockRecorder) SetStateRoot(root, epoch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetStateRoot", reflect.TypeOf((*MockIState)(nil).SetStateRoot), root, epoch)
 }
 
 // PoolExecutors mocks base method

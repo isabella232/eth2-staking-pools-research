@@ -20,7 +20,7 @@ func (state *State) PoolExecutors(poolId uint64, epoch uint64) ([]uint64, error)
 		}
 	}
 
-	shuffled,err := shared.ShuffleList(activeBps, state.seed, 10)
+	shuffled,err := shared.ShuffleList(activeBps, state.GetSeed(state.GetCurrentEpoch()), 10)
 	if err != nil {
 		return nil, err
 	}
@@ -47,17 +47,17 @@ func (state *State) DKGCommittee(reqId uint64, epoch uint64)([]uint64, error) {
 	}
 
 	h := sha1.New()
-	seed := state.seed[:]
+	seed := state.GetSeed(state.GetCurrentEpoch())
 	for i := 0 ; i < int(reqId) % 100 ; i++ {
-		_, err := h.Write(seed)
+		_, err := h.Write(seed[:])
 		if err != nil {
 			return ret, err
 		}
 
-		seed = h.Sum(nil)
+		seed = shared.SliceToByte32(h.Sum(nil))
 	}
 
-	shuffled,err := shared.ShuffleList(activeBps, shared.SliceToByte32(seed), 20)
+	shuffled,err := shared.ShuffleList(activeBps, seed, 20)
 	if err != nil {
 		return nil, err
 	}

@@ -7,33 +7,41 @@ import (
 )
 
 type State struct {
-	pools          []core.IPool
-	currentEpoch   uint64
+	genesisTime     uint64
+	currentEpoch    uint64
 	headBlockHeader core.IBlockHeader
-	blockProducers []core.IBlockProducer
-	seed           [32]byte
+	blockRoots      [][32]byte // fork choice block roots
+	stateRoots      [][32]byte // fork choice state roots
+	seeds           [][32]byte
+	blockProducers  []core.IBlockProducer
+	pools           []core.IPool
+	slashings       [][]uint64 // fork choice slashings
 }
 
 func NewState(
-	pools          []core.IPool,
+	genesisTime uint64,
+	pools []core.IPool,
 	currentEpoch   uint64,
 	headBlockHeader core.IBlockHeader,
 	blockProducers []core.IBlockProducer,
-	seed           [32]byte,
+	epochZeroSeed [32]byte,
 	) *State {
 	return &State{
+		genesisTime:	 genesisTime,
 		pools:           pools,
 		currentEpoch:    currentEpoch,
 		headBlockHeader: headBlockHeader,
 		blockProducers:  blockProducers,
-		seed:            seed,
+		seeds:           [][32]byte{epochZeroSeed},
+		blockRoots: 	 [][32]byte{},
+		stateRoots: 	 [][32]byte{},
+		slashings: 		 [][]uint64{},
 	}
 }
 
 func (state *State) Root() ([32]byte,error) {
-	// TODO - complete state serialization
-
-	return ssz.HashTreeRoot("to serialize")
+	// TODO - state root
+	return ssz.HashTreeRoot("state root ssz")
 }
 
 func (state *State) GetPools() []core.IPool {
@@ -75,6 +83,10 @@ func (state *State) GetCurrentEpoch() uint64 {
 	return state.currentEpoch
 }
 
+func (state *State) SetCurrentEpoch(epoch uint64) {
+	state.currentEpoch = epoch
+}
+
 func (state *State) GetHeadBlockHeader() core.IBlockHeader {
 	return state.headBlockHeader
 }
@@ -83,18 +95,45 @@ func (state *State) SetHeadBlockHeader(header core.IBlockHeader){
 	state.headBlockHeader = header
 }
 
-func (state *State) GetSeed() [32]byte {
-	return state.seed
+func (state *State) GetSeed(epoch uint64) [32]byte {
+	return state.seeds[epoch]
 }
 
-func (state *State) SetSeed(seed [32]byte) {
-	state.seed = seed
+func (state *State) SetSeed(seed [32]byte, epoch uint64) {
+	if uint64(len(state.seeds)) <= epoch {
+		state.seeds = append(state.seeds, seed)
+	} else {
+		state.seeds[epoch] = seed
+	}
 }
 
 func (state *State) GetPastSeed(epoch uint64) [32]byte {
 	return [32]byte{}
 }
 
+func (state *State) GetBlockRoot(epoch uint64) [32]byte {
+	return state.blockRoots[epoch]
+}
+
+func (state *State) SetBlockRoot(root [32]byte, epoch uint64) {
+	if uint64(len(state.blockRoots)) <= epoch {
+		state.blockRoots = append(state.blockRoots, root)
+	} else {
+		state.blockRoots[epoch] = root
+	}
+}
+
+func (state *State) GetStateRoot(epoch uint64) [32]byte {
+	return state.stateRoots[epoch]
+}
+
+func (state *State) SetStateRoot(root [32]byte, epoch uint64) {
+	if uint64(len(state.stateRoots)) <= epoch {
+		state.stateRoots = append(state.stateRoots, root)
+	} else {
+		state.stateRoots[epoch] = root
+	}
+}
 
 func (state *State) Copy() (core.IState, error) {
 	copiedPools := make([]core.IPool, len(state.pools))
@@ -118,7 +157,7 @@ func (state *State) Copy() (core.IState, error) {
 	return &State{
 		pools:          copiedPools,
 		blockProducers: copiedBps,
-		seed:           state.seed,
+		seeds:           state.seeds,
 	}, nil
 }
 
