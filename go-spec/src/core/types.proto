@@ -16,7 +16,7 @@ message State {
 
 message BlockProducer {
     uint64 Id = 1;
-    repeated bytes PubKey = 2;
+    bytes PubKey = 2;
     uint64 Balance = 3;
     uint64 Stake = 4;
     bool Slashed = 5;
@@ -27,7 +27,7 @@ message BlockProducer {
 message Pool {
     uint64 Id = 1;
     bool Active = 2;
-    repeated bytes PubKey = 3;
+    bytes PubKey = 3;
     repeated uint64 SortedCommittee = 4;
 }
 
@@ -41,7 +41,7 @@ message BeaconDuty {
     uint64 Committee = 2;
     uint64 Slott = 3;
     bool Finalized = 4;
-    repeated bytes Participation = 5;
+    bytes Participation = 5; // 128 bit of the executors (by order) which executed this duty
 }
 
 message ExecutionSummary {
@@ -74,8 +74,8 @@ message CreateNewPoolRequest {
     uint64 StartEpoch = 3; // epoch in which the request was included
     uint64 EndEpoch = 4; // max epoch for the request to be completed or failed
     uint64 LeaderBlockProducer = 5; // should be the BP proposer of next block after which this request was included in.
-    repeated bytes CreatePubKey = 6; // populated after DKG is successful
-    repeated bytes Participation = 7; // 128 bit of the executors (by order) which executed this duty
+    bytes CreatePubKey = 6; // populated after DKG is successful
+    bytes Participation = 7; // 128 bit of the executors (by order) which executed this duty
 }
 
 message BlockBody {
@@ -88,6 +88,6 @@ message BlockBody {
 }
 
 message BlockHeader {
-    repeated bytes BlockRoot = 1;
-    repeated bytes Signature = 2;
+    bytes BlockRoot = 1;
+    bytes Signature = 2;
 }
