@@ -81,21 +81,27 @@ func TestRandaoSeedMix(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
+	// block body root
+	bRoot := []byte("body root body root body root body root body root")
+
 	// mock block body
 	ctrl := gomock.NewController(t)
 	bodyMock := mocks.NewMockIBlockBody(ctrl)
 	bodyMock.EXPECT().GetProposer().Return(uint64(456))
 	bodyMock.EXPECT().GetExecutionSummaries().Return(make([]core.IExecutionSummary, 0))
 	bodyMock.EXPECT().GetNewPoolRequests().Return(nil)
+	bodyMock.EXPECT().Root().Return(bRoot, nil)
+	bodyMock.EXPECT().Validate().Return(nil)
 
 	// mock header
 	sk := &bls.SecretKey{}
 	sk.SetByCSPRNG()
-	bRoot := []byte("body root body root body root body root body root")
 	sig := sk.SignByte(bRoot)
 	headerMock := mocks.NewMockIBlockHeader(ctrl)
 	headerMock.EXPECT().GetSignature().Return(sig.Serialize())
 	headerMock.EXPECT().GetBlockRoot().Return(bRoot)
+	headerMock.EXPECT().GetBlockRoot().Return(bRoot)
+	headerMock.EXPECT().Validate(gomock.Any()).Return(nil)
 
 	state := GenerateState(t)
 	newState, err := state.ProcessNewBlock(headerMock, bodyMock)

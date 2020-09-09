@@ -1,6 +1,7 @@
 package state
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
@@ -8,12 +9,39 @@ import (
 )
 
 func (state *State) ValidateBlock(header core.IBlockHeader, body core.IBlockBody) error {
-	bp := state.GetBlockProducer(body.GetProposer())
-	if bp == nil {
-		return fmt.Errorf("could not find BP %d", body.GetProposer())
+	currentEpoch := state.GetCurrentEpoch()
+
+	// verify proposer is expected proposer
+	expectedProposer, err := state.GetBlockProposer(currentEpoch)
+	if err != nil {
+		return err
+	}
+	proposer := body.GetProposer()
+	if expectedProposer != proposer {
+		return fmt.Errorf("block expectedProposer is worng, expected %d but received %d", expectedProposer, proposer)
 	}
 
-	err := header.Validate(bp)
+	// signing committee
+	//committeeIds, err := state.BlockVotingCommittee(currentEpoch)
+	//if err != nil {
+	//	return err
+	//}
+	//committee := make([]core.IBlockProducer, len(committeeIds))
+	//for i, id := range committeeIds {
+	//	committee[i] = state.GetBlockProducer(id)
+	//}
+
+	// verify header block root matches
+	exectedRoot,err := body.Root()
+	if err != nil {
+		return err
+	}
+	if bytes.Compare(exectedRoot, header.GetBlockRoot()) != 0 {
+		return fmt.Errorf("signed block root does not match body root")
+	}
+
+	//
+	err = header.Validate(state.GetBlockProducer(proposer))
 	if err != nil {
 		return err
 	}
@@ -123,57 +151,51 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 }
 
 // called when a new block was proposed
-func (state *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBody core.IBlockBody) (newState core.IState, error error) {
-	previousEpoch := state.GetCurrentEpoch()
-	currentEpoch := previousEpoch + 1
-
-	expectedProposer, err := state.GetBlockProposer(previousEpoch) // TODO - should it be the previous?
-	if err != nil {
-		return nil, err
-	}
-	proposer := newBlockBody.GetProposer()
-	if expectedProposer != proposer {
-		return nil, fmt.Errorf("block expectedProposer is worng, expected %d but received %d", expectedProposer, newBlockBody.GetProposer())
-	}
-
-	bp := state.GetBlockProducer(proposer)
-	if bp == nil {
-		return nil, fmt.Errorf("could not find BP %d", newBlockBody.GetProposer())
-	}
-
-	// copy the state to apply state transition on
-	stateCopy, err := state.Copy()
+func (oldState *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBody core.IBlockBody) (newState core.IState, error error) {
+	// copy the oldState to apply oldState transition on
+	newState, err := oldState.Copy()
 	if err != nil {
 		return nil, err
 	}
 
-	err = stateCopy.ProcessPoolExecutions(newBlockBody.GetExecutionSummaries())
+	// bump epoch
+	newState.SetCurrentEpoch(newState.GetCurrentEpoch() + 1)
+
+	// validate block header and body
+	err = oldState.ValidateBlock(newBlockHeader, newBlockBody)
 	if err != nil {
 		return nil, err
 	}
 
-	err = stateCopy.ProcessNewPoolRequests(newBlockBody.GetNewPoolRequests())
+	//
+	err = newState.ProcessPoolExecutions(newBlockBody.GetExecutionSummaries())
 	if err != nil {
 		return nil, err
 	}
 
-	// update internal state vars
-	newSeed, err := shared.MixSeed(stateCopy.GetSeed(previousEpoch), shared.SliceToByte32(newBlockHeader.GetSignature()[:32])) // TODO - use something else than the sig
+	//
+	err = newState.ProcessNewPoolRequests(newBlockBody.GetNewPoolRequests())
 	if err != nil {
 		return nil, err
 	}
-	stateCopy.SetSeed(newSeed, currentEpoch)
-	stateCopy.SetCurrentEpoch(currentEpoch)
-	stateCopy.SetBlockRoot(shared.SliceToByte32(newBlockHeader.GetBlockRoot()), currentEpoch)
-	//stateCopy.SetHeadBlockHeader(newBlockHeader)
 
-	// the CurrentEpoch's state root is not included inside the state root as it creates
+	// update internal oldState vars
+	newSeed, err := shared.MixSeed(newState.GetSeed(oldState.GetCurrentEpoch()), shared.SliceToByte32(newBlockHeader.GetSignature()[:32])) // TODO - use something else than the sig
+	if err != nil {
+		return nil, err
+	}
+	newState.SetSeed(newSeed, newState.GetCurrentEpoch())
+	newState.SetCurrentEpoch(newState.GetCurrentEpoch())
+	newState.SetBlockRoot(shared.SliceToByte32(newBlockHeader.GetBlockRoot()), newState.GetCurrentEpoch())
+	//newState.SetHeadBlockHeader(newBlockHeader)
+
+	// the CurrentEpoch's oldState root is not included inside the oldState root as it creates
 	// a recursive dependency.
-	newStateRoot, err := stateCopy.Root()
+	newStateRoot, err := newState.Root()
 	if err != nil {
 		return nil, err
 	}
-	stateCopy.SetStateRoot(newStateRoot, currentEpoch)
+	newState.SetStateRoot(newStateRoot, newState.GetCurrentEpoch())
 
-	return stateCopy, nil
+	return newState, nil
 }
