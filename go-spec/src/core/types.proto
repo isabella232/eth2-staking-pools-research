@@ -32,14 +32,9 @@ message Pool {
 }
 
 message BeaconDuty {
-    enum DutyType {
-        Attestation = 0;
-        Proposal = 1;
-        Aggregation = 2;
-    }
-    DutyType Type = 1;
+    int32 Type = 1; // 0 - attestation, 1 - proposal, 2 - aggregation
     uint64 Committee = 2;
-    uint64 Slott = 3;
+    uint64 Slot = 3;
     bool Finalized = 4;
     bytes Participation = 5; // 128 bit of the executors (by order) which executed this duty
 }
@@ -65,12 +60,7 @@ message ExecutionSummary {
 // A non-successful DKG will penalized the DKG participants
 message CreateNewPoolRequest {
     uint64 Id = 1; // primary key
-    enum NewPoolStatus {
-        Started = 0;
-        Completed = 1;
-        Unsuccessful = 2;
-    }
-    NewPoolStatus Status = 2;
+    int32 Status = 2; // 0 - started, 1 completed, 2 - Unsuccessful
     uint64 StartEpoch = 3; // epoch in which the request was included
     uint64 EndEpoch = 4; // max epoch for the request to be completed or failed
     uint64 LeaderBlockProducer = 5; // should be the BP proposer of next block after which this request was included in.
@@ -83,8 +73,8 @@ message BlockBody {
     uint64 Epoch = 2;
     repeated ExecutionSummary ExecutionSummaries = 3;
     repeated CreateNewPoolRequest NewPoolReq = 4;
-    repeated bytes StateRoot = 5;
-    repeated bytes ParentBlockRoot = 6;
+    bytes StateRoot = 5;
+    bytes ParentBlockRoot = 6;
 }
 
 message BlockHeader {

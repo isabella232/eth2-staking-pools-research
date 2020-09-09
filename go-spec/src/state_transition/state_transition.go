@@ -12,7 +12,6 @@ type IStateTransition interface {
 	ProcessNewPoolRequests(state *core.State, summaries []*core.CreateNewPoolRequest) error
 }
 
-type StateTransition struct {
-
-}
+type StateTransition struct {}
+func NewStateTransition() *StateTransition { return &StateTransition{} }
 
