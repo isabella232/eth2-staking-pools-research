@@ -84,7 +84,7 @@ func TestRandaoSeedMix(t *testing.T) {
 
 	state := GenerateState(t)
 
-	body, err := block.NewBlockBody(484, 1, state, make([]core.IExecutionSummary, 0), nil, []byte("parent"))
+	body, err := block.NewBlockBody(456, 1, state, make([]core.IExecutionSummary, 0), nil, []byte("parent"))
 	require.NoError(t, err)
 	header,err := block.NewBlockHeader(sk, body)
 	require.NoError(t, err)
@@ -173,7 +173,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	// check new balances
 	currentBP = state.GetBlockProducer(currentBP.GetId())
 	require.NoError(t, err)
-	require.EqualValues(t, uint64(3000), currentBP.GetBalance()) // TODO - for now we allow the leader to be part of the DKG committee, in the future we will not
+	require.EqualValues(t, uint64(4000), currentBP.GetBalance())
 
 	bp := state.GetBlockProducer(participants[0])
 	require.EqualValues(t, uint64(2000), bp.GetBalance())
@@ -217,7 +217,7 @@ func TestFailedToCreateNewPool(t *testing.T) {
 
 	// check new balances
 	currentBP = state.GetBlockProducer(currentBP.GetId())
-	require.EqualValues(t, 0, currentBP.GetBalance()) // TODO - currentBP is also in the committee, separate it
+	require.EqualValues(t, 1000, currentBP.GetBalance())
 
 	for i := 0; i < len(participants); i++ {
 		bp := state.GetBlockProducer(participants[i])
