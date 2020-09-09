@@ -35,7 +35,7 @@ func (state *State) ProcessPoolExecutions(summaries []core.IExecutionSummary) er
 		}
 
 		if !pool.IsActive() {
-			return fmt.Errorf("pool %d not active", summary.GetPoolId())
+			return fmt.Errorf("pool %d not Active", summary.GetPoolId())
 		}
 
 		if err := summary.ApplyOnState(state); err != nil {
@@ -73,9 +73,9 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 			}
 
 			err = state.AddNewPool(&Pool{
-				id:              uint64(len(state.pools) + 1),
-				pubKey:          pk.Serialize(),
-				sortedExecutors: []uint64{}, // TODO - POPULAT
+				Id:              uint64(len(state.Pools) + 1),
+				PubKey:          pk.Serialize(),
+				SortedExecutors: []uint64{}, // TODO - POPULAT
 			})
 			if err != nil {
 				return err
@@ -167,7 +167,7 @@ func (state *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBo
 	stateCopy.SetBlockRoot(shared.SliceToByte32(newBlockHeader.GetBlockRoot()), currentEpoch)
 	//stateCopy.SetHeadBlockHeader(newBlockHeader)
 
-	// the currentEpoch's state root is not included inside the state root as it creates
+	// the CurrentEpoch's state root is not included inside the state root as it creates
 	// a recursive dependency.
 	newStateRoot, err := stateCopy.Root()
 	if err != nil {

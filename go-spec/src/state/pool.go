@@ -5,41 +5,27 @@ import (
 )
 
 type Pool struct {
-	id              uint64         // id
-	active 			bool
-	pubKey          []byte // eth2 validation pubkey
-	sortedExecutors []uint64       // ids of the block producers which are executors on this pool
-}
-
-func NewPool(
-	id              uint64,
-	active 			bool,
-	pubKey          []byte,
-	sortedExecutors []uint64,
-	) *Pool {
-	return &Pool{
-		id:              id,
-		active:          active,
-		pubKey:          pubKey,
-		sortedExecutors: sortedExecutors,
-	}
+	Id              uint64 // Id
+	Active          bool
+	PubKey          []byte   // eth2 validation pubkey
+	SortedExecutors []uint64 // ids of the block producers which are executors on this pool
 }
 
 func (pool *Pool) IsActive() bool {
-	return pool.active
+	return pool.Active
 }
 
 func (pool *Pool) SetActive(status bool) {
-	pool.active = status
+	pool.Active = status
 }
 
 func (pool *Pool) GetId() uint64 {
-	return pool.id
+	return pool.Id
 }
 
 func (pool *Pool) GetPubKey() (*bls.PublicKey, error) {
 	ret := &bls.PublicKey{}
-	err := ret.Deserialize(pool.pubKey)
+	err := ret.Deserialize(pool.PubKey)
 	if err != nil {
 		return nil, err
 	}
@@ -47,9 +33,9 @@ func (pool *Pool) GetPubKey() (*bls.PublicKey, error) {
 }
 
 func (pool *Pool) GetSortedExecutors() []uint64 {
-	return pool.sortedExecutors
+	return pool.SortedExecutors
 }
 
 func (pool *Pool) SetSortedExecutors(executors []uint64) {
-	pool.sortedExecutors = executors
+	pool.SortedExecutors = executors
 }

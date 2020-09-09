@@ -85,7 +85,7 @@ type IBlockProducer interface {
 	IsSlashed() bool
 	IsActive() bool
 	SetExited(atEpoch uint64) // will mark active=false ad exit epoch = atEpoch
-	ExitEpoch() uint64 // will return 0 if is still active
+	GetExitEpoch() uint64 // will return 0 if is still active
 	IncreaseBalance(change uint64) (newBalance uint64, error error)
 	DecreaseBalance(change uint64) (newBalance uint64, error error)
 }

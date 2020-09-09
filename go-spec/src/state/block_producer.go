@@ -6,40 +6,22 @@ import (
 )
 
 type BlockProducer struct {
-	id      uint64
-	pubKey  []byte
-	balance uint64 // balance on the pool chain (rewards earned)
-	stake   uint64 // stake
-	slashed bool
-	active  bool
-	exitEpoch uint64
-}
-
-func NewBlockProducer(
-	id      uint64,
-	pubKey  []byte,
-	balance uint64,
-	stake   uint64,
-	slashed bool,
-	active  bool,
-	) *BlockProducer {
-	return &BlockProducer{
-		id:      id,
-		pubKey:  pubKey,
-		balance: balance,
-		stake:   stake,
-		slashed: slashed,
-		active:  active,
-	}
+	Id        uint64
+	PubKey    []byte
+	Balance   uint64 // Balance on the pool chain (rewards earned)
+	Stake     uint64 // Stake
+	Slashed   bool
+	Active    bool
+	ExitEpoch uint64
 }
 
 func (bp *BlockProducer) GetId() uint64 {
-	return bp.id
+	return bp.Id
 }
 
 func (bp *BlockProducer) GetPubKey() (*bls.PublicKey, error) {
 	ret := &bls.PublicKey{}
-	err := ret.Deserialize(bp.pubKey)
+	err := ret.Deserialize(bp.PubKey)
 	if err != nil {
 		return nil, err
 	}
@@ -47,47 +29,47 @@ func (bp *BlockProducer) GetPubKey() (*bls.PublicKey, error) {
 }
 
 func (bp *BlockProducer) SetPubKey(pk []byte) {
-	bp.pubKey = pk
+	bp.PubKey = pk
 }
 
 func (bp *BlockProducer) GetBalance() uint64 {
-	return bp.balance
+	return bp.Balance
 }
 
 func (bp *BlockProducer) GetStake() uint64 {
-	return bp.stake
+	return bp.Stake
 }
 
 func (bp *BlockProducer) IsSlashed() bool {
-	return bp.slashed
+	return bp.Slashed
 }
 
 func (bp *BlockProducer) IsActive() bool {
-	return bp.active
+	return bp.Active
 }
 
 func (bp *BlockProducer) SetExited(atEpoch uint64) {
-	bp.active = false
-	bp.exitEpoch = atEpoch
+	bp.Active = false
+	bp.ExitEpoch = atEpoch
 }
 
-func (bp *BlockProducer) ExitEpoch() uint64 {
+func (bp *BlockProducer) GetExitEpoch() uint64 {
 	if bp.IsActive() {
 		return 0
 	}
-	return bp.exitEpoch
+	return bp.ExitEpoch
 }
 
 func (bp *BlockProducer) IncreaseBalance(change uint64) (newBalance uint64, error error) {
-	bp.balance += change
-	return bp.balance, nil
+	bp.Balance += change
+	return bp.Balance, nil
 }
 
 func (bp *BlockProducer) DecreaseBalance(change uint64) (newBalance uint64, error error) {
-	if bp.balance < change {
-		return 0, fmt.Errorf("BP %d dosen't have enonugh balance (%d) to decrease (%d)", bp.id, bp.balance, change)
+	if bp.Balance < change {
+		return 0, fmt.Errorf("BP %d dosen't have enonugh Balance (%d) to decrease (%d)", bp.Id, bp.Balance, change)
 	}
 
-	bp.balance -= change
-	return bp.balance, nil
+	bp.Balance -= change
+	return bp.Balance, nil
 }

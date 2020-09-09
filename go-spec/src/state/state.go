@@ -7,14 +7,14 @@ import (
 )
 
 type State struct {
-	genesisTime     uint64
-	currentEpoch    uint64
-	blockRoots      [][32]byte // fork choice block roots
-	stateRoots      [][32]byte // fork choice state roots
-	seeds           [][32]byte
-	blockProducers  []*BlockProducer
-	pools           []*Pool
-	slashings       [][]uint64 // fork choice slashings
+	GenesisTime    uint64
+	CurrentEpoch   uint64
+	BlockRoots     [][32]byte // fork choice block roots
+	StateRoots     [][32]byte // fork choice state roots
+	Seeds          [][32]byte
+	BlockProducers []*BlockProducer
+	Pools          []*Pool
+	Slashings      [][]uint64 // fork choice Slashings
 }
 
 func NewState(
@@ -26,33 +26,32 @@ func NewState(
 	epochZeroSeed [32]byte,
 	) *State {
 	return &State{
-		genesisTime:	 genesisTime,
-		pools:           pools,
-		currentEpoch:    currentEpoch,
+		GenesisTime:  genesisTime,
+		Pools:        pools,
+		CurrentEpoch: currentEpoch,
 		//headBlockHeader: headBlockHeader,
-		blockProducers:  blockProducers,
-		seeds:           [][32]byte{epochZeroSeed},
-		blockRoots: 	 [][32]byte{},
-		stateRoots: 	 [][32]byte{},
-		slashings: 		 [][]uint64{},
+		BlockProducers: blockProducers,
+		Seeds:          [][32]byte{epochZeroSeed},
+		BlockRoots:     [][32]byte{},
+		StateRoots:     [][32]byte{},
+		Slashings:      [][]uint64{},
 	}
 }
 
 func (state *State) Root() ([32]byte,error) {
-	// TODO - state root
-	return ssz.HashTreeRoot("state root ssz")
+	return ssz.HashTreeRoot(state)
 }
 
 func (state *State) GetPools() []core.IPool {
-	ret := make([]core.IPool, len(state.pools))
-	for i, d := range state.pools {
+	ret := make([]core.IPool, len(state.Pools))
+	for i, d := range state.Pools {
 		ret[i] = core.IPool(d)
 	}
 	return ret
 }
 
 func (state *State) GetPool(id uint64) core.IPool {
-	for _, p := range state.pools {
+	for _, p := range state.Pools {
 		if p.GetId() == id {
 			return p
 		}
@@ -65,13 +64,13 @@ func (state *State) AddNewPool(pool *Pool) error {
 		return fmt.Errorf("pool already exists")
 	}
 
-	state.pools = append(state.pools, pool)
+	state.Pools = append(state.Pools, pool)
 	return nil
 }
 
 func (state *State) GetBlockProducers() []core.IBlockProducer {
-	ret := make([]core.IBlockProducer, len(state.blockProducers))
-	for i, d := range state.blockProducers {
+	ret := make([]core.IBlockProducer, len(state.BlockProducers))
+	for i, d := range state.BlockProducers {
 		ret[i] = core.IBlockProducer(d)
 	}
 	return ret
@@ -87,22 +86,22 @@ func (state *State) GetBlockProducer(id uint64) core.IBlockProducer {
 }
 
 func (state *State) GetCurrentEpoch() uint64 {
-	return state.currentEpoch
+	return state.CurrentEpoch
 }
 
 func (state *State) SetCurrentEpoch(epoch uint64) {
-	state.currentEpoch = epoch
+	state.CurrentEpoch = epoch
 }
 
 func (state *State) GetSeed(epoch uint64) [32]byte {
-	return state.seeds[epoch]
+	return state.Seeds[epoch]
 }
 
 func (state *State) SetSeed(seed [32]byte, epoch uint64) {
-	if uint64(len(state.seeds)) <= epoch {
-		state.seeds = append(state.seeds, seed)
+	if uint64(len(state.Seeds)) <= epoch {
+		state.Seeds = append(state.Seeds, seed)
 	} else {
-		state.seeds[epoch] = seed
+		state.Seeds[epoch] = seed
 	}
 }
 
@@ -111,56 +110,56 @@ func (state *State) GetPastSeed(epoch uint64) [32]byte {
 }
 
 func (state *State) GetBlockRoot(epoch uint64) [32]byte {
-	return state.blockRoots[epoch]
+	return state.BlockRoots[epoch]
 }
 
 func (state *State) SetBlockRoot(root [32]byte, epoch uint64) {
-	if uint64(len(state.blockRoots)) <= epoch {
-		state.blockRoots = append(state.blockRoots, root)
+	if uint64(len(state.BlockRoots)) <= epoch {
+		state.BlockRoots = append(state.BlockRoots, root)
 	} else {
-		state.blockRoots[epoch] = root
+		state.BlockRoots[epoch] = root
 	}
 }
 
 func (state *State) GetStateRoot(epoch uint64) [32]byte {
-	return state.stateRoots[epoch]
+	return state.StateRoots[epoch]
 }
 
 func (state *State) SetStateRoot(root [32]byte, epoch uint64) {
-	if uint64(len(state.stateRoots)) <= epoch {
-		state.stateRoots = append(state.stateRoots, root)
+	if uint64(len(state.StateRoots)) <= epoch {
+		state.StateRoots = append(state.StateRoots, root)
 	} else {
-		state.stateRoots[epoch] = root
+		state.StateRoots[epoch] = root
 	}
 }
 
 func (state *State) Copy() (core.IState, error) {
-	copiedPools := make([]*Pool, len(state.pools))
-	for i, p := range state.pools {
-		copiedPools[i] = NewPool(
-				p.GetId(),
-				p.IsActive(),
-				p.pubKey,
-				p.GetSortedExecutors(),
-			)
+	copiedPools := make([]*Pool, len(state.Pools))
+	for i, p := range state.Pools {
+		copiedPools[i] = &Pool{
+			Id:              p.GetId(),
+			Active:          p.IsActive(),
+			PubKey:          p.PubKey,
+			SortedExecutors: p.GetSortedExecutors(),
+		}
 	}
 
-	copiedBps := make([]*BlockProducer, len(state.blockProducers))
-	for i, bp := range state.blockProducers {
+	copiedBps := make([]*BlockProducer, len(state.BlockProducers))
+	for i, bp := range state.BlockProducers {
 		copiedBps[i] = &BlockProducer{
-			id:      bp.id,
-			pubKey:  bp.pubKey,
-			balance: bp.balance,
-			stake:   bp.stake,
-			slashed: bp.slashed,
-			active:  bp.active,
+			Id:      bp.Id,
+			PubKey:  bp.PubKey,
+			Balance: bp.Balance,
+			Stake:   bp.Stake,
+			Slashed: bp.Slashed,
+			Active:  bp.Active,
 		}
 	}
 
 	return &State{
-		pools:          copiedPools,
-		blockProducers: copiedBps,
-		seeds:           state.seeds,
+		Pools:          copiedPools,
+		BlockProducers: copiedBps,
+		Seeds:          state.Seeds,
 	}, nil
 }
 

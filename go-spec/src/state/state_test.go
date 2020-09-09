@@ -44,12 +44,12 @@ func GenerateState(t *testing.T) *State {
 		sk.SetByCSPRNG()
 
 		bps[i] = &BlockProducer{
-			id:      uint64(i),
-			balance: 1000,
-			stake:   0,
-			slashed: false,
-			active:  true,
-			pubKey:  sk.GetPublicKey().Serialize(),
+			Id:      uint64(i),
+			Balance: 1000,
+			Stake:   0,
+			Slashed: false,
+			Active:  true,
+			PubKey:  sk.GetPublicKey().Serialize(),
 		}
 	}
 
@@ -64,20 +64,16 @@ func GenerateState(t *testing.T) *State {
 		sk.SetByCSPRNG()
 
 		pools[i] = &Pool{
-			id:              uint64(i),
-			sortedExecutors: executors,
-			pubKey:          sk.GetPublicKey().Serialize(),
+			Id:              uint64(i),
+			SortedExecutors: executors,
+			PubKey:          sk.GetPublicKey().Serialize(),
 		}
 	}
 
 	return &State{
-		pools: pools,
-		//headBlockHeader: &block.BlockHeader{
-		//	BlockRoot: nil,
-		//	Signature: nil,
-		//},
-		blockProducers: bps,
-		seeds:          [][32]byte{shared.SliceToByte32([]byte("seedseedseedseedseedseedseedseed"))},
+		Pools: pools,
+		BlockProducers: bps,
+		Seeds:          [][32]byte{shared.SliceToByte32([]byte("seedseedseedseedseedseedseedseed"))},
 	}
 }
 
@@ -181,7 +177,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	participants,err := state.DKGCommittee(0,0)
 
 	require.NoError(t, state.ProcessNewPoolRequests(reqs))
-	require.Equal(t, 6, len(state.pools))
+	require.Equal(t, 6, len(state.Pools))
 
 	// check new balances
 	currentBP = state.GetBlockProducer(currentBP.GetId())
@@ -226,7 +222,7 @@ func TestFailedToCreateNewPool(t *testing.T) {
 	require.NoError(t, err)
 
 	require.NoError(t, state.ProcessNewPoolRequests(reqs))
-	require.Equal(t, 5, len(state.pools))
+	require.Equal(t, 5, len(state.Pools))
 
 	// check new balances
 	currentBP = state.GetBlockProducer(currentBP.GetId())
@@ -249,27 +245,28 @@ func TestStateSSZ(t *testing.T) {
 			state:NewState(
 					1234562,
 					[]*Pool{
-						NewPool(
-							12,
-							true,
-							[]byte{1,2,3,4,5},
-							[]uint64{12,5423,1245,12435,21,0},
-							),
+						&Pool{
+							Id:              12,
+							Active:          true,
+							PubKey:          []byte{1,2,3,4,5},
+							SortedExecutors: []uint64{12,5423,1245,12435,21,0},
+						},
 					},
 					12,
 					[]*BlockProducer{
-						NewBlockProducer(
-							12,
-							[]byte{1,2,3,4,5},
-							100,
-							100,
-							false,
-							true,
-							),
+						&BlockProducer{
+							Id:        12,
+							PubKey:    []byte{1,2,3,4,5},
+							Balance:   100,
+							Stake:     100,
+							Slashed:   false,
+							Active:    true,
+							ExitEpoch: 0,
+						},
 					},
 					[32]byte{1,2,3,4,5},
 				),
-			expected:toBytes("893981688d75771da9898f8370c4c4458a0157d8ff7f974979f8f42e40247cc4"),
+			expected:toBytes("468737bf59e0f09bb4ce5d7d9bcff54010692377ad407cc2be21f1270c5a79e3"),
 		},
 	}
 

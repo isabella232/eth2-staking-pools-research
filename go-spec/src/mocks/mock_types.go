@@ -978,18 +978,18 @@ func (mr *MockIBlockProducerMockRecorder) SetExited(atEpoch interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetExited", reflect.TypeOf((*MockIBlockProducer)(nil).SetExited), atEpoch)
 }
 
-// ExitEpoch mocks base method
-func (m *MockIBlockProducer) ExitEpoch() uint64 {
+// GetExitEpoch mocks base method
+func (m *MockIBlockProducer) GetExitEpoch() uint64 {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExitEpoch")
+	ret := m.ctrl.Call(m, "GetExitEpoch")
 	ret0, _ := ret[0].(uint64)
 	return ret0
 }
 
-// ExitEpoch indicates an expected call of ExitEpoch
-func (mr *MockIBlockProducerMockRecorder) ExitEpoch() *gomock.Call {
+// GetExitEpoch indicates an expected call of GetExitEpoch
+func (mr *MockIBlockProducerMockRecorder) GetExitEpoch() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExitEpoch", reflect.TypeOf((*MockIBlockProducer)(nil).ExitEpoch))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExitEpoch", reflect.TypeOf((*MockIBlockProducer)(nil).GetExitEpoch))
 }
 
 // IncreaseBalance mocks base method
