@@ -3,6 +3,7 @@ package state_transition
 import (
 	"encoding/hex"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-ssz"
 	"github.com/stretchr/testify/require"
@@ -21,18 +22,48 @@ func GenerateValidHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) 
 			t,
 		456,
 		SK,
+		"",
 		)
 }
+
+func GenerateWrongProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		455, // wrong
+		SK,
+		"",
+	)
+}
+
+func GenerateInvalidProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		4550000000, // invalid
+		SK,
+		"",
+	)
+}
+
+func GenerateWrongRootHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		456, // invalid
+		SK,
+		"73aa0c267311b8c49f0b9812f7f2f845c55b0d4921c1b40a38f0d82d471d9bcf", // wrong
+	)
+}
+
 
 func GenerateInvalidSigHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
 		456,
 		"59aaaa8f68aad68552512feb1e27438ddbe2730ea416bb3337b579317610d702", // wrong
+		"",
 	)
 }
 
-func generateHeaderAndBody(t *testing.T, proposer uint64, skStr string) (*core.BlockHeader, *core.BlockBody) {
+func generateHeaderAndBody(t *testing.T, proposer uint64, skStr string, headerBodyRoot string) (*core.BlockHeader, *core.BlockBody) {
 	body := &core.BlockBody{
 		Proposer:           proposer,
 		Epoch:              5,
@@ -77,6 +108,9 @@ func generateHeaderAndBody(t *testing.T, proposer uint64, skStr string) (*core.B
 	sk.SetHexString(skStr)
 
 	root, _ := ssz.HashTreeRoot(body)
+	if len(headerBodyRoot) > 0 {
+		root = shared.SliceToByte32( toByte(headerBodyRoot))
+	}
 	sig := sk.SignByte(root[:])
 
 	return &core.BlockHeader{
