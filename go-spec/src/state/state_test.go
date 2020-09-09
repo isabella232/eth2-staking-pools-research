@@ -83,9 +83,10 @@ func TestRandaoSeedMix(t *testing.T) {
 	sk.SetByCSPRNG()
 
 	state := GenerateState(t)
-
-	body, err := block.NewBlockBody(456, 1, state, make([]core.IExecutionSummary, 0), nil, []byte("parent"))
+	stateRoot, err := state.Root()
 	require.NoError(t, err)
+
+	body := block.NewBlockBody(456, 1, stateRoot, make([]core.IExecutionSummary, 0), nil, []byte("parent"))
 	header,err := block.NewBlockHeader(sk, body)
 	require.NoError(t, err)
 

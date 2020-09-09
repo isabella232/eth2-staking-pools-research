@@ -1,11 +1,11 @@
 package block
 
 type BeaconDuty struct {
-	dutyType      uint8 // 0 - attestation, 1 - block proposal
-	committee     uint64
-	slot          uint64
-	finalized     bool     // whether or not it was included in the beacon chain (the pool earned reward from it)
-	participation [16]byte // 128 bit of the executors (by order) which executed this duty
+	DutyType      uint8 // 0 - attestation, 1 - block proposal
+	Committee     uint64
+	Slot          uint64
+	Finalized     bool     // whether or not it was included in the beacon chain (the pool earned reward from it)
+	Participation [16]byte // 128 bit of the executors (by order) which executed this duty
 }
 
 func NewBeaconDuty(
@@ -16,30 +16,30 @@ func NewBeaconDuty(
 	participation [16]byte,
 	) *BeaconDuty {
 	return &BeaconDuty{
-		dutyType:      dutyType,
-		committee:     committee,
-		slot:          slot,
-		finalized:     finalized,
-		participation: participation,
+		DutyType:      dutyType,
+		Committee:     committee,
+		Slot:          slot,
+		Finalized:     finalized,
+		Participation: participation,
 	}
 }
 
 func (duty *BeaconDuty) GetType() uint8 {
-	return duty.dutyType
+	return duty.DutyType
 }
 
 func (duty *BeaconDuty) GetCommittee() uint64 {
-	return duty.committee
+	return duty.Committee
 }
 
 func (duty *BeaconDuty) GetSlot() uint64 {
-	return duty.slot
+	return duty.Slot
 }
 
 func (duty *BeaconDuty) IsFinalized() bool  {
-	return duty.finalized
+	return duty.Finalized
 }
 
 func (duty *BeaconDuty) GetParticipation() [16]byte  {
-	return duty.participation
+	return duty.Participation
 }

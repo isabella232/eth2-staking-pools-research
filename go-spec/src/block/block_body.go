@@ -6,65 +6,66 @@ import (
 )
 
 type BlockBody struct {
-	proposer           uint64
-	epochNumber        uint64
-	executionSummaries []core.IExecutionSummary
-	newPoolReq         []core.ICreatePoolRequest
-	stateRoot          []byte
-	parentBlockRoot    []byte
+	Proposer           uint64
+	EpochNumber        uint64
+	ExecutionSummaries []*PoolExecutionSummary
+	NewPoolReq         []*CreatePoolRequest
+	StateRoot          []byte
+	ParentBlockRoot    []byte
 }
 
 func NewBlockBody(
 	Proposer uint64,
 	number uint64,
-	state core.IState,
-	summary []core.IExecutionSummary,
-	newPoolReq []core.ICreatePoolRequest,
+	stateRoot [32]byte,
+	summary []*PoolExecutionSummary,
+	newPoolReq []*CreatePoolRequest,
 	parentBlockRoot []byte,
-) (*BlockBody, error) {
-	stateRoot,err := state.Root()
-	if err != nil {
-		return nil, err
-	}
-
+) *BlockBody {
 	return &BlockBody{
-		proposer:           Proposer,
-		epochNumber:        number,
-		executionSummaries: summary,
-		newPoolReq:			newPoolReq,
-		stateRoot:          stateRoot[:],
-		parentBlockRoot:    parentBlockRoot,
-	}, nil
+		Proposer:           Proposer,
+		EpochNumber:        number,
+		ExecutionSummaries: summary,
+		NewPoolReq:         newPoolReq,
+		StateRoot:          stateRoot[:],
+		ParentBlockRoot:    parentBlockRoot,
+	}
 }
 
 func (body *BlockBody) GetEpochNumber() uint64 {
-	return body.epochNumber
+	return body.EpochNumber
 }
 
 func (body *BlockBody) GetProposer() uint64 {
-	return body.proposer
+	return body.Proposer
 }
 
 func (body *BlockBody) GetExecutionSummaries() []core.IExecutionSummary {
-	return body.executionSummaries
+	ret := make([]core.IExecutionSummary, len(body.ExecutionSummaries))
+	for i, d := range body.ExecutionSummaries {
+		ret[i] = core.IExecutionSummary(d)
+	}
+	return ret
 }
 
 func (body *BlockBody) GetNewPoolRequests() []core.ICreatePoolRequest {
-	return body.newPoolReq
+	ret := make([]core.ICreatePoolRequest, len(body.NewPoolReq))
+	for i, d := range body.NewPoolReq {
+		ret[i] = core.ICreatePoolRequest(d)
+	}
+	return ret
 }
 
 func (body *BlockBody) GetStateRoot() []byte {
-	return body.stateRoot
+	return body.StateRoot
 }
 
 func (body *BlockBody) GetParentBlockRoot() []byte {
-	return body.parentBlockRoot
+	return body.ParentBlockRoot
 }
 
 func (body *BlockBody) Root() ([]byte, error) {
-	// TODO - complete body serialization
-
-	ret, err := ssz.HashTreeRoot("body to serialize")
+	ret, err := ssz.HashTreeRoot(body)
 	if err != nil {
 		return nil, err
 	}

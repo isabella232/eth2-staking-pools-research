@@ -10,22 +10,22 @@ import (
 //
 // How it works?
 // - A user sends 32 eth and create pool request
-// - The first BP that sees it, will post a CreatePoolRequest with status 0 and will nominate the next BP as the leader for the DKG
+// - The first BP that sees it, will post a CreatePoolRequest with Status 0 and will nominate the next BP as the leader for the DKG
 //   (the 128 DKG participants are deterministically selected as well)
-// - If during the next epoch the DKG is successful, the BP (which is also the DKG leader) posts a CreatePoolRequest with the same ID,
-//   status 1 and the created pub key
-// - If the DKG is un-successful, the BP will post a CreatePoolRequest with the same ID, status 3 and will nominate the next BP as leader
+// - If during the next Epoch the DKG is successful, the BP (which is also the DKG leader) posts a CreatePoolRequest with the same ID,
+//   Status 1 and the created pub key
+// - If the DKG is un-successful, the BP will post a CreatePoolRequest with the same ID, Status 3 and will nominate the next BP as leader
 //
 // A successful DKG will reward the leader and DKG participants
 // A non-successful DKG will penalized the DKG participants
 type CreatePoolRequest struct {
-	id					uint64 // primary key
-	status 				uint64 // 0 for not completed, 1 for completed, 2 for un-successful
-	startEpoch			uint64
-	endEpoch			uint64
-	leaderBlockProducer	uint64 // should be the next block producer
-	createdPubKey		[]byte // populated after DKG is successful
-	participation		[16]byte // 128 bit of the executors (by order) which executed this duty
+	Id                  uint64 // primary key
+	Status              uint64 // 0 for not completed, 1 for completed, 2 for un-successful
+	StartEpoch          uint64
+	EndEpoch            uint64
+	LeaderBlockProducer uint64   // should be the next block producer
+	CreatedPubKey       []byte   // populated after DKG is successful
+	Participation       [16]byte // 128 bit of the executors (by order) which executed this duty
 }
 
 func NewCreatePoolRequest(
@@ -38,53 +38,53 @@ func NewCreatePoolRequest(
 	participation		[16]byte,
 	) *CreatePoolRequest {
 	return &CreatePoolRequest{
-		id:                  id,
-		status:              status,
-		startEpoch:          startEpoch,
-		endEpoch:            endEpoch,
-		leaderBlockProducer: leaderBlockProducer,
-		createdPubKey:       createdPubKey,
-		participation:       participation,
+		Id:                  id,
+		Status:              status,
+		StartEpoch:          startEpoch,
+		EndEpoch:            endEpoch,
+		LeaderBlockProducer: leaderBlockProducer,
+		CreatedPubKey:       createdPubKey,
+		Participation:       participation,
 	}
 }
 
 func (req *CreatePoolRequest) GetId() uint64 {
-	return req.id
+	return req.Id
 }
 
 func (req *CreatePoolRequest) GetStatus() uint64 {
-	return req.status
+	return req.Status
 }
 
 func (req *CreatePoolRequest) GetStartEpoch() uint64 {
-	return req.startEpoch
+	return req.StartEpoch
 }
 
 func (req *CreatePoolRequest) GetEndEpoch() uint64 {
-	return req.endEpoch
+	return req.EndEpoch
 }
 
 func (req *CreatePoolRequest) GetLeaderBP() uint64 {
-	return req.leaderBlockProducer
+	return req.LeaderBlockProducer
 }
 
 func (req *CreatePoolRequest) GetCreatePubKey() []byte {
-	return req.createdPubKey
+	return req.CreatedPubKey
 }
 
 func (req *CreatePoolRequest) GetParticipation() [16]byte  {
-	return req.participation
+	return req.Participation
 }
 
 func (req *CreatePoolRequest) Validate(state core.IState, currentBP core.IBlockProducer) error {
-	if req.leaderBlockProducer != currentBP.GetId() {
+	if req.LeaderBlockProducer != currentBP.GetId() {
 		return fmt.Errorf("pool leader should be the current block producer")
 	}
 
-	// TODO - req id is primary (non duplicate and incremental)
+	// TODO - req Id is primary (non duplicate and incremental)
 
 	// TODO - check that network has enough capitalization
 
-	// TODO - check leader is not part of DKG committee
+	// TODO - check leader is not part of DKG Committee
 	return nil
 }

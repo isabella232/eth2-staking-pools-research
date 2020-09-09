@@ -69,7 +69,7 @@ func TestAttestationSuccessful(t *testing.T) {
 	summary := NewExecutionSummary(
 			0,
 			1,
-			[]core.IBeaconDuty{
+			[]*BeaconDuty{
 				NewBeaconDuty(
 						0,
 						0,
@@ -88,8 +88,8 @@ func TestAttestationSuccessful(t *testing.T) {
 //		for i:=0 ; i < int(core.TestConfig().PoolExecutorsNumber) ; i++ {
 //			bp := state.GetBlockProducer(pool.GetSortedExecutors()[i])
 //
-//			participation := duty.GetParticipation()
-//			if shared.IsBitSet(participation[:], uint64(i)) {
+//			Participation := duty.GetParticipation()
+//			if shared.IsBitSet(Participation[:], uint64(i)) {
 //				require.EqualValues(t, 1100, bp.GetBalance())
 //				require.EqualValues(t, 0, i)
 //			} else {

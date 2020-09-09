@@ -9,40 +9,44 @@ import (
 /**
 	This object is crucial for the honest operation of executors assigned to a pool.
 	It does 2 things:
-	1) checks which duties the pool had in a specific epoch
+	1) checks which Duties the pool had in a specific Epoch
 	2) submits an array of 16 bytes (128 bits) which represents a 1 for each executor that participated in executing the duty
 	   and 0 for each that didn't.
 
 	This helps assigning rewards/ penalties for executors.
  */
 type PoolExecutionSummary struct {
-	poolId uint64
-	epoch  uint64 //
-	duties []core.IBeaconDuty
+	PoolId uint64
+	Epoch  uint64 //
+	Duties []*BeaconDuty
 }
 
 func NewExecutionSummary(
 	poolId uint64,
 	epoch  uint64,
-	duties []core.IBeaconDuty,
+	duties []*BeaconDuty,
 	) *PoolExecutionSummary {
 	return &PoolExecutionSummary{
-		poolId: poolId,
-		epoch:  epoch,
-		duties: duties,
+		PoolId: poolId,
+		Epoch:  epoch,
+		Duties: duties,
 	}
 }
 
 func (summary *PoolExecutionSummary) GetPoolId() uint64 {
-	return summary.poolId
+	return summary.PoolId
 }
 
 func (summary *PoolExecutionSummary) GetEpoch() uint64 {
-	return summary.epoch
+	return summary.Epoch
 }
 
 func (summary *PoolExecutionSummary) GetDuties() []core.IBeaconDuty {
-	return summary.duties
+	ret := make([]core.IBeaconDuty, len(summary.Duties))
+	for i, d := range summary.Duties {
+		ret[i] = core.IBeaconDuty(d)
+	}
+	return ret
 }
 
 func (summary *PoolExecutionSummary) ApplyOnState(state core.IState) error {
