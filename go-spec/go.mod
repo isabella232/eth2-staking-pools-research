@@ -13,4 +13,5 @@ require (
 	github.com/prysmaticlabs/go-bitfield v0.0.0-20200618145306-2ae0807bef65 // indirect
 	github.com/prysmaticlabs/go-ssz v0.0.0-20200612203617-6d5c9aa213ae
 	github.com/stretchr/testify v1.6.1
+	google.golang.org/protobuf v1.25.0 // indirect
 )

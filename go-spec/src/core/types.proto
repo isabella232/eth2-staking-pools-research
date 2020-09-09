@@ -1,0 +1,93 @@
+syntax = "proto3";
+package state;
+
+option go_package = ".;core";
+
+message State {
+    uint64 GenesisTime = 1;
+    uint64 CurrentEpoch = 2;
+    repeated bytes BlockRoots = 3;
+    repeated bytes StateRoots = 4;
+    repeated bytes Seeds = 5;
+    repeated BlockProducer BlockProducers = 6;
+    repeated Pool Pools = 7;
+    repeated uint64 Slashings = 8;
+}
+
+message BlockProducer {
+    uint64 Id = 1;
+    repeated bytes PubKey = 2;
+    uint64 Balance = 3;
+    uint64 Stake = 4;
+    bool Slashed = 5;
+    bool Active = 6;
+    uint64 ExitEpoch = 7;
+}
+
+message Pool {
+    uint64 Id = 1;
+    bool Active = 2;
+    repeated bytes PubKey = 3;
+    repeated uint64 SortedCommittee = 4;
+}
+
+message BeaconDuty {
+    enum DutyType {
+        Attestation = 0;
+        Proposal = 1;
+        Aggregation = 2;
+    }
+    DutyType Type = 1;
+    uint64 Committee = 2;
+    uint64 Slott = 3;
+    bool Finalized = 4;
+    repeated bytes Participation = 5;
+}
+
+message ExecutionSummary {
+    uint64 PoolId = 1;
+    uint64 Epoch = 2;
+    repeated BeaconDuty Duties = 3;
+}
+
+// A request struct for creating new pool credentials
+// will trigger random selection of 128 executors to DKG new pool credentials and wait for deposit
+//
+// How it works?
+// - A user sends 32 eth and create pool request
+// - The first BP that sees it, will post a CreatePoolRequest with Status 0 and will nominate the next BP as the leader for the DKG
+//   (the 128 DKG participants are deterministically selected as well)
+// - If during the next Epoch the DKG is successful, the BP (which is also the DKG leader) posts a CreatePoolRequest with the same ID,
+//   Status 1 and the created pub key
+// - If the DKG is un-successful, the BP will post a CreatePoolRequest with the same ID, Status 3 and will nominate the next BP as leader
+//
+// A successful DKG will reward the leader and DKG participants
+// A non-successful DKG will penalized the DKG participants
+message CreateNewPoolRequest {
+    uint64 Id = 1; // primary key
+    enum NewPoolStatus {
+        Started = 0;
+        Completed = 1;
+        Unsuccessful = 2;
+    }
+    NewPoolStatus Status = 2;
+    uint64 StartEpoch = 3; // epoch in which the request was included
+    uint64 EndEpoch = 4; // max epoch for the request to be completed or failed
+    uint64 LeaderBlockProducer = 5; // should be the BP proposer of next block after which this request was included in.
+    repeated bytes CreatePubKey = 6; // populated after DKG is successful
+    repeated bytes Participation = 7; // 128 bit of the executors (by order) which executed this duty
+}
+
+message BlockBody {
+    uint64 Proposer = 1;
+    uint64 Epoch = 2;
+    repeated ExecutionSummary ExecutionSummaries = 3;
+    repeated CreateNewPoolRequest NewPoolReq = 4;
+    repeated bytes StateRoot = 5;
+    repeated bytes ParentBlockRoot = 6;
+}
+
+message BlockHeader {
+    repeated bytes BlockRoot = 1;
+    repeated bytes Signature = 2;
+}
