@@ -41,42 +41,58 @@ func GetPool(state *State, id uint64) *Pool {
 }
 
 func PoolCommittee(state *State, poolId uint64, epoch uint64) ([]uint64,error) {
-	// TODO validate state.Seeds[epoch] returns not nil?
+	seed, err := GetSeed(state, epoch)
+	if err != nil {
+		return []uint64{}, err
+	}
 	return shuffle(
 		state.BlockProducers,
 		0,
 		epoch,
-		shared.SliceToByte32(state.Seeds[epoch]),
+		shared.SliceToByte32(seed),
 		[]byte(fmt.Sprintf("pool %d committee", poolId)),
 	)
 }
 
 func DKGCommittee(state *State, reqId uint64, epoch uint64)([]uint64, error) {
+	seed, err := GetSeed(state, epoch)
+	if err != nil {
+		return []uint64{}, err
+	}
 	return shuffle(
 		state.BlockProducers,
 		0,
 		epoch,
-		shared.SliceToByte32(state.Seeds[epoch]),
+		shared.SliceToByte32(seed),
 		[]byte("dkg committee"),
 	)
 }
 
 func BlockVotingCommittee(state *State, epoch uint64)([]uint64, error) {
+	seed, err := GetSeed(state, epoch)
+	if err != nil {
+		return []uint64{}, err
+	}
 	return shuffle(
 		state.BlockProducers,
 		0,
 		epoch,
-		shared.SliceToByte32(state.Seeds[epoch]),
+		shared.SliceToByte32(seed),
 		[]byte("block voting committee"),
 	)
 }
 
 func GetBlockProposer(state *State, epoch uint64) (uint64, error) {
+	seed, err := GetSeed(state, epoch)
+	if err != nil {
+		return 0, err
+	}
+
 	lst, err := shuffle(
 		state.BlockProducers,
 		0,
 		epoch,
-		shared.SliceToByte32(state.Seeds[epoch]),
+		shared.SliceToByte32(seed),
 		[]byte("block proposer"),
 	)
 	if err != nil {
@@ -85,6 +101,15 @@ func GetBlockProposer(state *State, epoch uint64) (uint64, error) {
 	return lst[0], nil
 }
 
+// will return error if not found
+func GetSeed(state *State, epoch uint64) ([]byte, error) {
+	for _, d := range state.Seeds {
+		if d.Epoch == epoch {
+			return d.Bytes, nil
+		}
+	}
+	return []byte{}, fmt.Errorf("seed for epoch %d not found", epoch)
+}
 
 // TODO - find out if secure
 func shuffle(allBPs []*BlockProducer, committeeId uint64, epoch uint64, seed [32]byte, nonce []byte) ([]uint64, error) {

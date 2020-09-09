@@ -28,24 +28,33 @@ func (st *StateTransition) ApplyBlockBody(oldState *core.State, newBlockHeader *
 	newState.CurrentEpoch += 1
 	// apply seed
 	newSeed, err := shared.MixSeed(
-		shared.SliceToByte32(newState.Seeds[oldState.GetCurrentEpoch()]), // previous seed
+		shared.SliceToByte32(oldState.Seeds[len(oldState.Seeds) - 1].Bytes), // previous seed
 		shared.SliceToByte32(newBlockHeader.Signature[:32])) // TODO - use something else than the sig
 	if err != nil {
 		return nil, err
 	}
-	newState.Seeds[newState.CurrentEpoch] = newSeed[:]
+	newState.Seeds = append(newState.Seeds, &core.EpochAndBytes{
+		Epoch:                newState.CurrentEpoch,
+		Bytes:                newSeed[:],
+	})
 	// add block root
 	root, err := ssz.HashTreeRoot(newBlockBody)
 	if err != nil {
 		return nil, err
 	}
-	newState.BlockRoots[newState.CurrentEpoch] = root[:]
+	newState.BlockRoots = append(newState.BlockRoots, &core.EpochAndBytes{
+		Epoch:                newState.CurrentEpoch,
+		Bytes:                root[:],
+	})
 	// state root
 	root, err = ssz.HashTreeRoot(newState)
 	if err != nil {
 		return nil, err
 	}
-	newState.StateRoots[newState.CurrentEpoch] = root[:]
+	newState.StateRoots = append(newState.StateRoots, &core.EpochAndBytes{
+		Epoch:                newState.CurrentEpoch,
+		Bytes:                root[:],
+	})
 
 	return newState, nil
 }

@@ -9,7 +9,7 @@ import (
 func (st *StateTransition) ProcessExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error {
 	for _, summary := range summaries {
 		pool := core.GetPool(state, summary.GetPoolId())
-		if pool != nil {
+		if pool == nil {
 			return fmt.Errorf("could not find pool %d", summary.GetPoolId())
 		}
 		if !pool.Active {

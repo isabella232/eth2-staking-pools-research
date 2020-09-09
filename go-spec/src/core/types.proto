@@ -6,9 +6,9 @@ option go_package = ".;core";
 message State {
     uint64 GenesisTime = 1;
     uint64 CurrentEpoch = 2;
-    repeated bytes BlockRoots = 3;
-    repeated bytes StateRoots = 4;
-    repeated bytes Seeds = 5;
+    repeated EpochAndBytes BlockRoots = 3;
+    repeated EpochAndBytes StateRoots = 4;
+    repeated EpochAndBytes Seeds = 5;
     repeated BlockProducer BlockProducers = 6;
     repeated Pool Pools = 7;
     repeated uint64 Slashings = 8;
@@ -80,4 +80,9 @@ message BlockBody {
 message BlockHeader {
     bytes BlockRoot = 1;
     bytes Signature = 2;
+}
+
+message EpochAndBytes {
+    uint64 Epoch = 1;
+    bytes Bytes = 2;
 }

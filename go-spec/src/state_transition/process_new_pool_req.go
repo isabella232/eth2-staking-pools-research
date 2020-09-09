@@ -8,8 +8,8 @@ import (
 	"sort"
 )
 
-func (st *StateTransition) ProcessNewPoolRequests(state *core.State, summaries []*core.CreateNewPoolRequest) error {
-	for _, req := range summaries {
+func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []*core.CreateNewPoolRequest) error {
+	for _, req := range requests {
 		leader := core.GetBlockProducer(state, req.StartEpoch)
 		if leader == nil {
 			return fmt.Errorf("could not find new pool req leader")
