@@ -92,20 +92,6 @@ func (mr *MockIStateMockRecorder) GetPool(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPool", reflect.TypeOf((*MockIState)(nil).GetPool), id)
 }
 
-// AddNewPool mocks base method
-func (m *MockIState) AddNewPool(pool core.IPool) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddNewPool", pool)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// AddNewPool indicates an expected call of AddNewPool
-func (mr *MockIStateMockRecorder) AddNewPool(pool interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddNewPool", reflect.TypeOf((*MockIState)(nil).AddNewPool), pool)
-}
-
 // GetBlockProducers mocks base method
 func (m *MockIState) GetBlockProducers() []core.IBlockProducer {
 	m.ctrl.T.Helper()
@@ -158,32 +144,6 @@ func (m *MockIState) SetCurrentEpoch(epoch uint64) {
 func (mr *MockIStateMockRecorder) SetCurrentEpoch(epoch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentEpoch", reflect.TypeOf((*MockIState)(nil).SetCurrentEpoch), epoch)
-}
-
-// GetHeadBlockHeader mocks base method
-func (m *MockIState) GetHeadBlockHeader() core.IBlockHeader {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetHeadBlockHeader")
-	ret0, _ := ret[0].(core.IBlockHeader)
-	return ret0
-}
-
-// GetHeadBlockHeader indicates an expected call of GetHeadBlockHeader
-func (mr *MockIStateMockRecorder) GetHeadBlockHeader() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHeadBlockHeader", reflect.TypeOf((*MockIState)(nil).GetHeadBlockHeader))
-}
-
-// SetHeadBlockHeader mocks base method
-func (m *MockIState) SetHeadBlockHeader(header core.IBlockHeader) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetHeadBlockHeader", header)
-}
-
-// SetHeadBlockHeader indicates an expected call of SetHeadBlockHeader
-func (mr *MockIStateMockRecorder) SetHeadBlockHeader(header interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHeadBlockHeader", reflect.TypeOf((*MockIState)(nil).SetHeadBlockHeader), header)
 }
 
 // GetSeed mocks base method
@@ -418,21 +378,6 @@ func (m *MockIPool) EXPECT() *MockIPoolMockRecorder {
 	return m.recorder
 }
 
-// Copy mocks base method
-func (m *MockIPool) Copy() (core.IPool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Copy")
-	ret0, _ := ret[0].(core.IPool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Copy indicates an expected call of Copy
-func (mr *MockIPoolMockRecorder) Copy() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Copy", reflect.TypeOf((*MockIPool)(nil).Copy))
-}
-
 // IsActive mocks base method
 func (m *MockIPool) IsActive() bool {
 	m.ctrl.T.Helper()
@@ -474,11 +419,12 @@ func (mr *MockIPoolMockRecorder) GetId() *gomock.Call {
 }
 
 // GetPubKey mocks base method
-func (m *MockIPool) GetPubKey() *bls.PublicKey {
+func (m *MockIPool) GetPubKey() (*bls.PublicKey, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPubKey")
 	ret0, _ := ret[0].(*bls.PublicKey)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetPubKey indicates an expected call of GetPubKey
@@ -923,21 +869,6 @@ func (m *MockIBlockProducer) EXPECT() *MockIBlockProducerMockRecorder {
 	return m.recorder
 }
 
-// Copy mocks base method
-func (m *MockIBlockProducer) Copy() (core.IBlockProducer, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Copy")
-	ret0, _ := ret[0].(core.IBlockProducer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Copy indicates an expected call of Copy
-func (mr *MockIBlockProducerMockRecorder) Copy() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Copy", reflect.TypeOf((*MockIBlockProducer)(nil).Copy))
-}
-
 // GetId mocks base method
 func (m *MockIBlockProducer) GetId() uint64 {
 	m.ctrl.T.Helper()
@@ -953,11 +884,12 @@ func (mr *MockIBlockProducerMockRecorder) GetId() *gomock.Call {
 }
 
 // GetPubKey mocks base method
-func (m *MockIBlockProducer) GetPubKey() *bls.PublicKey {
+func (m *MockIBlockProducer) GetPubKey() (*bls.PublicKey, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPubKey")
 	ret0, _ := ret[0].(*bls.PublicKey)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetPubKey indicates an expected call of GetPubKey
@@ -967,7 +899,7 @@ func (mr *MockIBlockProducerMockRecorder) GetPubKey() *gomock.Call {
 }
 
 // SetPubKey mocks base method
-func (m *MockIBlockProducer) SetPubKey(pk *bls.PublicKey) {
+func (m *MockIBlockProducer) SetPubKey(pk []byte) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SetPubKey", pk)
 }

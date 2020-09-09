@@ -7,13 +7,10 @@ type IState interface {
 	Root() ([32]byte,error)
 	GetPools() []IPool
 	GetPool(id uint64) IPool
-	AddNewPool(pool IPool) error
 	GetBlockProducers() []IBlockProducer
 	GetBlockProducer(id uint64) IBlockProducer
 	GetCurrentEpoch() uint64
 	SetCurrentEpoch(epoch uint64)
-	GetHeadBlockHeader() IBlockHeader
-	SetHeadBlockHeader(header IBlockHeader)
 	GetSeed(epoch uint64) [32]byte
 	SetSeed(seed [32]byte, epoch uint64)
 	GetPastSeed(epoch uint64) [32]byte
@@ -38,11 +35,10 @@ type IState interface {
 }
 
 type IPool interface {
-	Copy() (IPool, error)
 	IsActive() bool
 	SetActive(status bool)
 	GetId() uint64
-	GetPubKey() *bls.PublicKey
+	GetPubKey() (*bls.PublicKey, error)
 	GetSortedExecutors() []uint64
 	SetSortedExecutors(executors []uint64)
 }
@@ -81,10 +77,9 @@ type IExecutionSummary interface {
 }
 
 type IBlockProducer interface {
-	Copy() (IBlockProducer, error)
 	GetId() uint64
-	GetPubKey() *bls.PublicKey
-	SetPubKey(pk *bls.PublicKey)
+	GetPubKey() (*bls.PublicKey, error)
+	SetPubKey(pk []byte)
 	GetBalance() uint64
 	GetStake() uint64
 	IsSlashed() bool

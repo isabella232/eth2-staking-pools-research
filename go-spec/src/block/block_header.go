@@ -25,7 +25,12 @@ func (header *BlockHeader) Validate(bp core.IBlockProducer) error {
 		return err
 	}
 
-	if res := sig.VerifyHash(bp.GetPubKey(), header.BlockRoot); !res {
+	pk, err := bp.GetPubKey()
+	if err != nil {
+		return err
+	}
+
+	if res := sig.VerifyHash(pk, header.BlockRoot); !res {
 		return fmt.Errorf("signatur did not verify")
 	}
 	return nil

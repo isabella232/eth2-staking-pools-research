@@ -74,7 +74,7 @@ func (state *State) ProcessNewPoolRequests(requests []core.ICreatePoolRequest) e
 
 			err = state.AddNewPool(&Pool{
 				id:              uint64(len(state.pools) + 1),
-				pubKey:          pk,
+				pubKey:          pk.Serialize(),
 				sortedExecutors: []uint64{}, // TODO - POPULAT
 			})
 			if err != nil {
@@ -127,15 +127,16 @@ func (state *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBo
 	previousEpoch := state.GetCurrentEpoch()
 	currentEpoch := previousEpoch + 1
 
-	proposer, err := state.GetBlockProposer(previousEpoch) // TODO - should it be the previous?
+	expectedProposer, err := state.GetBlockProposer(previousEpoch) // TODO - should it be the previous?
 	if err != nil {
 		return nil, err
 	}
-	if proposer != newBlockBody.GetProposer() {
-		return nil, fmt.Errorf("block proposer is worng, expected %d but received %d", proposer, newBlockBody.GetProposer())
+	proposer := newBlockBody.GetProposer()
+	if expectedProposer != proposer {
+		return nil, fmt.Errorf("block expectedProposer is worng, expected %d but received %d", expectedProposer, newBlockBody.GetProposer())
 	}
 
-	bp := state.GetBlockProducer(newBlockBody.GetProposer())
+	bp := state.GetBlockProducer(proposer)
 	if bp == nil {
 		return nil, fmt.Errorf("could not find BP %d", newBlockBody.GetProposer())
 	}
@@ -164,8 +165,9 @@ func (state *State) ProcessNewBlock(newBlockHeader core.IBlockHeader, newBlockBo
 	stateCopy.SetSeed(newSeed, currentEpoch)
 	stateCopy.SetCurrentEpoch(currentEpoch)
 	stateCopy.SetBlockRoot(shared.SliceToByte32(newBlockHeader.GetBlockRoot()), currentEpoch)
+	//stateCopy.SetHeadBlockHeader(newBlockHeader)
 
-	// the currentEpoch's state root is not included inside the stat root as it creates
+	// the currentEpoch's state root is not included inside the state root as it creates
 	// a recursive dependency.
 	newStateRoot, err := stateCopy.Root()
 	if err != nil {

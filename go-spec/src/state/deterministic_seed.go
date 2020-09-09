@@ -29,7 +29,7 @@ func (state *State) GetBlockProposer(epoch uint64) (uint64, error) {
 }
 
 // TODO - find out if secure
-func shuffle(allBPs []core.IBlockProducer, committeeId uint64, epoch uint64, seed [32]byte, nonce []byte) ([]uint64, error) {
+func shuffle(allBPs []*BlockProducer, committeeId uint64, epoch uint64, seed [32]byte, nonce []byte) ([]uint64, error) {
 	// get active BPs
 	var activeBps []uint64
 	for _, bp := range allBPs {

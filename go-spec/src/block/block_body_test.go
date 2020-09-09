@@ -19,7 +19,7 @@ func TestBlockBodySSZ(t *testing.T) {
 		expected []byte
 	}{
 		{
-			testName: "",
+			testName: "full SSZ",
 			body: NewBlockBody(
 					12,
 					5,

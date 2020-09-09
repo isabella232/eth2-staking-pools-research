@@ -1,6 +1,7 @@
 package state
 
 import (
+	"encoding/hex"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/block"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/mocks"
@@ -10,6 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"testing"
 )
+
+func toBytes(i string) []byte {
+	ret, _ := hex.DecodeString(i)
+	return ret
+}
 
 func mockedSuccessfulAttestationSummary(t *testing.T) (core.IExecutionSummary, *gomock.Controller) {
 	ctrl := gomock.NewController(t)
@@ -29,10 +35,10 @@ func GenerateState(t *testing.T) *State {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	pools := make([]core.IPool, 5)
+	pools := make([]*Pool, 5)
 
 	//
-	bps := make([]core.IBlockProducer, len(pools) * int(core.TestConfig().PoolExecutorsNumber))
+	bps := make([]*BlockProducer, len(pools) * int(core.TestConfig().PoolExecutorsNumber))
 	for i := 0 ; i < len(bps) ; i++ {
 		sk := &bls.SecretKey{}
 		sk.SetByCSPRNG()
@@ -43,7 +49,7 @@ func GenerateState(t *testing.T) *State {
 			stake:   0,
 			slashed: false,
 			active:  true,
-			pubKey:  sk.GetPublicKey(),
+			pubKey:  sk.GetPublicKey().Serialize(),
 		}
 	}
 
@@ -60,16 +66,16 @@ func GenerateState(t *testing.T) *State {
 		pools[i] = &Pool{
 			id:              uint64(i),
 			sortedExecutors: executors,
-			pubKey:          sk.GetPublicKey(),
+			pubKey:          sk.GetPublicKey().Serialize(),
 		}
 	}
 
 	return &State{
 		pools: pools,
-		headBlockHeader: &block.BlockHeader{
-			BlockRoot: nil,
-			Signature: nil,
-		},
+		//headBlockHeader: &block.BlockHeader{
+		//	BlockRoot: nil,
+		//	Signature: nil,
+		//},
 		blockProducers: bps,
 		seeds:          [][32]byte{shared.SliceToByte32([]byte("seedseedseedseedseedseedseedseed"))},
 	}
@@ -79,21 +85,27 @@ func TestRandaoSeedMix(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
+	// mock block body
+	ctrl := gomock.NewController(t)
+	bodyMock := mocks.NewMockIBlockBody(ctrl)
+	bodyMock.EXPECT().GetProposer().Return(uint64(456))
+	bodyMock.EXPECT().GetExecutionSummaries().Return(make([]core.IExecutionSummary, 0))
+	bodyMock.EXPECT().GetNewPoolRequests().Return(nil)
+
+	// mock header
 	sk := &bls.SecretKey{}
 	sk.SetByCSPRNG()
+	bRoot := []byte("body root body root body root body root body root")
+	sig := sk.SignByte(bRoot)
+	headerMock := mocks.NewMockIBlockHeader(ctrl)
+	headerMock.EXPECT().GetSignature().Return(sig.Serialize())
+	headerMock.EXPECT().GetBlockRoot().Return(bRoot)
 
 	state := GenerateState(t)
-	stateRoot, err := state.Root()
+	newState, err := state.ProcessNewBlock(headerMock, bodyMock)
 	require.NoError(t, err)
 
-	body := block.NewBlockBody(456, 1, stateRoot, make([]core.IExecutionSummary, 0), nil, []byte("parent"))
-	header,err := block.NewBlockHeader(sk, body)
-	require.NoError(t, err)
-
-	newState, err := state.ProcessNewBlock(header, body)
-	require.NoError(t, err)
-
-	expectedSeed,err := shared.MixSeed(state.GetSeed(state.GetCurrentEpoch()), shared.SliceToByte32(header.Signature))
+	expectedSeed,err := shared.MixSeed(state.GetSeed(state.GetCurrentEpoch()), shared.SliceToByte32(sig.Serialize()))
 	require.NoError(t, err)
 	require.EqualValues(t, expectedSeed, newState.GetSeed(newState.GetCurrentEpoch()))
 }
@@ -223,5 +235,49 @@ func TestFailedToCreateNewPool(t *testing.T) {
 	for i := 0; i < len(participants); i++ {
 		bp := state.GetBlockProducer(participants[i])
 		require.EqualValues(t, 0, bp.GetBalance())
+	}
+}
+
+func TestStateSSZ(t *testing.T) {
+	tests := []struct {
+		name string
+		state *State
+		expected []byte
+	}{
+		{
+			name: "full SSZ",
+			state:NewState(
+					1234562,
+					[]*Pool{
+						NewPool(
+							12,
+							true,
+							[]byte{1,2,3,4,5},
+							[]uint64{12,5423,1245,12435,21,0},
+							),
+					},
+					12,
+					[]*BlockProducer{
+						NewBlockProducer(
+							12,
+							[]byte{1,2,3,4,5},
+							100,
+							100,
+							false,
+							true,
+							),
+					},
+					[32]byte{1,2,3,4,5},
+				),
+			expected:toBytes("893981688d75771da9898f8370c4c4458a0157d8ff7f974979f8f42e40247cc4"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func (t *testing.T) {
+			root, err := test.state.Root()
+			require.NoError(t, err)
+			require.EqualValues(t, test.expected, root[:])
+		})
 	}
 }

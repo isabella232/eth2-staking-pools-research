@@ -2,13 +2,12 @@ package state
 
 import (
 	"fmt"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/herumi/bls-eth-go-binary/bls"
 )
 
 type BlockProducer struct {
 	id      uint64
-	pubKey  *bls.PublicKey
+	pubKey  []byte
 	balance uint64 // balance on the pool chain (rewards earned)
 	stake   uint64 // stake
 	slashed bool
@@ -18,7 +17,7 @@ type BlockProducer struct {
 
 func NewBlockProducer(
 	id      uint64,
-	pubKey  *bls.PublicKey,
+	pubKey  []byte,
 	balance uint64,
 	stake   uint64,
 	slashed bool,
@@ -34,32 +33,20 @@ func NewBlockProducer(
 	}
 }
 
-func (bp *BlockProducer) Copy() (core.IBlockProducer, error) {
-	pk := &bls.PublicKey{}
-	err := pk.Deserialize(bp.pubKey.Serialize())
-	if err != nil {
-		return nil, err
-	}
-
-	return &BlockProducer{
-		id:      bp.id,
-		pubKey:  pk,
-		balance: bp.balance,
-		stake:   bp.stake,
-		slashed: bp.slashed,
-		active:  bp.active,
-	}, nil
-}
-
 func (bp *BlockProducer) GetId() uint64 {
 	return bp.id
 }
 
-func (bp *BlockProducer) GetPubKey() *bls.PublicKey {
-	return bp.pubKey
+func (bp *BlockProducer) GetPubKey() (*bls.PublicKey, error) {
+	ret := &bls.PublicKey{}
+	err := ret.Deserialize(bp.pubKey)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
-func (bp *BlockProducer) SetPubKey(pk *bls.PublicKey) {
+func (bp *BlockProducer) SetPubKey(pk []byte) {
 	bp.pubKey = pk
 }
 
