@@ -6,7 +6,16 @@ import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 )
 
+func (st *StateTransition) validateExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error {
+	// TODO - validate summaries epoch, should be in some range?
+	return nil
+}
+
 func (st *StateTransition) ProcessExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error {
+	if err := st.validateExecutionSummaries(state, summaries); err != nil {
+		return err
+	}
+
 	for _, summary := range summaries {
 		pool := core.GetPool(state, summary.GetPoolId())
 		if pool == nil {

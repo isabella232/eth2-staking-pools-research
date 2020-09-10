@@ -24,6 +24,11 @@ func GenerateValidHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) 
 		SK,
 		"",
 		0,
+		true,
+		true,
+		true,
+		true,
+		true,
 	)
 }
 
@@ -34,6 +39,11 @@ func GenerateWrongProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.Blo
 		SK,
 		"",
 		0,
+		true,
+		true,
+		true,
+		true,
+		true,
 	)
 }
 
@@ -44,6 +54,11 @@ func GenerateInvalidProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.B
 		SK,
 		"",
 		0,
+		true,
+		true,
+		true,
+		true,
+		true,
 	)
 }
 
@@ -54,6 +69,11 @@ func GenerateWrongRootHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBo
 		SK,
 		"73aa0c267311b8c49f0b9812f7f2f845c55b0d4921c1b40a38f0d82d471d9bcf", // wrong
 		0,
+		true,
+		true,
+		true,
+		true,
+		true,
 	)
 }
 
@@ -65,6 +85,11 @@ func GenerateInvalidSigHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockB
 		"59aaaa8f68aad68552512feb1e27438ddbe2730ea416bb3337b579317610d702", // wrong
 		"",
 		0,
+		true,
+		true,
+		true,
+		true,
+		true,
 	)
 }
 
@@ -75,6 +100,86 @@ func GenerateCreatePoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockB
 		SK,
 		"",
 		1,
+		true,
+		true,
+		false,
+		false,
+		true,
+	)
+}
+
+func GenerateNotCreatePoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		456,
+		SK,
+		"",
+		2,
+		true,
+		true,
+		false,
+		false,
+		true,
+	)
+}
+
+func GenerateFinalizedAttestationPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		456,
+		SK,
+		"",
+		2,
+		true,
+		true,
+		true,
+		false,
+		false,
+	)
+}
+
+func GenerateNotFinalizedAttestationPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		456,
+		SK,
+		"",
+		2,
+		false,
+		true,
+		true,
+		false,
+		false,
+	)
+}
+
+func GenerateFinalizedProposalPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		456,
+		SK,
+		"",
+		2,
+		true,
+		true,
+		false,
+		true,
+		false,
+	)
+}
+
+func GenerateNotFinalizedProposalPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		456,
+		SK,
+		"",
+		2,
+		false,
+		false,
+		false,
+		true,
+		false,
 	)
 }
 
@@ -84,6 +189,11 @@ func generateHeaderAndBody(
 	skStr string,
 	headerBodyRoot string,
 	createPoolStatus int32,
+	attestationDutyFinalized bool,
+	proposalDutyFinalized bool,
+	includeBeaconAttestationDuty bool,
+	includeBeaconProposalDuty bool,
+	includeCreatePool bool,
 	) (*core.BlockHeader, *core.BlockBody) {
 	body := &core.BlockBody{
 		Proposer:           proposer,
@@ -92,37 +202,42 @@ func generateHeaderAndBody(
 			&core.ExecutionSummary{
 				PoolId:        3,
 				Epoch:         5,
-				Duties:        []*core.BeaconDuty {
-					&core.BeaconDuty{
-						Type:          0, // attestation
-						Committee:     12,
-						Slot:         342,
-						Finalized:     true,
-						Participation: []byte{1,3,88,12,43,12,89,35,1,0,99,16,63,13,33,0},
-					},
-					&core.BeaconDuty{
-						Type:          1, // proposal
-						Committee:     0,
-						Slot:         343,
-						Finalized:     true,
-						Participation: []byte{1,3,88,12,43,12,89,35,1,0,99,16,63,13,33,0},
-					},
-				},
+				Duties:        []*core.BeaconDuty {},
 			},
 		},
-		NewPoolReq:         []*core.CreateNewPoolRequest{
-			&core.CreateNewPoolRequest{
-				Id:                  3,
-				Status:              createPoolStatus, // started
-				StartEpoch:          0,
-				EndEpoch:            1,
-				LeaderBlockProducer: 0,
-				CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
-				Participation:       []byte{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1},
-			},
-		},
+		NewPoolReq:         []*core.CreateNewPoolRequest{},
 		StateRoot:          toByte("state root state root state root state root state root"),
 		ParentBlockRoot:    toByte("parent block root parent block root parent block root parent block root"),
+	}
+
+	if includeBeaconAttestationDuty {
+		body.ExecutionSummaries[0].Duties = append(body.ExecutionSummaries[0].Duties, &core.BeaconDuty{
+			Type:          0, // attestation
+			Committee:     12,
+			Slot:         342,
+			Finalized:     attestationDutyFinalized,
+			Participation: []byte{1,3,88,12,43,12,89,35,1,0,99,16,63,13,33,0},
+		})
+	}
+	if includeBeaconProposalDuty {
+		body.ExecutionSummaries[0].Duties = append(body.ExecutionSummaries[0].Duties, &core.BeaconDuty{
+			Type:          1, // proposal
+			Committee:     0,
+			Slot:         343,
+			Finalized:     proposalDutyFinalized,
+			Participation: []byte{1,3,88,12,43,12,89,35,1,0,99,16,63,13,33,0},
+		})
+	}
+	if includeCreatePool {
+		body.NewPoolReq = append(body.NewPoolReq, &core.CreateNewPoolRequest{
+			Id:                  3,
+			Status:              createPoolStatus, // started
+			StartEpoch:          0,
+			EndEpoch:            1,
+			LeaderBlockProducer: 0,
+			CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
+			Participation:       []byte{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1},
+		})
 	}
 
 	sk := &bls.SecretKey{}

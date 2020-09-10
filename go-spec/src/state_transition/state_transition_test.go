@@ -21,21 +21,5 @@ func TestRandaoSeedMix(t *testing.T) {
 
 	newsSeed, err := core.GetSeed(newState, newState.CurrentEpoch)
 	require.NoError(t, err)
-	require.EqualValues(t, toByte("f9bbaed2f11ce8e9e67d0f519420eadc8fbd919d5ade1759e27fa6d912eb66ef"), newsSeed)
-}
-
-
-func TestCreatedNewPoolReq(t *testing.T) {
-	require.NoError(t, bls.Init(bls.BLS12_381))
-	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
-
-	state := generateTestState(t)
-	head, body := GenerateCreatePoolHeadAndBody(t)
-
-	st := NewStateTransition()
-
-	newState, err := st.ApplyBlockBody(state, head, body)
-	require.NoError(t, err)
-
-	require.Equal(t, 6, len(newState.Pools))
+	require.EqualValues(t, toByte("e232e8c5886ce4f8f89628766e2f5e75b8564be3e897d3ccfc8e57cc9ea9215d"), newsSeed)
 }

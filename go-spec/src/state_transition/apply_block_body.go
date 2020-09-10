@@ -25,7 +25,7 @@ func (st *StateTransition) ApplyBlockBody(oldState *core.State, newBlockHeader *
 	}
 
 	// bump epoch
-	newState.CurrentEpoch += 1
+	newState.CurrentEpoch = newBlockBody.Epoch
 	// apply seed
 	newSeed, err := shared.MixSeed(
 		shared.SliceToByte32(oldState.Seeds[len(oldState.Seeds) - 1].Bytes), // previous seed
