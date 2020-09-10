@@ -4,7 +4,56 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/ulule/deepcopier"
 )
+
+func CopyState(state *State) *State {
+	newBlockRoots := make([]*EpochAndBytes, len(state.BlockRoots))
+	for i, r := range state.BlockRoots {
+		newBlockRoots[i] = &EpochAndBytes{}
+		deepcopier.Copy(r).To(newBlockRoots[i])
+	}
+
+	newStateRoots := make([]*EpochAndBytes, len(state.StateRoots))
+	for i, r := range state.StateRoots {
+		newStateRoots[i] = &EpochAndBytes{}
+		deepcopier.Copy(r).To(newStateRoots[i])
+	}
+
+	newSeeds := make([]*EpochAndBytes, len(state.Seeds))
+	for i, r := range state.Seeds {
+		newSeeds[i] = &EpochAndBytes{}
+		deepcopier.Copy(r).To(newSeeds[i])
+	}
+
+	newBPs := make([]*BlockProducer, len(state.BlockProducers))
+	for i, bp := range state.BlockProducers {
+		newBPs[i] = &BlockProducer{}
+		deepcopier.Copy(bp).To(newBPs[i])
+	}
+
+	newPools := make([]*Pool, len(state.Pools))
+	for i, p := range state.Pools {
+		newPools[i] = &Pool{}
+		deepcopier.Copy(p).To(newPools[i])
+	}
+
+	newSlashings := make([]uint64, len(state.Slashings))
+	for i, s := range state.Slashings {
+		deepcopier.Copy(s).To(newSlashings[i])
+	}
+
+	return &State{
+		GenesisTime:          state.GenesisTime,
+		CurrentEpoch:         state.CurrentEpoch,
+		BlockRoots:           newBlockRoots,
+		StateRoots:           newStateRoots,
+		Seeds:                newSeeds,
+		BlockProducers:       newBPs,
+		Pools:                newPools,
+		Slashings:            newSlashings,
+	}
+}
 
 func DecreaseBPBalance(bp *BlockProducer, change uint64) error {
 	if bp.Balance < change {

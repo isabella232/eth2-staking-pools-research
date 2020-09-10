@@ -21,7 +21,6 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 		if core.GetPool(state, req.Id) != nil {
 			return fmt.Errorf("new pool id == req id, this is already exists")
 		}
-		// TODO - req Id is primary (non duplicate and incremental)
 		// TODO - check that network has enough capitalization
 		// TODO - check leader is not part of DKG Committee
 

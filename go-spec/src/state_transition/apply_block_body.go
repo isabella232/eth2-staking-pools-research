@@ -4,12 +4,10 @@ import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/prysmaticlabs/go-ssz"
-	"github.com/ulule/deepcopier"
 )
 
 func (st *StateTransition) ApplyBlockBody(oldState *core.State, newBlockHeader *core.BlockHeader, newBlockBody *core.BlockBody) (newState *core.State, err error) {
-	newState = &core.State{}
-	deepcopier.Copy(oldState).To(newState)
+	newState = core.CopyState(oldState)
 
 	// validate
 	if err := st.ValidateBlock(newState, newBlockHeader, newBlockBody); err != nil {
