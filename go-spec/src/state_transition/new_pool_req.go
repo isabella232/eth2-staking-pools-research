@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
-	"github.com/herumi/bls-eth-go-binary/bls"
 	"sort"
 )
 
@@ -19,26 +18,26 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 		if req.LeaderBlockProducer != leader.Id {
 			return fmt.Errorf("new pool req leader incorrect")
 		}
+		if core.GetPool(state, req.Id) != nil {
+			return fmt.Errorf("new pool id == req id, this is already exists")
+		}
 		// TODO - req Id is primary (non duplicate and incremental)
 		// TODO - check that network has enough capitalization
 		// TODO - check leader is not part of DKG Committee
 
 		// get DKG participants
-		participants,err :=  core.DKGCommittee(state, req.GetId(), req.GetStartEpoch())
+		committee, err := core.DKGCommittee(state, req.Id, req.StartEpoch)
 		if err != nil {
 			return err
 		}
+		sort.Slice(committee, func(i int, j int) bool {
+			return committee[i] < committee[j]
+		})
 
 		switch req.GetStatus() {
 		case 0:
 			// TODO if i'm the DKDG leader act uppon it
 		case 1: // successful
-			pk := &bls.PublicKey{}
-			err := pk.Deserialize(req.GetCreatePubKey())
-			if err != nil {
-				return err
-			}
-
 			// get committee
 			committee, err := core.DKGCommittee(state, req.Id, req.StartEpoch)
 			sort.Slice(committee, func(i int, j int) bool {
@@ -46,8 +45,8 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 			})
 
 			state.Pools = append(state.Pools, &core.Pool{
-				Id:              uint64(len(state.Pools) + 1),
-				PubKey:          pk.Serialize(),
+				Id:              req.Id,
+				PubKey:          req.GetCreatePubKey(),
 				SortedCommittee: committee,
 			})
 			if err != nil {
@@ -55,10 +54,10 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 			}
 
 			// reward/ penalty
-			for i := 0 ; i < len(participants) ; i ++ {
-				bp := core.GetBlockProducer(state, participants[i])
+			for i := 0 ; i < len(committee) ; i ++ {
+				bp := core.GetBlockProducer(state, committee[i])
 				if bp == nil {
-					return fmt.Errorf("could not find BP %d", participants[i])
+					return fmt.Errorf("could not find BP %d", committee[i])
 				}
 				partic := req.GetParticipation()
 				if shared.IsBitSet(partic[:], uint64(i)) {
@@ -80,10 +79,10 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 				return err
 			}
 		case 2: // un-successful
-			for i := 0 ; i < len(participants) ; i ++ {
-				bp := core.GetBlockProducer(state, participants[i])
+			for i := 0 ; i < len(committee) ; i ++ {
+				bp := core.GetBlockProducer(state, committee[i])
 				if bp == nil {
-					return fmt.Errorf("could not find BP %d", participants[i])
+					return fmt.Errorf("could not find BP %d", committee[i])
 				}
 				err := core.DecreaseBPBalance(bp, core.TestConfig().DKGReward)
 				if err != nil {

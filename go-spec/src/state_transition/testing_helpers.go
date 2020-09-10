@@ -24,6 +24,7 @@ func GenerateValidHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) 
 		SK,
 		"",
 		0,
+		6,
 		true,
 		true,
 		true,
@@ -39,6 +40,7 @@ func GenerateWrongProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.Blo
 		SK,
 		"",
 		0,
+		6,
 		true,
 		true,
 		true,
@@ -54,6 +56,7 @@ func GenerateInvalidProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.B
 		SK,
 		"",
 		0,
+		6,
 		true,
 		true,
 		true,
@@ -69,6 +72,7 @@ func GenerateWrongRootHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBo
 		SK,
 		"73aa0c267311b8c49f0b9812f7f2f845c55b0d4921c1b40a38f0d82d471d9bcf", // wrong
 		0,
+		6,
 		true,
 		true,
 		true,
@@ -85,6 +89,7 @@ func GenerateInvalidSigHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockB
 		"59aaaa8f68aad68552512feb1e27438ddbe2730ea416bb3337b579317610d702", // wrong
 		"",
 		0,
+		6,
 		true,
 		true,
 		true,
@@ -100,6 +105,7 @@ func GenerateCreatePoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockB
 		SK,
 		"",
 		1,
+		6,
 		true,
 		true,
 		false,
@@ -115,6 +121,7 @@ func GenerateNotCreatePoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.Blo
 		SK,
 		"",
 		2,
+		6,
 		true,
 		true,
 		false,
@@ -130,6 +137,7 @@ func GenerateFinalizedAttestationPoolHeadAndBody(t *testing.T)(*core.BlockHeader
 		SK,
 		"",
 		2,
+		6,
 		true,
 		true,
 		true,
@@ -145,6 +153,7 @@ func GenerateNotFinalizedAttestationPoolHeadAndBody(t *testing.T)(*core.BlockHea
 		SK,
 		"",
 		2,
+		6,
 		false,
 		true,
 		true,
@@ -160,6 +169,7 @@ func GenerateFinalizedProposalPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *
 		SK,
 		"",
 		2,
+		6,
 		true,
 		true,
 		false,
@@ -175,11 +185,28 @@ func GenerateNotFinalizedProposalPoolHeadAndBody(t *testing.T)(*core.BlockHeader
 		SK,
 		"",
 		2,
+		6,
 		false,
 		false,
 		false,
 		true,
 		false,
+	)
+}
+
+func GenerateCreatePoolWithExistingIdHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		456,
+		SK,
+		"",
+		1,
+		4,
+		true,
+		true,
+		false,
+		false,
+		true,
 	)
 }
 
@@ -189,6 +216,7 @@ func generateHeaderAndBody(
 	skStr string,
 	headerBodyRoot string,
 	createPoolStatus int32,
+	createPoolReqId uint64,
 	attestationDutyFinalized bool,
 	proposalDutyFinalized bool,
 	includeBeaconAttestationDuty bool,
@@ -230,7 +258,7 @@ func generateHeaderAndBody(
 	}
 	if includeCreatePool {
 		body.NewPoolReq = append(body.NewPoolReq, &core.CreateNewPoolRequest{
-			Id:                  3,
+			Id:                  createPoolReqId,
 			Status:              createPoolStatus, // started
 			StartEpoch:          0,
 			EndEpoch:            1,

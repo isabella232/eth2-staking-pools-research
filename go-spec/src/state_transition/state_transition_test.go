@@ -21,5 +21,5 @@ func TestRandaoSeedMix(t *testing.T) {
 
 	newsSeed, err := core.GetSeed(newState, newState.CurrentEpoch)
 	require.NoError(t, err)
-	require.EqualValues(t, toByte("e232e8c5886ce4f8f89628766e2f5e75b8564be3e897d3ccfc8e57cc9ea9215d"), newsSeed)
+	require.EqualValues(t, toByte("f3bd5f1c8baac2307ee3388e2e7dd7bcee2ab9ee141a6ffbc897f3a2b5e42170"), newsSeed)
 }
