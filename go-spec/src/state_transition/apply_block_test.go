@@ -43,13 +43,12 @@ func TestBlockApplyConsistency(t *testing.T) {
 	state := generateTestState(t)
 	_, body := GenerateValidHeadAndBody(state)
 
-	preRoot := core.GetStateRoot(state, 0)
-	require.NotEqualValues(t, len(preRoot), 0)
-
-	st := NewStateTransition()
+	preRoot,err := ssz.HashTreeRoot(state)
+	require.NoError(t, err)
 
 	var postRoot []byte
 	for i := 0 ; i < 10 ; i++ {
+		st := NewStateTransition()
 		newState, err := st.ApplyBlock(state, body)
 		require.NoError(t, err)
 
@@ -60,5 +59,7 @@ func TestBlockApplyConsistency(t *testing.T) {
 		postRoot = core.GetStateRoot(newState, 1)
 	}
 
-	require.EqualValues(t, preRoot, core.GetStateRoot(state, 0))
+	post,err := ssz.HashTreeRoot(state)
+	require.NoError(t, err)
+	require.EqualValues(t, preRoot, post)
 }

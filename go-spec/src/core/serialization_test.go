@@ -56,7 +56,6 @@ func TestBlockBodySSZ(t *testing.T) {
 						Participation:       []byte{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1},
 					},
 				},
-				StateRoot:          toByte("state root state root state root state root state root"),
 				ParentBlockRoot:    toByte("parent block root parent block root parent block root parent block root"),
 			},
 			expected:toByte("2a36efe0b9c926c269f77eb22bbe62216c7a518676ad02f1e64a27177e5a8ca2"),

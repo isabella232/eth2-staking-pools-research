@@ -73,14 +73,14 @@ message BlockBody {
     uint64 Epoch = 2;
     repeated ExecutionSummary ExecutionSummaries = 3;
     repeated CreateNewPoolRequest NewPoolReq = 4;
-    bytes StateRoot = 5;
-    bytes ParentBlockRoot = 6;
-    bytes Randao = 7;
+    bytes ParentBlockRoot = 5;
+    bytes Randao = 6;
 }
 
 message BlockHeader {
     bytes BlockRoot = 1;
-    bytes Signature = 2;
+    bytes StateRoot = 2;
+    bytes Signature = 3;
 }
 
 message EpochAndBytes {

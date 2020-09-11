@@ -281,7 +281,6 @@ func generateHeaderAndBody(
 			},
 		},
 		NewPoolReq:         []*core.CreateNewPoolRequest{},
-		StateRoot:          nil,// will be calculated later toByte("eb4a4ad8124e7c6511326a6951d3c9095077f9d7917750dc779b4beaee24e8e2"),
 		ParentBlockRoot:    toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
 		Randao: randao,
 	}
@@ -317,7 +316,10 @@ func generateHeaderAndBody(
 	}
 
 	// calculate and set state root after applying block
-	CalculateAndInsertStateRootToBlock(state ,body)
+	stateRoot, err := CalculateAndInsertStateRootToBlock(state ,body)
+	if err != nil {
+		return nil, nil
+	}
 
 	sk := &bls.SecretKey{}
 	sk.SetHexString(skStr)
@@ -330,6 +332,7 @@ func generateHeaderAndBody(
 
 	return &core.BlockHeader{
 		BlockRoot:            root[:],
+		StateRoot: 			  stateRoot,
 		Signature:            sig.Serialize(),
 	}, body
 }

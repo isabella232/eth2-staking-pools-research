@@ -52,9 +52,6 @@ func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core
 	if len(body.Randao) != 32 {
 		return fmt.Errorf("RANDAO should be 32 byte")
 	}
-	if len(body.StateRoot) != 32 {
-		return fmt.Errorf("state root should be 32 byte")
-	}
 	if len(body.ParentBlockRoot) != 32 {
 		return fmt.Errorf("parent block root should be 32 byte")
 	}
@@ -74,7 +71,7 @@ func (st *StateTransition) PostApplyValidateBlock(newState *core.State, header *
 	}
 
 	// validate state root is equal to block
-	if hex.EncodeToString(body.StateRoot) != hex.EncodeToString(root[:]) {
+	if hex.EncodeToString(header.StateRoot) != hex.EncodeToString(root[:]) {
 		return fmt.Errorf("new block state root is wrong")
 	}
 	return nil

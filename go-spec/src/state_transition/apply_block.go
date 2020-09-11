@@ -37,7 +37,7 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	}
 	newState.BlockRoots = append(newState.BlockRoots, &core.EpochAndBytes{
 		Epoch:                newState.CurrentEpoch,
-		Bytes:                root[:],
+		Bytes:               root[:],
 	})
 	// state root
 	root, err = ssz.HashTreeRoot(newState)

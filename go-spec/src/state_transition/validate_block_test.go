@@ -66,9 +66,21 @@ func TestValidPostStateRoot(t *testing.T) {
 	head, body := GenerateValidHeadAndBody(state)
 
 	st := NewStateTransition()
+	require.NoError(t, st.PreApplyValidateBlock(state, head, body))
 	newState, err := st.ApplyBlock(state, body)
 	require.NoError(t, err)
-
-	require.NoError(t, st.PreApplyValidateBlock(state, head, body))
 	require.NoError(t, st.PostApplyValidateBlock(newState, head, body))
+}
+
+func TestInvalidPostStateRoot(t *testing.T) {
+	state := generateTestState(t)
+	head, body := GenerateValidHeadAndBody(state)
+
+	head.StateRoot = toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e41") // wrong
+
+	st := NewStateTransition()
+	require.NoError(t, st.PreApplyValidateBlock(state, head, body))
+	newState, err := st.ApplyBlock(state, body)
+	require.NoError(t, err)
+	require.EqualError(t, st.PostApplyValidateBlock(newState, head, body), "new block state root is wrong")
 }
