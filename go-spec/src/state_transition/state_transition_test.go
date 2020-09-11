@@ -12,14 +12,14 @@ func TestRandaoSeedMix(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	head, body := GenerateValidHeadAndBody(t)
+	_, body := GenerateValidHeadAndBody(t, state)
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlockBody(state, head, body)
+	newState, err := st.ApplyBlock(state, body)
 	require.NoError(t, err)
 
 	newsSeed, err := core.GetSeed(newState, newState.CurrentEpoch)
 	require.NoError(t, err)
-	require.EqualValues(t, toByte("f3bd5f1c8baac2307ee3388e2e7dd7bcee2ab9ee141a6ffbc897f3a2b5e42170"), newsSeed)
+	require.EqualValues(t, toByte("e4a17401658219365021cf584f4758d4b22ec861d9653e8249c8b4f73285a909"), newsSeed)
 }

@@ -17,9 +17,10 @@ func toByte(str string) []byte {
 	return ret
 }
 
-func GenerateValidHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateValidHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		SK,
 		"",
@@ -30,12 +31,14 @@ func GenerateValidHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) 
 		true,
 		true,
 		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateWrongProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateWrongProposerHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		455, // wrong
 		SK,
 		"",
@@ -46,12 +49,14 @@ func GenerateWrongProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.Blo
 		true,
 		true,
 		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateInvalidProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateInvalidProposerHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		4550000000, // invalid
 		SK,
 		"",
@@ -62,12 +67,14 @@ func GenerateInvalidProposerHeadAndBody(t *testing.T)(*core.BlockHeader, *core.B
 		true,
 		true,
 		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateWrongRootHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateWrongRootHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456, // invalid
 		SK,
 		"73aa0c267311b8c49f0b9812f7f2f845c55b0d4921c1b40a38f0d82d471d9bcf", // wrong
@@ -78,13 +85,15 @@ func GenerateWrongRootHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBo
 		true,
 		true,
 		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
 
-func GenerateInvalidSigHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateInvalidSigHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		"59aaaa8f68aad68552512feb1e27438ddbe2730ea416bb3337b579317610d702", // wrong
 		"",
@@ -95,12 +104,14 @@ func GenerateInvalidSigHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockB
 		true,
 		true,
 		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateCreatePoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateCreatePoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		SK,
 		"",
@@ -111,12 +122,14 @@ func GenerateCreatePoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockB
 		false,
 		false,
 		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateNotCreatePoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateNotCreatePoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		SK,
 		"",
@@ -127,12 +140,14 @@ func GenerateNotCreatePoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.Blo
 		false,
 		false,
 		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateFinalizedAttestationPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateFinalizedAttestationPoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		SK,
 		"",
@@ -143,12 +158,14 @@ func GenerateFinalizedAttestationPoolHeadAndBody(t *testing.T)(*core.BlockHeader
 		true,
 		false,
 		false,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateNotFinalizedAttestationPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateNotFinalizedAttestationPoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		SK,
 		"",
@@ -159,12 +176,14 @@ func GenerateNotFinalizedAttestationPoolHeadAndBody(t *testing.T)(*core.BlockHea
 		true,
 		false,
 		false,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateFinalizedProposalPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateFinalizedProposalPoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		SK,
 		"",
@@ -175,12 +194,14 @@ func GenerateFinalizedProposalPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *
 		false,
 		true,
 		false,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateNotFinalizedProposalPoolHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateNotFinalizedProposalPoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		SK,
 		"",
@@ -191,12 +212,14 @@ func GenerateNotFinalizedProposalPoolHeadAndBody(t *testing.T)(*core.BlockHeader
 		false,
 		true,
 		false,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 	)
 }
 
-func GenerateCreatePoolWithExistingIdHeadAndBody(t *testing.T)(*core.BlockHeader, *core.BlockBody) {
+func GenerateCreatePoolWithExistingIdHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		t,
+		state,
 		456,
 		SK,
 		"",
@@ -207,11 +230,49 @@ func GenerateCreatePoolWithExistingIdHeadAndBody(t *testing.T)(*core.BlockHeader
 		false,
 		false,
 		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
+	)
+}
+
+func GenerateTooSmallRandaoHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		state,
+		456,
+		SK,
+		"",
+		0,
+		6,
+		true,
+		true,
+		true,
+		true,
+		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6"),
+	)
+}
+
+func GenerateTooBigRandaoHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		t,
+		state,
+		456,
+		SK,
+		"",
+		0,
+		6,
+		true,
+		true,
+		true,
+		true,
+		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6ddd"),
 	)
 }
 
 func generateHeaderAndBody(
 	t *testing.T,
+	state *core.State,
 	proposer uint64,
 	skStr string,
 	headerBodyRoot string,
@@ -222,6 +283,7 @@ func generateHeaderAndBody(
 	includeBeaconAttestationDuty bool,
 	includeBeaconProposalDuty bool,
 	includeCreatePool bool,
+	randao []byte,
 	) (*core.BlockHeader, *core.BlockBody) {
 	body := &core.BlockBody{
 		Proposer:           proposer,
@@ -234,8 +296,9 @@ func generateHeaderAndBody(
 			},
 		},
 		NewPoolReq:         []*core.CreateNewPoolRequest{},
-		StateRoot:          toByte("state root state root state root state root state root"),
-		ParentBlockRoot:    toByte("parent block root parent block root parent block root parent block root"),
+		StateRoot:          nil,// will be calculated later toByte("eb4a4ad8124e7c6511326a6951d3c9095077f9d7917750dc779b4beaee24e8e2"),
+		ParentBlockRoot:    toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		Randao: randao,
 	}
 
 	if includeBeaconAttestationDuty {
@@ -268,12 +331,15 @@ func generateHeaderAndBody(
 		})
 	}
 
+	// calculate and set state root after applying block
+	require.NoError(t, CalculateAndInsertStateRootToBlock(state ,body))
+
 	sk := &bls.SecretKey{}
 	sk.SetHexString(skStr)
 
 	root, _ := ssz.HashTreeRoot(body)
 	if len(headerBodyRoot) > 0 {
-		root = shared.SliceToByte32( toByte(headerBodyRoot))
+		root = shared.SliceToByte32(toByte(headerBodyRoot))
 	}
 	sig := sk.SignByte(root[:])
 
@@ -337,5 +403,6 @@ func generateTestState(t *testing.T) *core.State {
 			},
 		},
 		BlockRoots: 	[]*core.EpochAndBytes{},
+		// TODO - add state roots
 	}
 }

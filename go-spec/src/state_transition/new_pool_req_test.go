@@ -14,11 +14,11 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	head, body := GenerateCreatePoolHeadAndBody(t)
+	_, body := GenerateCreatePoolHeadAndBody(t, state)
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlockBody(state, head, body)
+	newState, err := st.ApplyBlock(state, body)
 	require.NoError(t, err)
 
 	// check created
@@ -58,28 +58,31 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	head, body := GenerateNotCreatePoolHeadAndBody(t)
+	_, body := GenerateNotCreatePoolHeadAndBody(t, state)
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlockBody(state, head, body)
+	newState, err := st.ApplyBlock(state, body)
 	require.NoError(t, err)
 
 	// check not created
 	require.Equal(t, 5, len(newState.Pools))
 
 	// check penalties
-	committee, err := core.DKGCommittee(state, 3, 0)
+	committee, err := core.DKGCommittee(newState, 6, 0)
+	sort.Slice(committee, func(i int, j int) bool {
+		return committee[i] < committee[j]
+	})
 	require.NoError(t, err)
 
 	// test penalties/ rewards
 	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber ; i++ {
-		bp := core.GetBlockProducer(state, committee[i])
+		bp := core.GetBlockProducer(newState, committee[i])
 		require.EqualValues(t, 0, bp.Balance)
 	}
 
 	// leader reward
-	bp := core.GetBlockProducer(state, 0)
+	bp := core.GetBlockProducer(newState, 0)
 	require.EqualValues(t, 1000, bp.Balance)
 }
 
@@ -88,10 +91,10 @@ func TestCreatedNewPoolReqWithExistingId(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	head, body := GenerateCreatePoolWithExistingIdHeadAndBody(t)
+	_, body := GenerateCreatePoolWithExistingIdHeadAndBody(t, state)
 
 	st := NewStateTransition()
 
-	_, err := st.ApplyBlockBody(state, head, body)
+	_, err := st.ApplyBlock(state, body)
 	require.EqualError(t, err, "new pool id == req id, this is already exists")
 }

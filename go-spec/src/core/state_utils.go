@@ -55,6 +55,16 @@ func CopyState(state *State) *State {
 	}
 }
 
+// will return an 0 length byte array if not found
+func GetStateRoot(state *State, epoch uint64) []byte {
+	for _, r := range state.StateRoots {
+		if r.Epoch == epoch {
+			return r.Bytes
+		}
+	}
+	return []byte{}
+}
+
 func DecreaseBPBalance(bp *BlockProducer, change uint64) error {
 	if bp.Balance < change {
 		return fmt.Errorf("BP %d dosen't have enonugh Balance (%d) to decrease (%d)", bp.Id, bp.Balance, change)

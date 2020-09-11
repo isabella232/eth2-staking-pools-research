@@ -75,6 +75,7 @@ message BlockBody {
     repeated CreateNewPoolRequest NewPoolReq = 4;
     bytes StateRoot = 5;
     bytes ParentBlockRoot = 6;
+    bytes Randao = 7;
 }
 
 message BlockHeader {

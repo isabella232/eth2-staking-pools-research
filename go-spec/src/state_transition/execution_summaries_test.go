@@ -13,11 +13,11 @@ func TestFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	head, body := GenerateFinalizedAttestationPoolHeadAndBody(t)
+	_, body := GenerateFinalizedAttestationPoolHeadAndBody(t, state)
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlockBody(state, head, body)
+	newState, err := st.ApplyBlock(state, body)
 	require.NoError(t, err)
 
 	// check rewards
@@ -41,11 +41,11 @@ func TestNotFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	head, body := GenerateNotFinalizedAttestationPoolHeadAndBody(t)
+	_, body := GenerateNotFinalizedAttestationPoolHeadAndBody(t, state)
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlockBody(state, head, body)
+	newState, err := st.ApplyBlock(state, body)
 	require.NoError(t, err)
 
 	// check rewards
@@ -64,11 +64,11 @@ func TestFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	head, body := GenerateFinalizedProposalPoolHeadAndBody(t)
+	_, body := GenerateFinalizedProposalPoolHeadAndBody(t, state)
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlockBody(state, head, body)
+	newState, err := st.ApplyBlock(state, body)
 	require.NoError(t, err)
 
 	// check rewards
@@ -92,11 +92,11 @@ func TestNotFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	head, body := GenerateNotFinalizedProposalPoolHeadAndBody(t)
+	_, body := GenerateNotFinalizedProposalPoolHeadAndBody(t, state)
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlockBody(state, head, body)
+	newState, err := st.ApplyBlock(state, body)
 	require.NoError(t, err)
 
 	// check rewards

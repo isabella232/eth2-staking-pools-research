@@ -6,28 +6,23 @@ import (
 	"github.com/prysmaticlabs/go-ssz"
 )
 
-func (st *StateTransition) ApplyBlockBody(oldState *core.State, newBlockHeader *core.BlockHeader, newBlockBody *core.BlockBody) (newState *core.State, err error) {
+func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody) (newState *core.State, err error) {
 	newState = core.CopyState(oldState)
 
-	// validate
-	if err := st.ValidateBlock(newState, newBlockHeader, newBlockBody); err != nil {
-		return nil,err
-	}
-
 	// process
-	if err := st.ProcessExecutionSummaries(newState, newBlockBody.ExecutionSummaries); err != nil {
+	if err := st.ProcessExecutionSummaries(newState, body.ExecutionSummaries); err != nil {
 		return nil,err
 	}
-	if err := st.ProcessNewPoolRequests(newState, newBlockBody.NewPoolReq); err != nil {
+	if err := st.ProcessNewPoolRequests(newState, body.NewPoolReq); err != nil {
 		return nil,err
 	}
 
 	// bump epoch
-	newState.CurrentEpoch = newBlockBody.Epoch
+	newState.CurrentEpoch = body.Epoch
 	// apply seed
 	newSeed, err := shared.MixSeed(
 		shared.SliceToByte32(oldState.Seeds[len(oldState.Seeds) - 1].Bytes), // previous seed
-		shared.SliceToByte32(newBlockHeader.Signature[:32])) // TODO - use something else than the sig
+		shared.SliceToByte32(body.Randao[:32]))
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +31,7 @@ func (st *StateTransition) ApplyBlockBody(oldState *core.State, newBlockHeader *
 		Bytes:                newSeed[:],
 	})
 	// add block root
-	root, err := ssz.HashTreeRoot(newBlockBody)
+	root, err := ssz.HashTreeRoot(body)
 	if err != nil {
 		return nil, err
 	}
