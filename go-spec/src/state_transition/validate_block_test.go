@@ -7,7 +7,7 @@ import (
 
 func TestValidSig(t *testing.T) {
 	state := generateTestState(t)
-	head, body := GenerateValidHeadAndBody(t, state)
+	head, body := GenerateValidHeadAndBody(state)
 	st := NewStateTransition()
 
 	require.NoError(t, st.PreApplyValidateBlock(state, head, body))
@@ -15,7 +15,7 @@ func TestValidSig(t *testing.T) {
 
 func TestInValidSig(t *testing.T) {
 	state := generateTestState(t)
-	head, body := GenerateInvalidSigHeadAndBody(t, state)
+	head, body := GenerateInvalidSigHeadAndBody(state)
 	st := NewStateTransition()
 
 	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "signature did not verify")
@@ -23,7 +23,7 @@ func TestInValidSig(t *testing.T) {
 
 func TestWrongProposer(t *testing.T) {
 	state := generateTestState(t)
-	head, body := GenerateWrongProposerHeadAndBody(t, state)
+	head, body := GenerateWrongProposerHeadAndBody(state)
 	st := NewStateTransition()
 
 	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "block expectedProposer is worng, expected 456 but received 455")
@@ -31,7 +31,7 @@ func TestWrongProposer(t *testing.T) {
 
 func TestInvalidProposer(t *testing.T) {
 	state := generateTestState(t)
-	head, body := GenerateInvalidProposerHeadAndBody(t, state)
+	head, body := GenerateInvalidProposerHeadAndBody(state)
 	st := NewStateTransition()
 
 	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "block expectedProposer is worng, expected 456 but received 4550000000")
@@ -39,7 +39,7 @@ func TestInvalidProposer(t *testing.T) {
 
 func TestWrongRoot(t *testing.T) {
 	state := generateTestState(t)
-	head, body := GenerateWrongRootHeadAndBody(t, state)
+	head, body := GenerateWrongRootHeadAndBody(state)
 	st := NewStateTransition()
 
 	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "signed block root does not match body root")
@@ -47,7 +47,7 @@ func TestWrongRoot(t *testing.T) {
 
 func TestTooSmallRadao(t *testing.T) {
 	state := generateTestState(t)
-	head, body := GenerateTooSmallRandaoHeadAndBody(t, state)
+	head, body := GenerateTooSmallRandaoHeadAndBody(state)
 	st := NewStateTransition()
 
 	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "RANDAO should be 32 byte")
@@ -55,7 +55,7 @@ func TestTooSmallRadao(t *testing.T) {
 
 func TestTooBigRadao(t *testing.T) {
 	state := generateTestState(t)
-	head, body := GenerateTooBigRandaoHeadAndBody(t, state)
+	head, body := GenerateTooBigRandaoHeadAndBody(state)
 	st := NewStateTransition()
 
 	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "RANDAO should be 32 byte")
@@ -63,7 +63,7 @@ func TestTooBigRadao(t *testing.T) {
 
 func TestValidPostStateRoot(t *testing.T) {
 	state := generateTestState(t)
-	head, body := GenerateValidHeadAndBody(t, state)
+	head, body := GenerateValidHeadAndBody(state)
 
 	st := NewStateTransition()
 	newState, err := st.ApplyBlock(state, body)

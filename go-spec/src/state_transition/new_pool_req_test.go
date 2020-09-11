@@ -14,7 +14,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateCreatePoolHeadAndBody(t, state)
+	_, body := GenerateCreatePoolHeadAndBody(state)
 
 	st := NewStateTransition()
 
@@ -58,7 +58,7 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateNotCreatePoolHeadAndBody(t, state)
+	_, body := GenerateNotCreatePoolHeadAndBody(state)
 
 	st := NewStateTransition()
 
@@ -91,7 +91,7 @@ func TestCreatedNewPoolReqWithExistingId(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateCreatePoolWithExistingIdHeadAndBody(t, state)
+	_, body := GenerateCreatePoolWithExistingIdHeadAndBody(state)
 
 	st := NewStateTransition()
 

@@ -12,7 +12,7 @@ func TestRandaoSeedMix(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateValidHeadAndBody(t, state)
+	_, body := GenerateValidHeadAndBody(state)
 
 	st := NewStateTransition()
 

@@ -17,9 +17,8 @@ func toByte(str string) []byte {
 	return ret
 }
 
-func GenerateValidHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateValidHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -35,9 +34,8 @@ func GenerateValidHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader
 	)
 }
 
-func GenerateWrongProposerHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateWrongProposerHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		455, // wrong
 		SK,
@@ -53,9 +51,8 @@ func GenerateWrongProposerHeadAndBody(t *testing.T, state *core.State)(*core.Blo
 	)
 }
 
-func GenerateInvalidProposerHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateInvalidProposerHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		4550000000, // invalid
 		SK,
@@ -71,9 +68,8 @@ func GenerateInvalidProposerHeadAndBody(t *testing.T, state *core.State)(*core.B
 	)
 }
 
-func GenerateWrongRootHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateWrongRootHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456, // invalid
 		SK,
@@ -90,9 +86,8 @@ func GenerateWrongRootHeadAndBody(t *testing.T, state *core.State)(*core.BlockHe
 }
 
 
-func GenerateInvalidSigHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateInvalidSigHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		"59aaaa8f68aad68552512feb1e27438ddbe2730ea416bb3337b579317610d702", // wrong
@@ -108,9 +103,8 @@ func GenerateInvalidSigHeadAndBody(t *testing.T, state *core.State)(*core.BlockH
 	)
 }
 
-func GenerateCreatePoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateCreatePoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -126,9 +120,8 @@ func GenerateCreatePoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockH
 	)
 }
 
-func GenerateNotCreatePoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateNotCreatePoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -144,9 +137,8 @@ func GenerateNotCreatePoolHeadAndBody(t *testing.T, state *core.State)(*core.Blo
 	)
 }
 
-func GenerateFinalizedAttestationPoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateFinalizedAttestationPoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -162,9 +154,8 @@ func GenerateFinalizedAttestationPoolHeadAndBody(t *testing.T, state *core.State
 	)
 }
 
-func GenerateNotFinalizedAttestationPoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateNotFinalizedAttestationPoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -180,9 +171,8 @@ func GenerateNotFinalizedAttestationPoolHeadAndBody(t *testing.T, state *core.St
 	)
 }
 
-func GenerateFinalizedProposalPoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateFinalizedProposalPoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -198,9 +188,8 @@ func GenerateFinalizedProposalPoolHeadAndBody(t *testing.T, state *core.State)(*
 	)
 }
 
-func GenerateNotFinalizedProposalPoolHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateNotFinalizedProposalPoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -216,9 +205,8 @@ func GenerateNotFinalizedProposalPoolHeadAndBody(t *testing.T, state *core.State
 	)
 }
 
-func GenerateCreatePoolWithExistingIdHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateCreatePoolWithExistingIdHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -234,9 +222,8 @@ func GenerateCreatePoolWithExistingIdHeadAndBody(t *testing.T, state *core.State
 	)
 }
 
-func GenerateTooSmallRandaoHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateTooSmallRandaoHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -252,9 +239,8 @@ func GenerateTooSmallRandaoHeadAndBody(t *testing.T, state *core.State)(*core.Bl
 	)
 }
 
-func GenerateTooBigRandaoHeadAndBody(t *testing.T, state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateTooBigRandaoHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
-		t,
 		state,
 		456,
 		SK,
@@ -271,7 +257,6 @@ func GenerateTooBigRandaoHeadAndBody(t *testing.T, state *core.State)(*core.Bloc
 }
 
 func generateHeaderAndBody(
-	t *testing.T,
 	state *core.State,
 	proposer uint64,
 	skStr string,
@@ -287,7 +272,7 @@ func generateHeaderAndBody(
 	) (*core.BlockHeader, *core.BlockBody) {
 	body := &core.BlockBody{
 		Proposer:           proposer,
-		Epoch:              5,
+		Epoch:              1,
 		ExecutionSummaries: []*core.ExecutionSummary{
 			&core.ExecutionSummary{
 				PoolId:        3,
@@ -332,7 +317,7 @@ func generateHeaderAndBody(
 	}
 
 	// calculate and set state root after applying block
-	require.NoError(t, CalculateAndInsertStateRootToBlock(state ,body))
+	CalculateAndInsertStateRootToBlock(state ,body)
 
 	sk := &bls.SecretKey{}
 	sk.SetHexString(skStr)
@@ -393,7 +378,8 @@ func generateTestState(t *testing.T) *core.State {
 		}
 	}
 
-	return &core.State{
+	ret := &core.State {
+		CurrentEpoch:0,
 		Pools: pools,
 		BlockProducers: bps,
 		Seeds:          []*core.EpochAndBytes{
@@ -403,6 +389,19 @@ func generateTestState(t *testing.T) *core.State {
 			},
 		},
 		BlockRoots: 	[]*core.EpochAndBytes{},
-		// TODO - add state roots
+		StateRoots: 	[]*core.EpochAndBytes{},
+		Slashings: []uint64{},
 	}
+
+	root, err := ssz.HashTreeRoot(ret)
+	if err != nil {
+		return nil
+	}
+
+	ret.StateRoots = append(ret.StateRoots, &core.EpochAndBytes{
+		Epoch:                0,
+		Bytes:                root[:],
+	})
+
+	return ret
 }

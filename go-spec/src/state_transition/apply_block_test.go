@@ -13,7 +13,7 @@ func TestStateCopying(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateValidHeadAndBody(t, state)
+	_, body := GenerateValidHeadAndBody(state)
 
 	preRoot, err := ssz.HashTreeRoot(state)
 	require.NoError(t, err)
@@ -41,10 +41,10 @@ func TestBlockApplyConsistency(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateValidHeadAndBody(t, state)
+	_, body := GenerateValidHeadAndBody(state)
 
-	preRoot, err := ssz.HashTreeRoot(state)
-	require.NoError(t, err)
+	preRoot := core.GetStateRoot(state, 0)
+	require.NotEqualValues(t, len(preRoot), 0)
 
 	st := NewStateTransition()
 
@@ -54,11 +54,11 @@ func TestBlockApplyConsistency(t *testing.T) {
 		require.NoError(t, err)
 
 		if i != 0 {
-			require.EqualValues(t, postRoot, core.GetStateRoot(newState, 5))
+			require.EqualValues(t, postRoot, core.GetStateRoot(newState, 1))
 		}
 
-		postRoot = core.GetStateRoot(newState, 5)
+		postRoot = core.GetStateRoot(newState, 1)
 	}
 
-	require.EqualValues(t, preRoot, core.GetStateRoot(state, 4))
+	require.EqualValues(t, preRoot, core.GetStateRoot(state, 0))
 }

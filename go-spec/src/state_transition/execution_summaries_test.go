@@ -13,7 +13,7 @@ func TestFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateFinalizedAttestationPoolHeadAndBody(t, state)
+	_, body := GenerateFinalizedAttestationPoolHeadAndBody(state)
 
 	st := NewStateTransition()
 
@@ -41,7 +41,7 @@ func TestNotFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateNotFinalizedAttestationPoolHeadAndBody(t, state)
+	_, body := GenerateNotFinalizedAttestationPoolHeadAndBody(state)
 
 	st := NewStateTransition()
 
@@ -64,7 +64,7 @@ func TestFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateFinalizedProposalPoolHeadAndBody(t, state)
+	_, body := GenerateFinalizedProposalPoolHeadAndBody(state)
 
 	st := NewStateTransition()
 
@@ -92,7 +92,7 @@ func TestNotFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateNotFinalizedProposalPoolHeadAndBody(t, state)
+	_, body := GenerateNotFinalizedProposalPoolHeadAndBody(state)
 
 	st := NewStateTransition()
 
