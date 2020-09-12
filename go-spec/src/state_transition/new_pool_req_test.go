@@ -26,7 +26,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 
 	// check rewards
 	participation := []byte{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1}
-	committee, err := core.DKGCommittee(newState, 6, 0)
+	committee, err := core.DKGCommittee(newState, 6, 1)
 	sort.Slice(committee, func(i int, j int) bool {
 		return committee[i] < committee[j]
 	})
@@ -43,7 +43,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	}
 
 	// leader reward
-	bp := core.GetBlockProducer(newState, 0)
+	bp := core.GetBlockProducer(newState, 1)
 	require.EqualValues(t, 4000, bp.Balance)
 
 	// pool data
@@ -69,7 +69,7 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	require.Equal(t, 5, len(newState.Pools))
 
 	// check penalties
-	committee, err := core.DKGCommittee(newState, 6, 0)
+	committee, err := core.DKGCommittee(newState, 6, 1)
 	sort.Slice(committee, func(i int, j int) bool {
 		return committee[i] < committee[j]
 	})
@@ -82,7 +82,7 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	}
 
 	// leader reward
-	bp := core.GetBlockProducer(newState, 0)
+	bp := core.GetBlockProducer(newState, 1)
 	require.EqualValues(t, 1000, bp.Balance)
 }
 

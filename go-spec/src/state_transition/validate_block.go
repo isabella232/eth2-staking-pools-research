@@ -10,8 +10,33 @@ import (
 )
 
 func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core.BlockHeader, body *core.BlockBody) error {
+	// check necessary vars are not nil
+	if len(body.Randao) != 32 {
+		return fmt.Errorf("RANDAO should be 32 byte")
+	}
+	if len(body.ParentBlockRoot) != 32 {
+		return fmt.Errorf("parent block root should be 32 byte")
+	}
+
+	// validate parent block root
+	// Rule 1: need to point to an existing parent block root
+	// Rule 2: need to have a higher epoch
+	// TODO - block 0?
+	foundParent := false
+	for _, parent := range state.BlockRoots {
+		if bytes.Compare(parent.Bytes, body.ParentBlockRoot) == 0 {
+			foundParent = true
+			if parent.Epoch >= body.Epoch {
+				return fmt.Errorf("new block's parent block root can't be of a future epoch")
+			}
+		}
+	}
+	if !foundParent {
+		return fmt.Errorf("parent block root not found")
+	}
+
 	// verify proposer is expected proposer
-	expectedProposer, err := core.GetBlockProposer(state, state.CurrentEpoch)
+	expectedProposer, err := core.GetBlockProposer(state, body.Epoch)
 	if err != nil {
 		return err
 	}
@@ -47,15 +72,6 @@ func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core
 	if res := sig.VerifyHash(pk, header.BlockRoot); !res {
 		return fmt.Errorf("signature did not verify")
 	}
-
-	// check necessary vars are not nil
-	if len(body.Randao) != 32 {
-		return fmt.Errorf("RANDAO should be 32 byte")
-	}
-	if len(body.ParentBlockRoot) != 32 {
-		return fmt.Errorf("parent block root should be 32 byte")
-	}
-	// TODO - validate parent block root exists and it's epoch is lower than this body
 
 	// TODO - validate RANDAO
 

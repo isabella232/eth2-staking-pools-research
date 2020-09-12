@@ -100,7 +100,8 @@ func GetPool(state *State, id uint64) *Pool {
 }
 
 func PoolCommittee(state *State, poolId uint64, epoch uint64) ([]uint64,error) {
-	seed, err := GetSeed(state, epoch)
+	// TODO - handle integer overflow
+	seed, err := GetSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return []uint64{}, err
 	}
@@ -113,8 +114,11 @@ func PoolCommittee(state *State, poolId uint64, epoch uint64) ([]uint64,error) {
 	)
 }
 
+// DKG committee is chosen randomly by shuffling a seed + category (dkg committee)
+// The previous epoch's seed is used to choose the DKG committee as the current one (the block's epoch)
 func DKGCommittee(state *State, reqId uint64, epoch uint64)([]uint64, error) {
-	seed, err := GetSeed(state, epoch)
+	// TODO - handle integer overflow
+	seed, err := GetSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return []uint64{}, err
 	}
@@ -127,8 +131,11 @@ func DKGCommittee(state *State, reqId uint64, epoch uint64)([]uint64, error) {
 	)
 }
 
+// Block voting committee is chosen randomly by shuffling a seed + category (block voting committee)
+// The previous epoch's seed is used to choose the block voting committee as the current one (the block's epoch)
 func BlockVotingCommittee(state *State, epoch uint64)([]uint64, error) {
-	seed, err := GetSeed(state, epoch)
+	// TODO - handle integer overflow
+	seed, err := GetSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return []uint64{}, err
 	}
@@ -141,8 +148,10 @@ func BlockVotingCommittee(state *State, epoch uint64)([]uint64, error) {
 	)
 }
 
+// Block producer is chosen randomly by shuffling a seed + category (block proposer)
+// The previous epoch's seed is used to choose the block producer as the current one (the block's epoch)
 func GetBlockProposer(state *State, epoch uint64) (uint64, error) {
-	seed, err := GetSeed(state, epoch)
+	seed, err := GetSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return 0, err
 	}

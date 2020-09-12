@@ -84,3 +84,19 @@ func TestInvalidPostStateRoot(t *testing.T) {
 	require.NoError(t, err)
 	require.EqualError(t, st.PostApplyValidateBlock(newState, head, body), "new block state root is wrong")
 }
+
+func TestInvalidParentBlockRoot(t *testing.T) {
+	state := generateTestState(t)
+	head, body := GenerateInvalidParentBlockRootHeadAndBody(state)
+	st := NewStateTransition()
+
+	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "parent block root not found")
+}
+
+func TestInvalidBlockEpoch(t *testing.T) {
+	state := generateTestState(t)
+	head, body := GenerateInvalidBlockEpochRootHeadAndBody(state)
+	st := NewStateTransition()
+
+	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "new block's parent block root can't be of a future epoch")
+}
