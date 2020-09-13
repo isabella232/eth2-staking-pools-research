@@ -49,14 +49,8 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 		Bytes:                root[:],
 	})
 	// ETH1 and ETH2 block/ epoch
-	newState.ETH1Blocks = append(newState.ETH1Blocks, &core.EpochAndNumber{
-		Epoch:                newState.CurrentEpoch,
-		Number:               body.ETH1Block,
-	})
-	newState.ETH2Epochs = append(newState.ETH2Epochs, &core.EpochAndNumber{
-		Epoch:                newState.CurrentEpoch,
-		Number:               body.ETH2Epoch,
-	})
+	newState.ETH1Blocks = append(newState.ETH1Blocks, body.ETH1Block)
+	newState.ETH2Epochs = append(newState.ETH2Epochs, body.ETH2Epoch)
 
 	return newState, nil
 }

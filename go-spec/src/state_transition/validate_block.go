@@ -107,17 +107,19 @@ func (st *StateTransition) validateBlockRoots (state *core.State, parentBlockRoo
 }
 
 // for eth1 and eth2 blocks/ epoch, verify that the state doesn't have a block/ epoch equal or higher.
-func (st *StateTransition) validateETH1And2Data (state *core.State, eth1Block uint64, eth2Epoch uint64) error {
+func (st *StateTransition) validateETH1And2Data (state *core.State, eth1Block *core.ETH1Data, eth2Epoch *core.ETH2Data) error {
 	// eth1
+	// TODO - validate the actual eth1 data
 	for _, eth1 := range state.ETH1Blocks {
-		if eth1.GetNumber() >= eth1Block {
+		if eth1.GetBlock() >= eth1Block.GetBlock() {
 			return fmt.Errorf("ETH1 block exists or is higher than block's ETH1 block")
 		}
 	}
 
 	// eth2
+	// TODO - validate the actual eth2 data
 	for _, eth2 := range state.ETH2Epochs {
-		if eth2.GetNumber() >= eth2Epoch {
+		if eth2.GetLastFinalizedEpoch() >= eth2Epoch.GetLastFinalizedEpoch() {
 			return fmt.Errorf("ETH2 epoch exists or is higher than block's ETH2 epoch")
 		}
 	}

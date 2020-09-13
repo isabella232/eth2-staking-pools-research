@@ -12,8 +12,8 @@ message State {
     repeated BlockProducer BlockProducers = 6;
     repeated Pool Pools = 7;
     repeated uint64 Slashings = 8;
-    repeated EpochAndNumber ETH1Blocks = 9;
-    repeated EpochAndNumber ETH2Epochs = 10;
+    repeated ETH1Data ETH1Blocks = 9;
+    repeated ETH2Data ETH2Epochs = 10;
 }
 
 message BlockProducer {
@@ -80,8 +80,8 @@ message BlockBody {
     uint64 Epoch = 2;
     bytes ParentBlockRoot = 3;
     bytes Randao = 4;
-    uint64 ETH1Block = 5;
-    uint64 ETH2Epoch = 6;
+    ETH1Data ETH1Block = 5;
+    ETH2Data ETH2Epoch = 6;
     repeated ExecutionSummary ExecutionSummaries = 7;
     repeated CreateNewPoolRequest NewPoolReq = 8;
 }
@@ -97,7 +97,15 @@ message EpochAndBytes {
     bytes Bytes = 2;
 }
 
-message EpochAndNumber {
-    uint64 Epoch = 1;
-    uint64 Number = 2;
+// represents the state of the deposit contract for block producers on eth1
+message ETH1Data {
+    bytes DepositsRoot = 1;
+    uint64 Block = 2;
+    bytes BlockHash = 3;
+}
+
+// represents the last finalized eth2 state and it's state root
+message ETH2Data {
+    uint64 LastFinalizedEpoch = 1;
+    bytes StateRoot = 2;
 }

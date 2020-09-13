@@ -427,8 +427,15 @@ func generateHeaderAndBody(
 		NewPoolReq:         []*core.CreateNewPoolRequest{},
 		ParentBlockRoot:    parentBlockRoot,
 		Randao: randao,
-		ETH1Block: eth1Block,
-		ETH2Epoch: eth2Epoch,
+		ETH1Block: &core.ETH1Data{
+			DepositsRoot:         []byte("root"),
+			Block:                eth1Block,
+			BlockHash:            []byte("hash"),
+		},
+		ETH2Epoch: &core.ETH2Data{
+			LastFinalizedEpoch:   eth2Epoch,
+			StateRoot:            []byte("state root"),
+		},
 	}
 
 	if includeBeaconAttestationDuty {
@@ -550,16 +557,17 @@ func generateTestState(t *testing.T) *core.State {
 			},
 		},
 		Slashings: []uint64{},
-		ETH1Blocks: []*core.EpochAndNumber{
-			&core.EpochAndNumber{
-				Epoch:                0,
-				Number:               999,
+		ETH1Blocks: []*core.ETH1Data{
+			&core.ETH1Data{
+				DepositsRoot:         []byte("root"),
+				Block:                999,
+				BlockHash:            []byte("hash"),
 			},
 		},
-		ETH2Epochs: []*core.EpochAndNumber{
-			&core.EpochAndNumber{
-				Epoch:                0,
-				Number:               9,
+		ETH2Epochs: []*core.ETH2Data{
+			&core.ETH2Data{
+				LastFinalizedEpoch:   9,
+				StateRoot:            []byte("state"),
 			},
 		},
 	}
