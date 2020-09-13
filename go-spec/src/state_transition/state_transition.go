@@ -17,6 +17,7 @@ type IStateTransition interface {
 
 	ProcessExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error
 	ProcessNewPoolRequests(state *core.State, summaries []*core.CreateNewPoolRequest) error
+	ProcessStakeDeposits(state *core.State, deposits []*core.StakeDeposit) error
 }
 
 type StateTransition struct {}
