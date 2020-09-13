@@ -21,7 +21,7 @@ func GenerateValidHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockB
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		0,
@@ -78,7 +78,7 @@ func GenerateWrongRootHeadAndBody(state *core.State)(*core.BlockHeader, *core.Bl
 	return generateHeaderAndBody(
 		state,
 		1,
-		456, // invalid
+		17,
 		SK,
 		"73aa0c267311b8c49f0b9812f7f2f845c55b0d4921c1b40a38f0d82d471d9bcf", // wrong
 		0,
@@ -98,7 +98,7 @@ func GenerateInvalidSigHeadAndBody(state *core.State)(*core.BlockHeader, *core.B
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		"59aaaa8f68aad68552512feb1e27438ddbe2730ea416bb3337b579317610d702", // wrong
 		"",
 		0,
@@ -117,7 +117,7 @@ func GenerateCreatePoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.B
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		1,
@@ -136,7 +136,7 @@ func GenerateNotCreatePoolHeadAndBody(state *core.State)(*core.BlockHeader, *cor
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		2,
@@ -155,7 +155,7 @@ func GenerateFinalizedAttestationPoolHeadAndBody(state *core.State)(*core.BlockH
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		2,
@@ -174,7 +174,7 @@ func GenerateNotFinalizedAttestationPoolHeadAndBody(state *core.State)(*core.Blo
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		2,
@@ -193,7 +193,7 @@ func GenerateFinalizedProposalPoolHeadAndBody(state *core.State)(*core.BlockHead
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		2,
@@ -212,7 +212,7 @@ func GenerateNotFinalizedProposalPoolHeadAndBody(state *core.State)(*core.BlockH
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		2,
@@ -231,7 +231,7 @@ func GenerateCreatePoolWithExistingIdHeadAndBody(state *core.State)(*core.BlockH
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		1,
@@ -250,7 +250,7 @@ func GenerateTooSmallRandaoHeadAndBody(state *core.State)(*core.BlockHeader, *co
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		0,
@@ -269,7 +269,7 @@ func GenerateTooBigRandaoHeadAndBody(state *core.State)(*core.BlockHeader, *core
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		0,
@@ -288,7 +288,7 @@ func GenerateInvalidParentBlockRootHeadAndBody(state *core.State)(*core.BlockHea
 	return generateHeaderAndBody(
 		state,
 		1,
-		456,
+		17,
 		SK,
 		"",
 		0,
@@ -307,7 +307,7 @@ func GenerateInvalidBlockEpochRootHeadAndBody(state *core.State)(*core.BlockHead
 	return generateHeaderAndBody(
 		state,
 		0,
-		456,
+		17,
 		SK,
 		"",
 		0,
@@ -417,7 +417,7 @@ func generateTestState(t *testing.T) *core.State {
 		sk := &bls.SecretKey{}
 		sk.SetByCSPRNG()
 
-		if i == 456 { // is the block producer for this state
+		if i == 17 { // is the block producer for this state
 			sk.SetHexString(SK)
 		}
 

@@ -26,7 +26,7 @@ func TestWrongProposer(t *testing.T) {
 	head, body := GenerateWrongProposerHeadAndBody(state)
 	st := NewStateTransition()
 
-	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "block expectedProposer is worng, expected 456 but received 455")
+	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "block expectedProposer is worng, expected 17 but received 455")
 }
 
 func TestInvalidProposer(t *testing.T) {
@@ -34,7 +34,7 @@ func TestInvalidProposer(t *testing.T) {
 	head, body := GenerateInvalidProposerHeadAndBody(state)
 	st := NewStateTransition()
 
-	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "block expectedProposer is worng, expected 456 but received 4550000000")
+	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "block expectedProposer is worng, expected 17 but received 4550000000")
 }
 
 func TestWrongRoot(t *testing.T) {

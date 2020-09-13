@@ -89,6 +89,16 @@ func GetBlockProducer(state *State, id uint64) *BlockProducer {
 	return nil
 }
 
+func GetActiveBlockProducers(state *State, epoch uint64) []uint64 {
+	var activeBps []uint64
+	for _, bp := range state.BlockProducers {
+		if bp.Active || bp.GetExitEpoch() > epoch {
+			activeBps = append(activeBps, bp.GetId())
+		}
+	}
+	return activeBps
+}
+
 // will return nil if not found
 func GetPool(state *State, id uint64) *Pool {
 	for _, p := range state.Pools {
@@ -99,35 +109,22 @@ func GetPool(state *State, id uint64) *Pool {
 	return nil
 }
 
+// Pool committee is a randomly selected committee of BPs that are chosen to receive a pool's
+// keys via key rotation.
+// For new pools, the first committee is responsible for doing DKG
+//
+// Pool committee is chosen randomly by shuffling a seed + category (pool %d committee)
+// The previous epoch's seed is used to choose the DKG committee as the current one (the block's epoch)
 func PoolCommittee(state *State, poolId uint64, epoch uint64) ([]uint64,error) {
 	// TODO - handle integer overflow
 	seed, err := GetSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return []uint64{}, err
 	}
-	return shuffle(
-		state.BlockProducers,
-		0,
-		epoch,
+	return shuffleActiveBPs(
+		GetActiveBlockProducers(state, epoch),
 		shared.SliceToByte32(seed),
 		[]byte(fmt.Sprintf("pool %d committee", poolId)),
-	)
-}
-
-// DKG committee is chosen randomly by shuffling a seed + category (dkg committee)
-// The previous epoch's seed is used to choose the DKG committee as the current one (the block's epoch)
-func DKGCommittee(state *State, reqId uint64, epoch uint64)([]uint64, error) {
-	// TODO - handle integer overflow
-	seed, err := GetSeed(state, epoch - 1) // we always use the seed from previous epoch
-	if err != nil {
-		return []uint64{}, err
-	}
-	return shuffle(
-		state.BlockProducers,
-		0,
-		epoch,
-		shared.SliceToByte32(seed),
-		[]byte("dkg committee"),
 	)
 }
 
@@ -139,10 +136,8 @@ func BlockVotingCommittee(state *State, epoch uint64)([]uint64, error) {
 	if err != nil {
 		return []uint64{}, err
 	}
-	return shuffle(
-		state.BlockProducers,
-		0,
-		epoch,
+	return shuffleActiveBPs(
+		GetActiveBlockProducers(state, epoch),
 		shared.SliceToByte32(seed),
 		[]byte("block voting committee"),
 	)
@@ -156,10 +151,8 @@ func GetBlockProposer(state *State, epoch uint64) (uint64, error) {
 		return 0, err
 	}
 
-	lst, err := shuffle(
-		state.BlockProducers,
-		0,
-		epoch,
+	lst, err := shuffleActiveBPs(
+		GetActiveBlockProducers(state, epoch),
 		shared.SliceToByte32(seed),
 		[]byte("block proposer"),
 	)
@@ -179,17 +172,12 @@ func GetSeed(state *State, epoch uint64) ([]byte, error) {
 	return []byte{}, fmt.Errorf("seed for epoch %d not found", epoch)
 }
 
+// Shuffle takes in a list of block producers Ids, a seed and a nonce to create a unique shuffle for that
+// combination by hashing seed + nonce.
+// Changing the nonce for different purposes can be used as "categories" from the same seed
 // TODO - find out if secure
-func shuffle(allBPs []*BlockProducer, committeeId uint64, epoch uint64, seed [32]byte, nonce []byte) ([]uint64, error) {
-	// get Active BPs
-	var activeBps []uint64
-	for _, bp := range allBPs {
-		if bp.Active || bp.GetExitEpoch() > epoch {
-			activeBps = append(activeBps, bp.GetId())
-		}
-	}
-
-	// nonce is used as different categories for the seed
+func shuffleActiveBPs(bps []uint64, seed [32]byte, nonce []byte) ([]uint64, error) {
+	// nonce is used to randomly select multiple types of committees from the same seed
 	seedToUse := seed
 	if nonce != nil {
 		h := sha256.New() // TODO - secure enough?
@@ -200,8 +188,8 @@ func shuffle(allBPs []*BlockProducer, committeeId uint64, epoch uint64, seed [32
 		seedToUse = shared.SliceToByte32(h.Sum(nil))
 	}
 
-	// shuffle
-	shuffled,err := shared.ShuffleList(activeBps, seedToUse, 60)
+	// shuffleActiveBPs
+	shuffled,err := shared.ShuffleList(bps, seedToUse, 60)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +197,7 @@ func shuffle(allBPs []*BlockProducer, committeeId uint64, epoch uint64, seed [32
 	//
 	ret := make([]uint64, TestConfig().PoolExecutorsNumber)
 	for i := uint64(0) ; i < TestConfig().PoolExecutorsNumber ; i++ {
-		ret[i] = shuffled[committeeId* TestConfig().PoolExecutorsNumber + i]
+		ret[i] = shuffled[TestConfig().PoolExecutorsNumber + i]
 	}
 
 	return ret, nil

@@ -25,7 +25,7 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 		// TODO - check leader is not part of DKG Committee
 
 		// get DKG participants
-		committee, err := core.DKGCommittee(state, req.Id, req.StartEpoch)
+		committee, err := core.PoolCommittee(state, req.Id, req.StartEpoch)
 		if err != nil {
 			return err
 		}
@@ -38,7 +38,7 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 			// TODO if i'm the DKDG leader act uppon it
 		case 1: // successful
 			// get committee
-			committee, err := core.DKGCommittee(state, req.Id, req.StartEpoch)
+			committee, err := core.PoolCommittee(state, req.Id, req.StartEpoch)
 			sort.Slice(committee, func(i int, j int) bool {
 				return committee[i] < committee[j]
 			})
