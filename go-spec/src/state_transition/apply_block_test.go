@@ -13,15 +13,17 @@ func TestStateCopying(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateValidHeadAndBody(state)
 
 	preRoot, err := ssz.HashTreeRoot(state)
 	require.NoError(t, err)
 
-	st := NewStateTransition()
-
-	newState, err := st.ApplyBlock(state, body)
+	newState := core.CopyState(state)
 	require.NoError(t, err)
+
+	// test new state and old state ssz
+	newStateRoot, err := ssz.HashTreeRoot(newState)
+	require.NoError(t, err)
+	require.EqualValues(t, preRoot, newStateRoot)
 
 	// test manipulating prams on new state copying
 	bp := core.GetBlockProducer(newState, 0)
@@ -33,6 +35,7 @@ func TestStateCopying(t *testing.T) {
 
 	// test old state root not changed
 	postRoot, err := ssz.HashTreeRoot(state)
+	require.NoError(t, err)
 	require.EqualValues(t, preRoot, postRoot)
 }
 
@@ -62,4 +65,20 @@ func TestBlockApplyConsistency(t *testing.T) {
 	post,err := ssz.HashTreeRoot(state)
 	require.NoError(t, err)
 	require.EqualValues(t, preRoot, post)
+}
+
+func TestBlockApplyPostRoot(t *testing.T) {
+	t.Skipf("need to test static state transition")
+	// TODO - need to test static state transition
+	//require.NoError(t, bls.Init(bls.BLS12_381))
+	//require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
+	//
+	//state := generateTestState(t)
+	//_, body := GenerateValidHeadAndBody(state)
+	//st := NewStateTransition()
+	//newState, err := st.ApplyBlock(state, body)
+	//require.NoError(t, err)
+	//
+	//fmt.Printf("%s\n", hex.EncodeToString(core.GetStateRoot(newState, newState.CurrentEpoch)))
+	//require.EqualValues(t, toByte(""), core.GetStateRoot(newState, newState.CurrentEpoch))
 }

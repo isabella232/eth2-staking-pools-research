@@ -19,20 +19,13 @@ func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core
 	}
 
 	// validate parent block root
-	// Rule 1: need to point to an existing parent block root
-	// Rule 2: need to have a higher epoch
-	// TODO - block 0?
-	foundParent := false
-	for _, parent := range state.BlockRoots {
-		if bytes.Compare(parent.Bytes, body.ParentBlockRoot) == 0 {
-			foundParent = true
-			if parent.Epoch >= body.Epoch {
-				return fmt.Errorf("new block's parent block root can't be of a future epoch")
-			}
-		}
+	if err := st.validateBlockRoots(state, body.ParentBlockRoot, body.Epoch); err != nil {
+		return err
 	}
-	if !foundParent {
-		return fmt.Errorf("parent block root not found")
+
+	// validate ETH1 block, should be higher than previous blocks
+	if err := st.validateETH1And2Data(state, body.ETH1Block, body.ETH2Epoch); err != nil {
+		return err
 	}
 
 	// verify proposer is expected proposer
@@ -90,5 +83,44 @@ func (st *StateTransition) PostApplyValidateBlock(newState *core.State, header *
 	if hex.EncodeToString(header.StateRoot) != hex.EncodeToString(root[:]) {
 		return fmt.Errorf("new block state root is wrong")
 	}
+	return nil
+}
+
+// validate parent block root
+// Rule 1: need to point to an existing parent block root
+// Rule 2: need to have a higher epoch
+// TODO - block 0?
+func (st *StateTransition) validateBlockRoots (state *core.State, parentBlockRoot []byte, epoch uint64) error {
+	foundParent := false
+	for _, parent := range state.BlockRoots {
+		if bytes.Compare(parent.GetBytes(), parentBlockRoot) == 0 {
+			foundParent = true
+			if parent.Epoch >= epoch {
+				return fmt.Errorf("new block's parent block root can't be of a future epoch")
+			}
+		}
+	}
+	if !foundParent {
+		return fmt.Errorf("parent block root not found")
+	}
+	return nil
+}
+
+// for eth1 and eth2 blocks/ epoch, verify that the state doesn't have a block/ epoch equal or higher.
+func (st *StateTransition) validateETH1And2Data (state *core.State, eth1Block uint64, eth2Epoch uint64) error {
+	// eth1
+	for _, eth1 := range state.ETH1Blocks {
+		if eth1.GetNumber() >= eth1Block {
+			return fmt.Errorf("ETH1 block exists or is higher than block's ETH1 block")
+		}
+	}
+
+	// eth2
+	for _, eth2 := range state.ETH2Epochs {
+		if eth2.GetNumber() >= eth2Epoch {
+			return fmt.Errorf("ETH2 epoch exists or is higher than block's ETH2 epoch")
+		}
+	}
+
 	return nil
 }

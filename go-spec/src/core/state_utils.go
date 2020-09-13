@@ -43,15 +43,29 @@ func CopyState(state *State) *State {
 		deepcopier.Copy(s).To(newSlashings[i])
 	}
 
+	newETH1 := make([]*EpochAndNumber, len(state.ETH1Blocks))
+	for i, s := range state.ETH1Blocks {
+		newETH1[i] = &EpochAndNumber{}
+		deepcopier.Copy(s).To(newETH1[i])
+	}
+
+	newETH2 := make([]*EpochAndNumber, len(state.ETH2Epochs))
+	for i, s := range state.ETH2Epochs {
+		newETH2[i] = &EpochAndNumber{}
+		deepcopier.Copy(s).To(newETH2[i])
+	}
+
 	return &State{
-		GenesisTime:          state.GenesisTime,
-		CurrentEpoch:         state.CurrentEpoch,
-		BlockRoots:           newBlockRoots,
-		StateRoots:           newStateRoots,
-		Seeds:                newSeeds,
-		BlockProducers:       newBPs,
-		Pools:                newPools,
-		Slashings:            newSlashings,
+		GenesisTime:    state.GenesisTime,
+		CurrentEpoch:   state.CurrentEpoch,
+		BlockRoots:     newBlockRoots,
+		StateRoots:     newStateRoots,
+		Seeds:          newSeeds,
+		BlockProducers: newBPs,
+		Pools:          newPools,
+		Slashings:      newSlashings,
+		ETH1Blocks:     newETH1,
+		ETH2Epochs:     newETH2,
 	}
 }
 

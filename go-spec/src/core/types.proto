@@ -12,6 +12,8 @@ message State {
     repeated BlockProducer BlockProducers = 6;
     repeated Pool Pools = 7;
     repeated uint64 Slashings = 8;
+    repeated EpochAndNumber ETH1Blocks = 9;
+    repeated EpochAndNumber ETH2Epochs = 10;
 }
 
 message BlockProducer {
@@ -68,13 +70,20 @@ message CreateNewPoolRequest {
     bytes Participation = 7; // 128 bit of the executors (by order) which executed this duty
 }
 
+//message StakeDeposit {
+//    bytes PubKey = 1; // BPs public key
+//    bytes ETH1Transaction = 2;
+//}
+
 message BlockBody {
     uint64 Proposer = 1;
     uint64 Epoch = 2;
-    repeated ExecutionSummary ExecutionSummaries = 3;
-    repeated CreateNewPoolRequest NewPoolReq = 4;
-    bytes ParentBlockRoot = 5;
-    bytes Randao = 6;
+    bytes ParentBlockRoot = 3;
+    bytes Randao = 4;
+    uint64 ETH1Block = 5;
+    uint64 ETH2Epoch = 6;
+    repeated ExecutionSummary ExecutionSummaries = 7;
+    repeated CreateNewPoolRequest NewPoolReq = 8;
 }
 
 message BlockHeader {
@@ -86,4 +95,9 @@ message BlockHeader {
 message EpochAndBytes {
     uint64 Epoch = 1;
     bytes Bytes = 2;
+}
+
+message EpochAndNumber {
+    uint64 Epoch = 1;
+    uint64 Number = 2;
 }

@@ -33,6 +33,8 @@ func GenerateValidHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockB
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -52,6 +54,8 @@ func GenerateWrongProposerHeadAndBody(state *core.State)(*core.BlockHeader, *cor
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -71,6 +75,8 @@ func GenerateInvalidProposerHeadAndBody(state *core.State)(*core.BlockHeader, *c
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -90,6 +96,8 @@ func GenerateWrongRootHeadAndBody(state *core.State)(*core.BlockHeader, *core.Bl
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -110,6 +118,8 @@ func GenerateInvalidSigHeadAndBody(state *core.State)(*core.BlockHeader, *core.B
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -129,6 +139,8 @@ func GenerateCreatePoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.B
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -148,6 +160,8 @@ func GenerateNotCreatePoolHeadAndBody(state *core.State)(*core.BlockHeader, *cor
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -167,6 +181,8 @@ func GenerateFinalizedAttestationPoolHeadAndBody(state *core.State)(*core.BlockH
 		false,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -186,6 +202,8 @@ func GenerateNotFinalizedAttestationPoolHeadAndBody(state *core.State)(*core.Blo
 		false,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -205,6 +223,8 @@ func GenerateFinalizedProposalPoolHeadAndBody(state *core.State)(*core.BlockHead
 		false,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -224,6 +244,8 @@ func GenerateNotFinalizedProposalPoolHeadAndBody(state *core.State)(*core.BlockH
 		false,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -243,6 +265,8 @@ func GenerateCreatePoolWithExistingIdHeadAndBody(state *core.State)(*core.BlockH
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -262,6 +286,8 @@ func GenerateTooSmallRandaoHeadAndBody(state *core.State)(*core.BlockHeader, *co
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -281,6 +307,8 @@ func GenerateTooBigRandaoHeadAndBody(state *core.State)(*core.BlockHeader, *core
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6ddd"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
 	)
 }
 
@@ -300,6 +328,8 @@ func GenerateInvalidParentBlockRootHeadAndBody(state *core.State)(*core.BlockHea
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e30"),
+		1000,
+		10,
 	)
 }
 
@@ -319,6 +349,50 @@ func GenerateInvalidBlockEpochRootHeadAndBody(state *core.State)(*core.BlockHead
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		10,
+	)
+}
+
+func GenerateInvalidETH1HeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		state,
+		1,
+		17,
+		SK,
+		"",
+		0,
+		6,
+		true,
+		true,
+		true,
+		true,
+		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
+		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		999,
+		10,
+	)
+}
+
+func GenerateInvalidETH2HeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
+	return generateHeaderAndBody(
+		state,
+		1,
+		17,
+		SK,
+		"",
+		0,
+		6,
+		true,
+		true,
+		true,
+		true,
+		true,
+		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
+		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		1000,
+		9,
 	)
 }
 
@@ -337,6 +411,8 @@ func generateHeaderAndBody(
 	includeCreatePool bool,
 	randao []byte,
 	parentBlockRoot []byte,
+	eth1Block uint64,
+	eth2Epoch uint64,
 	) (*core.BlockHeader, *core.BlockBody) {
 	body := &core.BlockBody{
 		Proposer:           proposer,
@@ -351,6 +427,8 @@ func generateHeaderAndBody(
 		NewPoolReq:         []*core.CreateNewPoolRequest{},
 		ParentBlockRoot:    parentBlockRoot,
 		Randao: randao,
+		ETH1Block: eth1Block,
+		ETH2Epoch: eth2Epoch,
 	}
 
 	if includeBeaconAttestationDuty {
@@ -472,6 +550,18 @@ func generateTestState(t *testing.T) *core.State {
 			},
 		},
 		Slashings: []uint64{},
+		ETH1Blocks: []*core.EpochAndNumber{
+			&core.EpochAndNumber{
+				Epoch:                0,
+				Number:               999,
+			},
+		},
+		ETH2Epochs: []*core.EpochAndNumber{
+			&core.EpochAndNumber{
+				Epoch:                0,
+				Number:               9,
+			},
+		},
 	}
 
 	root, err := ssz.HashTreeRoot(ret)
