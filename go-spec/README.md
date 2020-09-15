@@ -1,14 +1,10 @@
-# ETH 2.0 Go minimal staking pool implementation - Research
+# ETH 2.0 Go spec for eth2 staking pool - Research
 [<img src="https://www.bloxstaking.com/wp-content/uploads/2020/04/Blox-Staking_logo_blue.png" width="100">](https://www.bloxstaking.com/)
 
-## This is still under development!!
+## This spec is a draft and under active development
 
-A basic and minimal POC for staking pools for eth 2.0 based on this [research](https://github.com/bloxapp/eth2-staking-pools-research).
+This spec is state transition code for the pools blockchain, it encompasses the creation, validation and operations for the pools blockchain
 
-### What it does?
-* Initial DKG (without VSS!)
-* contructs epochs and rotates participants randomly between them
-* during a rotation it does a redistribution of shares very naively at the moment (again, no VSS).
-* It has no netwokring, all participants send messages via function calls.
+### Pools mini paper
 
-This project is a result of the [python_minimal_pool](https://github.com/bloxapp/eth2-staking-pools-research/tree/master/python_minimal_pool). It was too slow for pairing operations.
+[mini paper](https://docs.google.com/document/d/1Fq35txbe8U5uMY4njHht1ZDQ_6PPQLj6gOMiM1Pm37A/edit#).
