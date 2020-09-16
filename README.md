@@ -1,21 +1,7 @@
 # ETH 2.0 Decentralized Staking Pools - Research
 [<img src="https://www.bloxstaking.com/wp-content/uploads/2020/04/Blox-Staking_logo_blue.png" width="100">](https://www.bloxstaking.com/)
 
-
 This repo aims to have in one place all the research around decentralized staking pools for eth 2.0.
-
-- [Distribuited key generation](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/dkg.md) and [redistribuition](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_rotation.md)
-- Rewards/ penalties
-- Consensus
-	- [CDT 2.0](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/cdt2.md)
-	- [Block producers](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/block_producers.md)
-	- create new pools
-	- [coordinate rotation and assignment of participants between pools](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_rotation.md)
-	- [coordinate the execution of the validator's epoch duties by the pool](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_duties.md)
-	- coordinate participants exit from the protocol
-	- [epoch processing](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/epoch_processing.md)
-- bilinear pairings and BLS12-381 keys [part 1](https://medium.com/@alonmuroch_65570/bls-signatures-part-1-overview-47d9eebf1c75), [part 2](https://medium.com/@alonmuroch_65570/bls-signatures-part-2-key-concepts-of-pairings-27a8a9533d0c)
-- Networking  
 
 ### Overview
 The backbone of decentralized staking pools is in distribuiting the control of the keys that control the validator and its withdrawal key. You can think of it as a giant multisig setup with some M-of-N threshold for signing attestations, block proposals and withdrawal transactions.\
@@ -24,17 +10,19 @@ A good starting point could be [this](https://www.youtube.com/watch?v=Jtz9b7yWbL
 If we add a consensus protocol that rewards and punishes pool participants, controls withdrawal and onboarding then we have a full protocol for an open decentralzied staking pools network.\
 The key word here is open as in autonomous and open to join by anyone.
 
-An issue that arises immediatley is the security around the oboarding process, how can we guarantee that a formed pool will include (worst case) no more that 1/3 malicious participants?
-Following the Binomial distribuition we can calculate how big does a pool needs to be, this is similar to an ethereum committee selection as explained [here](https://notes.ethereum.org/@vbuterin/rkhCgQteN?type=view#Why-32-ETH-validator-sizes). 
+The network has 2 actors: block producers (BP) and staker. 
+A BP is a bonded actor (staked)  which has the responsibility of executing eth2 validator assignments and pool network assignments (producing a block and signing it).
+A pool is a collection of ETH deposited by a staker.
 
-Another issue is how big the actual set of participants to select from needs to be, if it's too small a malicious participant can hijack an entire pool, **example**: a pool consists of 60 participants but the available set of un-assigned participants is only of 19. A malicious actor can quickly add 39 of his own participants and kidnap the pool. \
-This scenario is very feasable as there is no guarantee that a large set of un-assigned participants will exist. We can force the protocol to not create new pools as long as the un-assigned poo is below a certain number but that will lead to bad user experience and the protocol's ability to move forward.
+### Research
+[Pools mini paper]() for in-depth details
+[protoco go-spec]()
+[DKG + key rotation POC](https://github.com/bloxapp/eth2-staking-pools-research/tree/master/go_minimal_pool)
 
-A solution to this porblem is to use all the participants (allocated and not) as the set from which pool participants are selected from.  
-A way this could work is to continously rotate all participants between the pools such that new created pools can be secured by the set of "rotating pariticipants".
+### Basic building blocks
 
-This repository aims to explore all those challenges (and others) towards a formal protocol definition.
-
-### Minimal Pool
-A research project towards establishing key concepts in staking pools like creation of new pools, rotation, withdrawal, networking and more.\
-[Minimal Pool](https://github.com/bloxapp/eth2-staking-pools-research/tree/master/go_minimal_pool)
+- [Distribuited key generation](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/dkg.md) and [redistribuition](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/pool_rotation.md)
+- [CDT 2.0](https://github.com/bloxapp/eth2-staking-pools-research/blob/master/cdt2.md)
+- bilinear pairings and BLS12-381 keys [part 1](https://medium.com/@alonmuroch_65570/bls-signatures-part-1-overview-47d9eebf1c75), [part 2](https://medium.com/@alonmuroch_65570/bls-signatures-part-2-key-concepts-of-pairings-27a8a9533d0c)
+- Randomness beacon - TBD
+- Consensus - TBD
