@@ -16,6 +16,7 @@ func (st *StateTransition) ProcessExecutionSummaries(state *core.State, summarie
 		return err
 	}
 
+	// TODO - what if a BP doesn't have enough CDT for penalties?
 	for _, summary := range summaries {
 		pool := core.GetPool(state, summary.GetPoolId())
 		if pool == nil {
@@ -44,10 +45,7 @@ func (st *StateTransition) ProcessExecutionSummaries(state *core.State, summarie
 					} else {
 						participation := duty.GetParticipation()
 						if shared.IsBitSet(participation, uint64(i)) {
-							err := core.IncreaseBPBalance(bp, core.TestConfig().BaseEth2DutyReward)
-							if err != nil {
-								return err
-							}
+							core.IncreaseBPBalance(bp, core.TestConfig().BaseEth2DutyReward)
 						} else {
 							err := core.DecreaseBPBalance(bp, core.TestConfig().BaseEth2DutyReward)
 							if err != nil {
@@ -71,10 +69,7 @@ func (st *StateTransition) ProcessExecutionSummaries(state *core.State, summarie
 					} else {
 						participation := duty.GetParticipation()
 						if shared.IsBitSet(participation[:], uint64(i)) {
-							err := core.IncreaseBPBalance(bp, 2*core.TestConfig().BaseEth2DutyReward)
-							if err != nil {
-								return err
-							}
+							core.IncreaseBPBalance(bp, 2*core.TestConfig().BaseEth2DutyReward)
 						} else {
 							err := core.DecreaseBPBalance(bp, 2*core.TestConfig().BaseEth2DutyReward)
 							if err != nil {

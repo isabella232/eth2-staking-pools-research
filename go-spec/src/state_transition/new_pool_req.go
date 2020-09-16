@@ -24,6 +24,8 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 		// TODO - check that network has enough capitalization
 		// TODO - check leader is not part of DKG Committee
 
+		// TODO - what if a BP doesn't have enough CDT for penalties?
+
 		// get DKG participants
 		committee, err := core.PoolCommittee(state, req.Id, req.StartEpoch)
 		if err != nil {
@@ -60,10 +62,7 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 				}
 				partic := req.GetParticipation()
 				if shared.IsBitSet(partic[:], uint64(i)) {
-					err := core.IncreaseBPBalance(bp, core.TestConfig().DKGReward)
-					if err != nil {
-						return err
-					}
+					core.IncreaseBPBalance(bp, core.TestConfig().DKGReward)
 				} else {
 					err := core.DecreaseBPBalance(bp, core.TestConfig().DKGReward)
 					if err != nil {
@@ -73,11 +72,9 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 			}
 
 			// special reward for leader
-			err = core.IncreaseBPBalance(leader, 3* core.TestConfig().DKGReward)
-			if err != nil {
-				return err
-			}
+			core.IncreaseBPBalance(leader, 3* core.TestConfig().DKGReward)
 		case 2: // un-successful
+			// TODO - better define how the un-successful status is assigned.
 			for i := 0 ; i < len(committee) ; i ++ {
 				bp := core.GetBlockProducer(state, committee[i])
 				if bp == nil {

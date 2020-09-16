@@ -29,9 +29,9 @@ func TestFinalizedAttestation(t *testing.T) {
 	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber; i++ { // pool id = 3
 		bp := core.GetBlockProducer(newState, committee[i])
 		if shared.IsBitSet(participation, i) {
-			require.EqualValues(t, 1100, bp.Balance)
+			require.EqualValues(t, 1100, bp.CDTBalance)
 		} else {
-			require.EqualValues(t, 900, bp.Balance)
+			require.EqualValues(t, 900, bp.CDTBalance)
 		}
 	}
 }
@@ -55,7 +55,7 @@ func TestNotFinalizedAttestation(t *testing.T) {
 	// test penalties/ rewards
 	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber; i++ { // pool id = 3
 		bp := core.GetBlockProducer(newState, committee[i])
-		require.EqualValues(t, 800, bp.Balance)
+		require.EqualValues(t, 800, bp.CDTBalance)
 	}
 }
 
@@ -80,9 +80,9 @@ func TestFinalizedProposal(t *testing.T) {
 	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber; i++ { // pool id = 3
 		bp := core.GetBlockProducer(newState, committee[i])
 		if shared.IsBitSet(participation, i) {
-			require.EqualValues(t, 1200, bp.Balance)
+			require.EqualValues(t, 1200, bp.CDTBalance)
 		} else {
-			require.EqualValues(t, 800, bp.Balance)
+			require.EqualValues(t, 800, bp.CDTBalance)
 		}
 	}
 }
@@ -106,6 +106,6 @@ func TestNotFinalizedProposal(t *testing.T) {
 	// test penalties/ rewards
 	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber; i++ { // pool id = 3
 		bp := core.GetBlockProducer(newState, committee[i])
-		require.EqualValues(t, 600, bp.Balance)
+		require.EqualValues(t, 600, bp.CDTBalance)
 	}
 }

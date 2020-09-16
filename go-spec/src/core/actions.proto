@@ -18,7 +18,7 @@ option go_package = ".;core";
 // A non-successful DKG will penalized the DKG participants
 message CreateNewPoolRequest {
   uint64 Id = 1; // primary key
-  int32 Status = 2; // 0 - started, 1 completed, 2 - Unsuccessful
+  uint32 Status = 2; // 0 - started, 1 completed, 2 - Unsuccessful
   uint64 StartEpoch = 3; // epoch in which the request was included
   uint64 EndEpoch = 4; // max epoch for the request to be completed or failed
   uint64 LeaderBlockProducer = 5; // should be the BP proposer of next block after which this request was included in.
@@ -30,4 +30,17 @@ message StakeDeposit {
   bytes PubKey = 1; // BPs public key
   bytes TransactionHash = 2; // the transaction hash that made the deposit
   uint64 Amount = 3;
+}
+
+// CDT Withdrawal request is a request for withdrawing CDT from the pool's chain to ethereum mainnet
+// The block voting committee will process the request and if valid will sign the request with it's parameters.
+// With the signed approval the withdrawer could create an eth1 transaction to withdraw his CDT.
+message CDTWithdrawalRequest {
+  bytes PubKey = 1; // the BPs pubkey
+  uint64 Amount = 2;
+  uint32 Status = 3; // 0 for requested, 1 - for approved, 2 - for rejected
+  uint64 ApprovalBlock = 4; // in which eth1 block is this approved from
+
+  // the below params are set only when status = 1
+  bytes Signature = 5;
 }

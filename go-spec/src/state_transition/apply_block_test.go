@@ -27,8 +27,8 @@ func TestStateCopying(t *testing.T) {
 
 	// test manipulating prams on new state copying
 	bp := core.GetBlockProducer(newState, 0)
-	bp.Balance = 100000
-	require.NotEqualValues(t, core.GetBlockProducer(state, 0).Balance, 100000)
+	bp.CDTBalance = 100000
+	require.NotEqualValues(t, core.GetBlockProducer(state, 0).CDTBalance, 100000)
 
 	core.GetPool(newState, 0).Active = false
 	require.NotEqualValues(t, core.GetPool(state, 0).Active, core.GetPool(newState, 0).Active)

@@ -21,7 +21,7 @@ message State {
 message BlockProducer {
     uint64 Id = 1;
     bytes PubKey = 2;
-    uint64 Balance = 3;
+    uint64 CDTBalance = 3;
     uint64 Stake = 4;
     bool Slashed = 5;
     bool Active = 6;
@@ -61,6 +61,7 @@ message BlockBody {
     repeated ExecutionSummary ExecutionSummaries = 7;
     repeated CreateNewPoolRequest NewPoolReq = 8;
     repeated StakeDeposit StakeDeposits = 9;
+    repeated CDTWithdrawalRequest CDTWithdrawReq = 10;
 }
 
 message BlockHeader {

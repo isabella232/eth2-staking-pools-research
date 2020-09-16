@@ -80,17 +80,16 @@ func GetStateRoot(state *State, epoch uint64) []byte {
 }
 
 func DecreaseBPBalance(bp *BlockProducer, change uint64) error {
-	if bp.Balance < change {
-		return fmt.Errorf("BP %d dosen't have enonugh Balance (%d) to decrease (%d)", bp.Id, bp.Balance, change)
+	if bp.CDTBalance < change {
+		return fmt.Errorf("BP %d dosen't have enonugh Balance (%d) to decrease (%d)", bp.Id, bp.CDTBalance, change)
 	}
 
-	bp.Balance -= change
+	bp.CDTBalance -= change
 	return nil
 }
 
-func IncreaseBPBalance(bp *BlockProducer, change uint64) error {
-	bp.Balance += change
-	return nil
+func IncreaseBPBalance(bp *BlockProducer, change uint64) {
+	bp.CDTBalance += change
 }
 
 // will return nil if not found

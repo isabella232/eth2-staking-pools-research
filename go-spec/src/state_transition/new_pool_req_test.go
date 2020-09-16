@@ -36,15 +36,15 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber ; i++ {
 		bp := core.GetBlockProducer(newState, committee[i])
 		if shared.IsBitSet(participation, i) {
-			require.EqualValues(t, 2000, bp.Balance)
+			require.EqualValues(t, 2000, bp.CDTBalance)
 		} else {
-			require.EqualValues(t, 0, bp.Balance)
+			require.EqualValues(t, 0, bp.CDTBalance)
 		}
 	}
 
 	// leader reward
 	bp := core.GetBlockProducer(newState, 1)
-	require.EqualValues(t, 4000, bp.Balance)
+	require.EqualValues(t, 4000, bp.CDTBalance)
 
 	// pool data
 	pool := core.GetPool(newState, 6)
@@ -78,12 +78,12 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	// test penalties/ rewards
 	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber ; i++ {
 		bp := core.GetBlockProducer(newState, committee[i])
-		require.EqualValues(t, 0, bp.Balance)
+		require.EqualValues(t, 0, bp.CDTBalance)
 	}
 
 	// leader reward
 	bp := core.GetBlockProducer(newState, 1)
-	require.EqualValues(t, 1000, bp.Balance)
+	require.EqualValues(t, 1000, bp.CDTBalance)
 }
 
 func TestCreatedNewPoolReqWithExistingId(t *testing.T) {
