@@ -10,16 +10,7 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	newState = core.CopyState(oldState)
 
 	// process
-	if err := st.ProcessExecutionSummaries(newState, body.ExecutionSummaries); err != nil {
-		return nil,err
-	}
 	if err := st.ProcessNewPoolRequests(newState, body.NewPoolReq); err != nil {
-		return nil,err
-	}
-	if err := st.ProcessStakeDeposits(newState, body.StakeDeposits); err != nil {
-		return nil,err
-	}
-	if err := st.ProcessCDTWithdrawals(newState, body.CDTWithdrawReq); err != nil {
 		return nil,err
 	}
 

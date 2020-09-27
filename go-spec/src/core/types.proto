@@ -13,7 +13,6 @@ message State {
     repeated EpochAndBytes Seeds = 5;
     repeated BlockProducer BlockProducers = 6;
     repeated Pool Pools = 7;
-    repeated uint64 Slashings = 8;
     repeated ETH1Data ETH1Blocks = 9;
     repeated ETH2Data ETH2Epochs = 10;
 }
@@ -59,8 +58,6 @@ message BlockBody {
     ETH1Data ETH1Block = 5;
     ETH2Data ETH2Epoch = 6;
     repeated CreateNewPoolRequest NewPoolReq = 8;
-    repeated StakeDeposit StakeDeposits = 9;
-    repeated CDTWithdrawalRequest CDTWithdrawReq = 10;
 }
 
 message BlockHeader {

@@ -38,11 +38,6 @@ func CopyState(state *State) *State {
 		deepcopier.Copy(p).To(newPools[i])
 	}
 
-	newSlashings := make([]uint64, len(state.Slashings))
-	for i, s := range state.Slashings {
-		deepcopier.Copy(s).To(newSlashings[i])
-	}
-
 	newETH1 := make([]*ETH1Data, len(state.ETH1Blocks))
 	for i, s := range state.ETH1Blocks {
 		newETH1[i] = &ETH1Data{}
@@ -63,7 +58,6 @@ func CopyState(state *State) *State {
 		Seeds:          newSeeds,
 		BlockProducers: newBPs,
 		Pools:          newPools,
-		Slashings:      newSlashings,
 		ETH1Blocks:     newETH1,
 		ETH2Epochs:     newETH2,
 	}
