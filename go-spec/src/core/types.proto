@@ -6,15 +6,18 @@ option go_package = ".;core";
 import "src/core/actions.proto";
 
 message State {
+    // time
     uint64 GenesisTime = 1;
     uint64 CurrentEpoch = 2;
+
+    // past
     repeated EpochAndBytes BlockRoots = 3;
     repeated EpochAndBytes StateRoots = 4;
     repeated EpochAndBytes Seeds = 5;
+
+    // network
     repeated BlockProducer BlockProducers = 6;
     repeated Pool Pools = 7;
-    repeated ETH1Data ETH1Blocks = 9;
-    repeated ETH2Data ETH2Epochs = 10;
 }
 
 message BlockProducer {
@@ -93,17 +96,4 @@ message Checkpoint {
 message EpochAndBytes {
     uint64 Epoch = 1;
     bytes Bytes = 2;
-}
-
-// represents the state of the deposit contract for block producers on eth1
-message ETH1Data {
-    bytes DepositsRoot = 1;
-    uint64 Block = 2;
-    bytes BlockHash = 3;
-}
-
-// represents the last finalized eth2 state and it's state root
-message ETH2Data {
-    uint64 LastFinalizedEpoch = 1;
-    bytes StateRoot = 2;
 }
