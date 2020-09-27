@@ -58,8 +58,6 @@ message BlockBody {
     uint64 Epoch = 2;
     bytes ParentBlockRoot = 3;
     bytes Randao = 4;
-    ETH1Data ETH1Block = 5;
-    ETH2Data ETH2Epoch = 6;
     repeated CreateNewPoolRequest NewPoolReq = 8;
 }
 

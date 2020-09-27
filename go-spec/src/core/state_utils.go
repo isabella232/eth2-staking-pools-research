@@ -38,18 +38,6 @@ func CopyState(state *State) *State {
 		deepcopier.Copy(p).To(newPools[i])
 	}
 
-	newETH1 := make([]*ETH1Data, len(state.ETH1Blocks))
-	for i, s := range state.ETH1Blocks {
-		newETH1[i] = &ETH1Data{}
-		deepcopier.Copy(s).To(newETH1[i])
-	}
-
-	newETH2 := make([]*ETH2Data, len(state.ETH2Epochs))
-	for i, s := range state.ETH2Epochs {
-		newETH2[i] = &ETH2Data{}
-		deepcopier.Copy(s).To(newETH2[i])
-	}
-
 	return &State{
 		GenesisTime:    state.GenesisTime,
 		CurrentEpoch:   state.CurrentEpoch,
@@ -58,8 +46,6 @@ func CopyState(state *State) *State {
 		Seeds:          newSeeds,
 		BlockProducers: newBPs,
 		Pools:          newPools,
-		ETH1Blocks:     newETH1,
-		ETH2Epochs:     newETH2,
 	}
 }
 

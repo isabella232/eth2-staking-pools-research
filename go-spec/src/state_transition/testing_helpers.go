@@ -363,15 +363,6 @@ func generateHeaderAndBody(
 		Epoch:              blockEpoch,
 		ParentBlockRoot:    parentBlockRoot,
 		Randao: randao,
-		ETH1Block: &core.ETH1Data{
-			DepositsRoot:         []byte("root"),
-			Block:                eth1Block,
-			BlockHash:            []byte("hash"),
-		},
-		ETH2Epoch: &core.ETH2Data{
-			LastFinalizedEpoch:   eth2Epoch,
-			StateRoot:            []byte("state root"),
-		},
 	}
 
 	if includeCreatePool {
@@ -472,19 +463,6 @@ func generateTestState(t *testing.T) *core.State {
 			&core.EpochAndBytes{
 				Epoch:                0,
 				Bytes:                toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e41"),
-			},
-		},
-		ETH1Blocks: []*core.ETH1Data{
-			&core.ETH1Data{
-				DepositsRoot:         []byte("root"),
-				Block:                999,
-				BlockHash:            []byte("hash"),
-			},
-		},
-		ETH2Epochs: []*core.ETH2Data{
-			&core.ETH2Data{
-				LastFinalizedEpoch:   9,
-				StateRoot:            []byte("state"),
 			},
 		},
 	}
