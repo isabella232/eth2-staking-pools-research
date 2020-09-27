@@ -100,19 +100,3 @@ func TestInvalidBlockEpoch(t *testing.T) {
 
 	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "new block's parent block root can't be of a future epoch")
 }
-
-func TestInvalidETH1Block(t *testing.T) {
-	state := generateTestState(t)
-	head, body := GenerateInvalidETH1HeadAndBody(state)
-	st := NewStateTransition()
-
-	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "ETH1 block exists or is higher than block's ETH1 block")
-}
-
-func TestInvalidETH2Block(t *testing.T) {
-	state := generateTestState(t)
-	head, body := GenerateInvalidETH2HeadAndBody(state)
-	st := NewStateTransition()
-
-	require.EqualError(t, st.PreApplyValidateBlock(state, head, body), "ETH2 epoch exists or is higher than block's ETH2 epoch")
-}
