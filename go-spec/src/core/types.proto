@@ -58,7 +58,6 @@ message BlockBody {
     bytes Randao = 4;
     ETH1Data ETH1Block = 5;
     ETH2Data ETH2Epoch = 6;
-    repeated ExecutionSummary ExecutionSummaries = 7;
     repeated CreateNewPoolRequest NewPoolReq = 8;
     repeated StakeDeposit StakeDeposits = 9;
     repeated CDTWithdrawalRequest CDTWithdrawReq = 10;
@@ -68,6 +67,30 @@ message BlockHeader {
     bytes BlockRoot = 1;
     bytes StateRoot = 2;
     bytes Signature = 3;
+}
+
+message AttestationData {
+    // Slot of the attestation attesting for.
+    uint64 slot = 1;
+    // The committee index that submitted this attestation.
+    uint32 committee_index = 2;
+    // 32 byte root of the LMD GHOST block vote.
+    bytes beacon_block_root = 3;
+    // The most recent justified checkpoint in the beacon state
+    Checkpoint source = 4;
+    // The checkpoint attempting to be justified for the current epoch and its epoch boundary block
+    Checkpoint target = 5;
+    // The committees execution tasks.
+    repeated ExecutionSummary ExecutionSummaries = 6;
+}
+
+message Checkpoint {
+    // A checkpoint is every epoch's first slot. The goal of Casper FFG
+    // is to link the check points together for justification and finalization.
+    // Epoch the checkpoint references.
+    uint64 epoch = 1;
+    // Block root of the checkpoint references.
+    bytes root = 2;
 }
 
 message EpochAndBytes {
