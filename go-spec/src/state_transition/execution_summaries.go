@@ -11,7 +11,7 @@ func (st *StateTransition) validateExecutionSummaries(state *core.State, summari
 	return nil
 }
 
-func (st *StateTransition) ProcessExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error {
+func (st *StateTransition) processExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error {
 	if err := st.validateExecutionSummaries(state, summaries); err != nil {
 		return err
 	}

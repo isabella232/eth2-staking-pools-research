@@ -13,6 +13,9 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	if err := st.ProcessNewPoolRequests(newState, body.NewPoolReq); err != nil {
 		return nil,err
 	}
+	if err := st.ProcessBlockAttestations(newState, body.Attestations); err != nil {
+		return nil,err
+	}
 
 	// bump epoch
 	newState.CurrentEpoch = body.Epoch

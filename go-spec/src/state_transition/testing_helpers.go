@@ -30,9 +30,7 @@ func GenerateValidHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockB
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -48,9 +46,7 @@ func GenerateWrongProposerHeadAndBody(state *core.State)(*core.BlockHeader, *cor
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -66,9 +62,7 @@ func GenerateInvalidProposerHeadAndBody(state *core.State)(*core.BlockHeader, *c
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -84,9 +78,7 @@ func GenerateWrongRootHeadAndBody(state *core.State)(*core.BlockHeader, *core.Bl
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -103,9 +95,7 @@ func GenerateInvalidSigHeadAndBody(state *core.State)(*core.BlockHeader, *core.B
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -121,9 +111,7 @@ func GenerateCreatePoolHeadAndBody(state *core.State)(*core.BlockHeader, *core.B
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -139,9 +127,7 @@ func GenerateNotCreatePoolHeadAndBody(state *core.State)(*core.BlockHeader, *cor
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -157,9 +143,7 @@ func GenerateFinalizedAttestationPoolHeadAndBody(state *core.State)(*core.BlockH
 		false,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		generateAttestations(true, 0 /* attestation */),
 	)
 }
 
@@ -175,9 +159,7 @@ func GenerateNotFinalizedAttestationPoolHeadAndBody(state *core.State)(*core.Blo
 		false,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		generateAttestations(false, 0 /* attestation */),
 	)
 }
 
@@ -193,9 +175,7 @@ func GenerateFinalizedProposalPoolHeadAndBody(state *core.State)(*core.BlockHead
 		false,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		generateAttestations(true, 1 /* proposal */),
 	)
 }
 
@@ -211,9 +191,7 @@ func GenerateNotFinalizedProposalPoolHeadAndBody(state *core.State)(*core.BlockH
 		false,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		generateAttestations(false, 1 /* proposal */),
 	)
 }
 
@@ -229,9 +207,7 @@ func GenerateCreatePoolWithExistingIdHeadAndBody(state *core.State)(*core.BlockH
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -247,9 +223,7 @@ func GenerateTooSmallRandaoHeadAndBody(state *core.State)(*core.BlockHeader, *co
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -265,9 +239,7 @@ func GenerateTooBigRandaoHeadAndBody(state *core.State)(*core.BlockHeader, *core
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6ddd"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -283,9 +255,7 @@ func GenerateInvalidParentBlockRootHeadAndBody(state *core.State)(*core.BlockHea
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e30"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -301,9 +271,7 @@ func GenerateInvalidBlockEpochRootHeadAndBody(state *core.State)(*core.BlockHead
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -319,9 +287,7 @@ func GenerateInvalidETH1HeadAndBody(state *core.State)(*core.BlockHeader, *core.
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		999,
-		10,
-		toByte(PK),
+		nil,
 	)
 }
 
@@ -337,10 +303,48 @@ func GenerateInvalidETH2HeadAndBody(state *core.State)(*core.BlockHeader, *core.
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		1000,
-		9,
-		toByte(PK),
+		nil,
 	)
+}
+
+func generateAttestations(
+	finalized bool,
+	dutyType int32, // 0 - attestation, 1 - proposal, 2 - aggregation
+	) []*core.Attestation {
+	return []*core.Attestation{
+		{
+			AggregationBits:      []byte{},
+			Data:                 &core.AttestationData{
+				Slot:                 0,
+				CommitteeIndex:       0,
+				BeaconBlockRoot:      []byte("block root"),
+				Source:               &core.Checkpoint{
+					Epoch:                0,
+					Root:                 []byte{},
+				},
+				Target:               &core.Checkpoint{
+					Epoch:                1,
+					Root:                 []byte{},
+				},
+				ExecutionSummaries:   []*core.ExecutionSummary{
+					&core.ExecutionSummary{
+						PoolId:               3,
+						Epoch:                5,
+						Duties:               []*core.BeaconDuty{
+							&core.BeaconDuty{
+								Type:                 dutyType, // attestation
+								Committee:            12,
+								Slot:                 342,
+								Finalized:            finalized,
+								Participation:        []byte{1,3,88,12,43,12,89,35,1,0,99,16,63,13,33,0},
+							},
+						},
+					},
+				},
+			},
+			Signature:            []byte{},
+		},
+	}
 }
 
 func generateHeaderAndBody(
@@ -354,9 +358,7 @@ func generateHeaderAndBody(
 	includeCreatePool bool,
 	randao []byte,
 	parentBlockRoot []byte,
-	eth1Block uint64,
-	eth2Epoch uint64,
-	stakeDepositPubKey []byte,
+	attestations []*core.Attestation,
 	) (*core.BlockHeader, *core.BlockBody) {
 	body := &core.BlockBody{
 		Proposer:           proposer,
@@ -375,6 +377,10 @@ func generateHeaderAndBody(
 			CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
 			Participation:       []byte{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1},
 		})
+	}
+
+	if attestations != nil {
+		body.Attestations = attestations
 	}
 
 	// calculate and set state root after applying block

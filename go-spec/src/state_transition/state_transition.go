@@ -17,6 +17,7 @@ type IStateTransition interface {
 
 	ProcessExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error
 	ProcessNewPoolRequests(state *core.State, summaries []*core.CreateNewPoolRequest) error
+	ProcessBlockAttestations(state *core.State, attestations []*core.Attestation) error
 }
 
 type StateTransition struct {}
