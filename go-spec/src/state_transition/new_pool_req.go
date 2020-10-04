@@ -37,7 +37,7 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 
 		switch req.GetStatus() {
 		case 0:
-			// TODO if i'm the DKDG leader act uppon it
+			// TODO if i'm the DKG leader act uppon it
 		case 1: // successful
 			// get committee
 			committee, err := shared.VaultCommittee(state, req.Id, req.StartEpoch)

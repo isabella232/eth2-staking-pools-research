@@ -15,19 +15,32 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateCreatePoolHeadAndBody(state)
+	body := &core.BlockBody{
+		Slot:                 33,
+		NewPoolReq:           []*core.CreateNewPoolRequest{
+			{
+				Id:                  129,
+				Status:              1, // completed
+				StartEpoch:          1,
+				EndEpoch:            2,
+				LeaderBlockProducer: 1,
+				CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
+				Participation:       bitfield.Bitlist{43,12,89},
+			},
+		},
+	}
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlock(state, body)
+	err := st.ProcessNewPoolRequests(state, body.NewPoolReq)
 	require.NoError(t, err)
 
 	// check created
-	require.Equal(t, 6, len(newState.Pools))
+	require.Equal(t, 129, len(state.Pools))
 
 	// check rewards
-	participation := bitfield.Bitlist{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1}
-	committee, err := shared.VaultCommittee(newState, 6, 1)
+	participation := bitfield.Bitlist{43,12,89}
+	committee, err := shared.VaultCommittee(state, 129, 1)
 	sort.Slice(committee, func(i int, j int) bool {
 		return committee[i] < committee[j]
 	})
@@ -35,7 +48,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 
 	// test penalties/ rewards
 	for i := uint64(0) ; i < core.TestConfig().VaultSize ; i++ {
-		bp := core.GetBlockProducer(newState, committee[i])
+		bp := core.GetBlockProducer(state, committee[i])
 		if participation.BitAt(i) {
 			require.EqualValues(t, 2000, bp.CDTBalance)
 		} else {
@@ -44,11 +57,11 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	}
 
 	// leader reward
-	bp := core.GetBlockProducer(newState, 1)
+	bp := core.GetBlockProducer(state, 1)
 	require.EqualValues(t, 4000, bp.CDTBalance)
 
 	// pool data
-	pool := core.GetPool(newState, 6)
+	pool := core.GetPool(state, 129)
 	require.NotNil(t, pool)
 	require.EqualValues(t, toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), pool.PubKey)
 	require.EqualValues(t, committee, pool.SortedCommittee)
@@ -59,18 +72,31 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateNotCreatePoolHeadAndBody(state)
+	body := &core.BlockBody{
+		Slot:                 33,
+		NewPoolReq:           []*core.CreateNewPoolRequest{
+			{
+				Id:                  129,
+				Status:              2, // completed
+				StartEpoch:          1,
+				EndEpoch:            2,
+				LeaderBlockProducer: 1,
+				CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
+				Participation:       bitfield.Bitlist{43,12,89},
+			},
+		},
+	}
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlock(state, body)
+	err := st.ProcessNewPoolRequests(state, body.NewPoolReq)
 	require.NoError(t, err)
 
 	// check not created
-	require.Equal(t, 5, len(newState.Pools))
+	require.Equal(t, 128, len(state.Pools))
 
 	// check penalties
-	committee, err := shared.VaultCommittee(newState, 6, 1)
+	committee, err := shared.VaultCommittee(state, 129, 1)
 	sort.Slice(committee, func(i int, j int) bool {
 		return committee[i] < committee[j]
 	})
@@ -78,26 +104,37 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 
 	// test penalties/ rewards
 	for i := uint64(0) ; i < core.TestConfig().VaultSize ; i++ {
-		bp := core.GetBlockProducer(newState, committee[i])
+		bp := core.GetBlockProducer(state, committee[i])
 		require.EqualValues(t, 0, bp.CDTBalance)
 	}
 
 	// leader reward
-	bp := core.GetBlockProducer(newState, 1)
+	bp := core.GetBlockProducer(state, 1)
 	require.EqualValues(t, 1000, bp.CDTBalance)
 }
 
 func TestCreatedNewPoolReqWithExistingId(t *testing.T) {
-	t.Skipf("skipping as we can't build state root becasuse state apply errors")
+	require.NoError(t, bls.Init(bls.BLS12_381))
+	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	//require.NoError(t, bls.Init(bls.BLS12_381))
-	//require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
-	//
-	//state := generateTestState(t)
-	//_, body := GenerateCreatePoolWithExistingIdHeadAndBody(state)
-	//
-	//st := NewStateTransition()
-	//
-	//_, err := st.ApplyBlock(state, body)
-	//require.EqualError(t, err, "new pool id == req id, this is already exists")
+	state := generateTestState(t)
+	body := &core.BlockBody{
+		Slot:                 33,
+		NewPoolReq:           []*core.CreateNewPoolRequest{
+			{
+				Id:                  127,
+				Status:              2, // completed
+				StartEpoch:          1,
+				EndEpoch:            2,
+				LeaderBlockProducer: 1,
+				CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
+				Participation:       bitfield.Bitlist{43,12,89},
+			},
+		},
+	}
+
+	st := NewStateTransition()
+
+	err := st.ProcessNewPoolRequests(state, body.NewPoolReq)
+	require.Error(t, err, "new pool id == req id, this is already exists")
 }
