@@ -3,7 +3,6 @@ package core
 import (
 	"bytes"
 	"fmt"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/ulule/deepcopier"
 )
 
@@ -110,25 +109,6 @@ func GetPool(state *State, id uint64) *Pool {
 		}
 	}
 	return nil
-}
-
-// Block producer is chosen randomly by shuffling a seed + category (block proposer)
-// The previous epoch's seed is used to choose the block producer as the current one (the block's epoch)
-func GetBlockProposer(state *State, epoch uint64) (uint64, error) {
-	seed, err := GetSeed(state, epoch - 1) // we always use the seed from previous epoch
-	if err != nil {
-		return 0, err
-	}
-
-	lst, err := shuffleActiveBPs(
-		GetActiveBlockProducers(state, epoch),
-		shared.SliceToByte32(seed),
-		[]byte("block proposer"),
-	)
-	if err != nil {
-		return 0, err
-	}
-	return lst[0], nil
 }
 
 // will return error if not found

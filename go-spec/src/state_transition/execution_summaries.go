@@ -31,7 +31,7 @@ func (st *StateTransition) processExecutionSummaries(state *core.State, summarie
 		for _, duty := range summary.GetDuties() {
 			switch duty.GetType() {
 			case 0: // attestation
-				for i:=0 ; i < int(core.TestConfig().PoolExecutorsNumber) ; i++ {
+				for i:=0 ; i < int(core.TestConfig().VaultSize) ; i++ {
 					bp := core.GetBlockProducer(state, executors[i])
 					if bp == nil {
 						return fmt.Errorf("BP %d not found", executors[i])
@@ -55,7 +55,7 @@ func (st *StateTransition) processExecutionSummaries(state *core.State, summarie
 					}
 				}
 			case 1: // proposal
-				for i:=0 ; i < int(core.TestConfig().PoolExecutorsNumber) ; i++ {
+				for i:=0 ; i < int(core.TestConfig().VaultSize) ; i++ {
 					bp := core.GetBlockProducer(state, executors[i])
 					if bp == nil {
 						return fmt.Errorf("BP %d not found", executors[i])

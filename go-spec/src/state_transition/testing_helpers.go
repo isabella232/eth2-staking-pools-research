@@ -412,7 +412,7 @@ func generateTestState(t *testing.T) *core.State {
 	pools := make([]*core.Pool, 5)
 
 	//
-	bps := make([]*core.BlockProducer, len(pools) * int(core.TestConfig().PoolExecutorsNumber))
+	bps := make([]*core.BlockProducer, len(pools) * int(core.TestConfig().VaultSize))
 	for i := 0 ; i < len(bps) ; i++ {
 		sk := &bls.SecretKey{}
 		sk.SetByCSPRNG()
@@ -433,9 +433,9 @@ func generateTestState(t *testing.T) *core.State {
 
 	//
 	for i := 0 ; i < len(pools) ; i++ {
-		executors := make([]uint64, core.TestConfig().PoolExecutorsNumber)
-		for j := 0 ; j < int(core.TestConfig().PoolExecutorsNumber) ; j++ {
-			executors[j] = bps[i*int(core.TestConfig().PoolExecutorsNumber) + j].GetId()
+		executors := make([]uint64, core.TestConfig().VaultSize)
+		for j := 0 ; j < int(core.TestConfig().VaultSize) ; j++ {
+			executors[j] = bps[i*int(core.TestConfig().VaultSize) + j].GetId()
 		} // no need to sort as they are already
 
 		sk := &bls.SecretKey{}
