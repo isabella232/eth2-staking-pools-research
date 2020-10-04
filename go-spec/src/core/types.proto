@@ -4,6 +4,7 @@ package state;
 option go_package = ".;core";
 
 import "src/core/actions.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 message State {
     // time
@@ -39,7 +40,7 @@ message Pool {
 
 message BlockBody {
     uint64 Proposer = 1;
-    uint64 Epoch = 2;
+    uint64 Slot = 2;
     bytes ParentBlockRoot = 3;
     bytes Randao = 4;
     repeated CreateNewPoolRequest NewPoolReq = 5;
@@ -55,7 +56,7 @@ message BlockHeader {
 message Attestation {
     // A bitfield representation of validator indices that have voted exactly
     // the same vote and have been aggregated into this attestation.
-    bytes aggregation_bits = 1;
+    bytes aggregation_bits = 1 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitlist"];
     AttestationData data = 2;
     bytes signature = 3; // 96 byte BLS aggregate signature.
 }
@@ -101,4 +102,12 @@ message Checkpoint {
 message EpochAndBytes {
     uint64 Epoch = 1;
     bytes Bytes = 2;
+}
+
+message StateCommitment {
+    bytes StateRoot = 1; // pools chain state root as of the last block at said epoch
+    bytes Epoch = 2;
+    repeated bytes Committee = 3; // see https://github.com/ethereum/annotated-spec/blob/master/phase1/beacon-chain.md#compactcommittee
+    bytes AuxCommitteesRoot = 4;
+    repeated bytes NextCommittee = 5;
 }
