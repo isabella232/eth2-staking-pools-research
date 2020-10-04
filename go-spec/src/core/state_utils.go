@@ -6,21 +6,21 @@ import (
 )
 
 func CopyState(state *State) *State {
-	newBlockRoots := make([]*EpochAndBytes, len(state.BlockRoots))
+	newBlockRoots := make([]*SlotAndBytes, len(state.BlockRoots))
 	for i, r := range state.BlockRoots {
-		newBlockRoots[i] = &EpochAndBytes{}
+		newBlockRoots[i] = &SlotAndBytes{}
 		deepcopier.Copy(r).To(newBlockRoots[i])
 	}
 
-	newStateRoots := make([]*EpochAndBytes, len(state.StateRoots))
+	newStateRoots := make([]*SlotAndBytes, len(state.StateRoots))
 	for i, r := range state.StateRoots {
-		newStateRoots[i] = &EpochAndBytes{}
+		newStateRoots[i] = &SlotAndBytes{}
 		deepcopier.Copy(r).To(newStateRoots[i])
 	}
 
-	newSeeds := make([]*EpochAndBytes, len(state.Seeds))
+	newSeeds := make([]*SlotAndBytes, len(state.Seeds))
 	for i, r := range state.Seeds {
-		newSeeds[i] = &EpochAndBytes{}
+		newSeeds[i] = &SlotAndBytes{}
 		deepcopier.Copy(r).To(newSeeds[i])
 	}
 
@@ -38,7 +38,7 @@ func CopyState(state *State) *State {
 
 	return &State{
 		GenesisTime:    state.GenesisTime,
-		CurrentEpoch:   state.CurrentEpoch,
+		CurrentSlot:   state.CurrentSlot,
 		BlockRoots:     newBlockRoots,
 		StateRoots:     newStateRoots,
 		Seeds:          newSeeds,
@@ -48,9 +48,9 @@ func CopyState(state *State) *State {
 }
 
 // will return an 0 length byte array if not found
-func GetStateRoot(state *State, epoch uint64) []byte {
+func GetStateRoot(state *State, slot uint64) []byte {
 	for _, r := range state.StateRoots {
-		if r.Epoch == epoch {
+		if r.Slot == slot {
 			return r.Bytes
 		}
 	}
@@ -100,13 +100,24 @@ func GetPool(state *State, id uint64) *Pool {
 	return nil
 }
 
+// Returns the seed after randao was applied on the last slot of the epoch
 // will return error if not found
-func GetSeed(state *State, epoch uint64) ([]byte, error) {
+func GetEpochSeed(state *State, epoch uint64) ([]byte, error) {
+	targetSlot := epoch * TestConfig().SlotsInEpoch - 1 + TestConfig().SlotsInEpoch
+	seed, err := GetSeed(state, targetSlot)
+	if err != nil {
+		return []byte{}, fmt.Errorf("seed for epoch %d not found", epoch)
+	}
+	return seed, nil
+}
+
+// returns seed for a slot
+func GetSeed(state *State, slot uint64) ([]byte, error) {
 	for _, d := range state.Seeds {
-		if d.Epoch == epoch {
+		if d.Slot == slot {
 			return d.Bytes, nil
 		}
 	}
-	return []byte{}, fmt.Errorf("seed for epoch %d not found", epoch)
+	return []byte{}, fmt.Errorf("seed for slot %d not found", slot)
 }
 

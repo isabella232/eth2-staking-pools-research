@@ -12,7 +12,7 @@ import (
 // The previous epoch's seed is used to choose the DKG committee as the current one (the block's epoch)
 func VaultCommittee(state *core.State, poolId uint64, epoch uint64) ([]uint64,error) {
 	// TODO - handle integer overflow
-	seed, err := core.GetSeed(state, epoch - 1) // we always use the seed from previous epoch
+	seed, err := core.GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return []uint64{}, err
 	}
@@ -34,7 +34,7 @@ func SlotCommittee(state *core.State, slot uint64, committeeIdx uint64)([]uint64
 	slotInEpoch := slot - epoch * core.TestConfig().SlotsInEpoch
 
 	// TODO - handle integer overflow
-	seed, err := core.GetSeed(state, epoch - 1) // we always use the seed from previous epoch
+	seed, err := core.GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return []uint64{}, err
 	}
@@ -91,7 +91,7 @@ func BlockProposer(state *core.State, slot uint64) (uint64, error) {
 	epoch := core.TestConfig().SlotToEpoch(slot)
 	slotInEpoch := slot - epoch * core.TestConfig().SlotsInEpoch
 
-	seed, err := core.GetSeed(state, epoch - 1) // we always use the seed from previous epoch
+	seed, err := core.GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return 0, err
 	}

@@ -18,7 +18,7 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	}
 
 	// bump epoch
-	newState.CurrentEpoch = core.TestConfig().SlotToEpoch(body.Slot) // TODO - dynamic config
+	newState.CurrentSlot = body.Slot
 	// apply seed
 	newSeed, err := shared.MixSeed(
 		shared.SliceToByte32(oldState.Seeds[len(oldState.Seeds) - 1].Bytes), // previous seed
@@ -26,17 +26,17 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	if err != nil {
 		return nil, err
 	}
-	newState.Seeds = append(newState.Seeds, &core.EpochAndBytes{
-		Epoch:                newState.CurrentEpoch,
-		Bytes:                newSeed[:],
+	newState.Seeds = append(newState.Seeds, &core.SlotAndBytes{
+		Slot:                newState.CurrentSlot,
+		Bytes:               newSeed[:],
 	})
 	// add block root
 	root, err := ssz.HashTreeRoot(body)
 	if err != nil {
 		return nil, err
 	}
-	newState.BlockRoots = append(newState.BlockRoots, &core.EpochAndBytes{
-		Epoch:                newState.CurrentEpoch,
+	newState.BlockRoots = append(newState.BlockRoots, &core.SlotAndBytes{
+		Slot:                newState.CurrentSlot,
 		Bytes:               root[:],
 	})
 	// state root
@@ -44,10 +44,14 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	if err != nil {
 		return nil, err
 	}
-	newState.StateRoots = append(newState.StateRoots, &core.EpochAndBytes{
-		Epoch:                newState.CurrentEpoch,
+	newState.StateRoots = append(newState.StateRoots, &core.SlotAndBytes{
+		Slot:                 newState.CurrentSlot,
 		Bytes:                root[:],
 	})
+
+	if err := st.ApplySlot(newState, body); err != nil {
+		return nil, err
+	}
 
 	return newState, nil
 }

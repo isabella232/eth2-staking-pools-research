@@ -369,7 +369,7 @@ func generateTestState(t *testing.T) *core.State {
 		} // no need to sort as they are already
 
 		sk := &bls.SecretKey{}
-		sk.SetByCSPRNG()
+		sk.SetHexString(hex.EncodeToString([]byte(fmt.Sprintf("%d", uint64(i)))))
 
 		pools[i] = &core.Pool{
 			Id:              uint64(i),
@@ -380,24 +380,28 @@ func generateTestState(t *testing.T) *core.State {
 	}
 
 	ret := &core.State {
-		CurrentEpoch:1,
+		CurrentSlot:33,
 		Pools: pools,
 		BlockProducers: bps,
-		Seeds:          []*core.EpochAndBytes{
-			&core.EpochAndBytes{
-				Epoch:                0,
+		Seeds:          []*core.SlotAndBytes{
+			&core.SlotAndBytes{
+				Slot:                31,
 				Bytes:                []byte("seedseedseedseedseedseedseedseed"),
 			},
 		},
-		BlockRoots: 	[]*core.EpochAndBytes{
-			&core.EpochAndBytes{
-				Epoch:                0,
+		BlockRoots: 	[]*core.SlotAndBytes{
+			&core.SlotAndBytes{
+				Slot:                0,
 				Bytes:                toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
 			},
+			&core.SlotAndBytes{
+				Slot:                34,
+				Bytes:                toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e41"),
+			},
 		},
-		StateRoots: 	[]*core.EpochAndBytes{
-			&core.EpochAndBytes{
-				Epoch:                0,
+		StateRoots: 	[]*core.SlotAndBytes{
+			&core.SlotAndBytes{
+				Slot:                0,
 				Bytes:                toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e41"),
 			},
 		},
@@ -408,8 +412,8 @@ func generateTestState(t *testing.T) *core.State {
 		return nil
 	}
 
-	ret.StateRoots = append(ret.StateRoots, &core.EpochAndBytes{
-		Epoch:                0,
+	ret.StateRoots = append(ret.StateRoots, &core.SlotAndBytes{
+		Slot:                0,
 		Bytes:                root[:],
 	})
 

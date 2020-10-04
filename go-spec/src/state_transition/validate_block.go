@@ -11,8 +11,6 @@ import (
 )
 
 func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core.BlockHeader, body *core.BlockBody) error {
-	epoch := core.TestConfig().SlotToEpoch(body.Slot) // TODO - dynamic config
-
 	// check necessary vars are not nil
 	if len(body.Randao) != 32 {
 		return fmt.Errorf("RANDAO should be 32 byte")
@@ -22,12 +20,12 @@ func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core
 	}
 
 	// validate parent block root
-	if err := st.validateBlockRoots(state, body.ParentBlockRoot, epoch); err != nil {
+	if err := st.validateBlockRoots(state, body.ParentBlockRoot, body.Slot); err != nil {
 		return err
 	}
 
 	// verify proposer is expected proposer
-	expectedProposer, err := shared.BlockProposer(state, epoch)
+	expectedProposer, err := shared.BlockProposer(state,body.Slot)
 	if err != nil {
 		return err
 	}
@@ -72,9 +70,9 @@ func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core
 }
 
 func (st *StateTransition) PostApplyValidateBlock(newState *core.State, header *core.BlockHeader, body *core.BlockBody) error {
-	root := core.GetStateRoot(newState, newState.CurrentEpoch)
+	root := core.GetStateRoot(newState, newState.CurrentSlot)
 	if len(root) == 0 {
-		return fmt.Errorf("could not find statet root for epoch %d", newState.CurrentEpoch)
+		return fmt.Errorf("could not find statet root for epoch %d", newState.CurrentSlot)
 	}
 
 	// validate state root is equal to block
@@ -88,12 +86,12 @@ func (st *StateTransition) PostApplyValidateBlock(newState *core.State, header *
 // Rule 1: need to point to an existing parent block root
 // Rule 2: need to have a higher epoch
 // TODO - block 0?
-func (st *StateTransition) validateBlockRoots (state *core.State, parentBlockRoot []byte, epoch uint64) error {
+func (st *StateTransition) validateBlockRoots (state *core.State, parentBlockRoot []byte, slot uint64) error {
 	foundParent := false
 	for _, parent := range state.BlockRoots {
 		if bytes.Compare(parent.GetBytes(), parentBlockRoot) == 0 {
 			foundParent = true
-			if parent.Epoch >= epoch {
+			if parent.Slot >= slot {
 				return fmt.Errorf("new block's parent block root can't be of a future epoch")
 			}
 		}

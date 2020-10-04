@@ -9,12 +9,12 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 message State {
     // time
     uint64 GenesisTime = 1;
-    uint64 CurrentEpoch = 2;
+    uint64 CurrentSlot = 2;
 
     // past
-    repeated EpochAndBytes BlockRoots = 3;
-    repeated EpochAndBytes StateRoots = 4;
-    repeated EpochAndBytes Seeds = 5;
+    repeated SlotAndBytes BlockRoots = 3;
+    repeated SlotAndBytes StateRoots = 4;
+    repeated SlotAndBytes Seeds = 5;
 
     // network
     repeated BlockProducer BlockProducers = 6;
@@ -99,8 +99,8 @@ message Checkpoint {
     bytes root = 2;
 }
 
-message EpochAndBytes {
-    uint64 Epoch = 1;
+message SlotAndBytes {
+    uint64 Slot = 1;
     bytes Bytes = 2;
 }
 

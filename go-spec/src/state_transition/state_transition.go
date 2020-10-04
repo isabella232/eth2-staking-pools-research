@@ -14,6 +14,7 @@ type IStateTransition interface {
 	// Give a block, apply it's transactions on the current state.
 	// Returns a new state post block.
 	ApplyBlock(oldState *core.State, head *core.BlockHeader, newBlockBody *core.BlockBody) (newState *core.State, err error)
+	ApplySlot(state *core.State, body *core.BlockBody) error
 
 	ProcessNewPoolRequests(state *core.State, blockBody *core.BlockBody) error
 	ProcessBlockAttestations(state *core.State, blockBody *core.BlockBody) error
@@ -32,9 +33,9 @@ func CalculateAndInsertStateRootToBlock(state *core.State, body *core.BlockBody)
 		return []byte{}, err
 	}
 
-	root := core.GetStateRoot(newState, newState.CurrentEpoch)
+	root := core.GetStateRoot(newState, newState.CurrentSlot)
 	if len(root) == 0 {
-		return []byte{}, fmt.Errorf("could not find statet root for epoch %d", newState.CurrentEpoch)
+		return []byte{}, fmt.Errorf("could not find statet root for epoch %d", newState.CurrentSlot)
 	}
 
 	return root[:], nil
