@@ -34,7 +34,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber ; i++ {
+	for i := uint64(0) ; i < core.TestConfig().VaultSize ; i++ {
 		bp := core.GetBlockProducer(newState, committee[i])
 		if participation.BitAt(i) {
 			require.EqualValues(t, 2000, bp.CDTBalance)
@@ -77,7 +77,7 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber ; i++ {
+	for i := uint64(0) ; i < core.TestConfig().VaultSize ; i++ {
 		bp := core.GetBlockProducer(newState, committee[i])
 		require.EqualValues(t, 0, bp.CDTBalance)
 	}

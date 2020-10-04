@@ -13,21 +13,23 @@ func TestFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateFinalizedAttestationPoolHeadAndBody(state)
-
+	body := &core.BlockBody{
+		Slot:                 33,
+		Attestations:         generateAttestations(state,128, 33,0,true, 0 /* attestation */),
+	}
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlock(state, body)
+	err := st.processExecutionSummaries(state, body.Attestations[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
-	participation := bitfield.Bitlist{1,3,88,12,43,12,89,35,1,0,99,16,63,13,33,0}
-	committee := core.GetPool(newState, 3).SortedCommittee
+	participation := bitfield.Bitlist{1,3,88}
+	committee := core.GetPool(state, 3).SortedCommittee
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber; i++ { // pool id = 3
-		bp := core.GetBlockProducer(newState, committee[i])
+	for i := uint64(0) ; i < core.TestConfig().VaultSize; i++ { // pool id = 3
+		bp := core.GetBlockProducer(state, committee[i])
 		if participation.BitAt(i) {
 			require.EqualValues(t, 1100, bp.CDTBalance)
 		} else {
@@ -41,20 +43,23 @@ func TestNotFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateNotFinalizedAttestationPoolHeadAndBody(state)
+	body := &core.BlockBody{
+		Slot:                 33,
+		Attestations:         generateAttestations(state,128, 33,0,false, 0 /* attestation */),
+	}
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlock(state, body)
+	err := st.processExecutionSummaries(state, body.Attestations[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
-	committee := core.GetPool(newState, 3).SortedCommittee
+	committee := core.GetPool(state, 3).SortedCommittee
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber; i++ { // pool id = 3
-		bp := core.GetBlockProducer(newState, committee[i])
+	for i := uint64(0) ; i < core.TestConfig().VaultSize; i++ { // pool id = 3
+		bp := core.GetBlockProducer(state, committee[i])
 		require.EqualValues(t, 800, bp.CDTBalance)
 	}
 }
@@ -64,21 +69,23 @@ func TestFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateFinalizedProposalPoolHeadAndBody(state)
-
+	body := &core.BlockBody{
+		Slot:                 33,
+		Attestations:         generateAttestations(state,128, 33,0,true, 1 /* proposal */),
+	}
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlock(state, body)
+	err := st.processExecutionSummaries(state, body.Attestations[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
-	participation := bitfield.Bitlist{1,3,88,12,43,12,89,35,1,0,99,16,63,13,33,0}
-	committee := core.GetPool(newState, 3).SortedCommittee
+	participation := bitfield.Bitlist{1,3,88}
+	committee := core.GetPool(state, 3).SortedCommittee
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber; i++ { // pool id = 3
-		bp := core.GetBlockProducer(newState, committee[i])
+	for i := uint64(0) ; i < core.TestConfig().VaultSize; i++ { // pool id = 3
+		bp := core.GetBlockProducer(state, committee[i])
 		if participation.BitAt(i) {
 			require.EqualValues(t, 1200, bp.CDTBalance)
 		} else {
@@ -92,20 +99,23 @@ func TestNotFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	_, body := GenerateNotFinalizedProposalPoolHeadAndBody(state)
+	body := core.BlockBody{
+		Slot:                 33,
+		Attestations:         generateAttestations(state,128, 33,0,false, 1 /* proposal */),
+	}
 
 	st := NewStateTransition()
 
-	newState, err := st.ApplyBlock(state, body)
+	err := st.processExecutionSummaries(state, body.Attestations[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
-	committee := core.GetPool(newState, 3).SortedCommittee
+	committee := core.GetPool(state, 3).SortedCommittee
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber; i++ { // pool id = 3
-		bp := core.GetBlockProducer(newState, committee[i])
+	for i := uint64(0) ; i < core.TestConfig().VaultSize; i++ { // pool id = 3
+		bp := core.GetBlockProducer(state, committee[i])
 		require.EqualValues(t, 600, bp.CDTBalance)
 	}
 }

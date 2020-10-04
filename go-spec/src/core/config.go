@@ -2,7 +2,6 @@ package core
 
 type Config struct {
 	VaultSize             uint64
-	DKGParticipantsNumber uint64
 	BaseEth2DutyReward    uint64
 	DKGReward             uint64
 
@@ -15,7 +14,6 @@ type Config struct {
 func TestConfig() *Config {
 	return &Config{
 		VaultSize:             24,
-		DKGParticipantsNumber: 128, // TODO - remove and use VaultSize
 
 		BaseEth2DutyReward:    100,
 		DKGReward:             1000,
