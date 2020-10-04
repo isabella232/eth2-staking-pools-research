@@ -9,6 +9,7 @@ type Config struct {
 	// slots and epochs
 	SlotsInEpoch                uint64
 	MinAttestationCommitteeSize uint64
+	MaxAttestationCommitteeSize	uint64
 }
 
 func TestConfig() *Config {
@@ -21,6 +22,7 @@ func TestConfig() *Config {
 
 		SlotsInEpoch:                32,
 		MinAttestationCommitteeSize: 128,
+		MaxAttestationCommitteeSize: 2048,
 	}
 }
 

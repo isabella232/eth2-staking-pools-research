@@ -1,6 +1,8 @@
 syntax = "proto3";
 package state;
 
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
 option go_package = ".;core";
 
 // A request struct for creating new pool credentials
@@ -23,5 +25,5 @@ message CreateNewPoolRequest {
   uint64 EndEpoch = 4; // max epoch for the request to be completed or failed
   uint64 LeaderBlockProducer = 5; // should be the BP proposer of next block after which this request was included in.
   bytes CreatePubKey = 6; // populated after DKG is successful
-  bytes Participation = 7; // 128 bit of the executors (by order) which executed this duty
+  bytes Participation = 7 [(gogoproto.moretags) = "ssz-max:\"3\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitlist"]; // 24 bit of the executors (by order) which executed this duty
 }

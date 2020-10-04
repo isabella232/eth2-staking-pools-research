@@ -3,7 +3,6 @@ package state_transition
 import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 )
 
 func (st *StateTransition) validateExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error {
@@ -44,7 +43,7 @@ func (st *StateTransition) processExecutionSummaries(state *core.State, summarie
 						}
 					} else {
 						participation := duty.GetParticipation()
-						if shared.IsBitSet(participation, uint64(i)) {
+						if participation.BitAt(uint64(i)) {
 							core.IncreaseBPBalance(bp, core.TestConfig().BaseEth2DutyReward)
 						} else {
 							err := core.DecreaseBPBalance(bp, core.TestConfig().BaseEth2DutyReward)
@@ -68,7 +67,7 @@ func (st *StateTransition) processExecutionSummaries(state *core.State, summarie
 						}
 					} else {
 						participation := duty.GetParticipation()
-						if shared.IsBitSet(participation[:], uint64(i)) {
+						if participation[:].BitAt(uint64(i)) {
 							core.IncreaseBPBalance(bp, 2*core.TestConfig().BaseEth2DutyReward)
 						} else {
 							err := core.DecreaseBPBalance(bp, 2*core.TestConfig().BaseEth2DutyReward)

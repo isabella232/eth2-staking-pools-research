@@ -61,7 +61,7 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 					return fmt.Errorf("could not find BP %d", committee[i])
 				}
 				partic := req.GetParticipation()
-				if shared.IsBitSet(partic[:], uint64(i)) {
+				if partic[:].BitAt(uint64(i)) {
 					core.IncreaseBPBalance(bp, core.TestConfig().DKGReward)
 				} else {
 					err := core.DecreaseBPBalance(bp, core.TestConfig().DKGReward)

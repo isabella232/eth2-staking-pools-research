@@ -15,9 +15,8 @@ type IStateTransition interface {
 	// Returns a new state post block.
 	ApplyBlock(oldState *core.State, head *core.BlockHeader, newBlockBody *core.BlockBody) (newState *core.State, err error)
 
-	ProcessExecutionSummaries(state *core.State, summaries []*core.ExecutionSummary) error
-	ProcessNewPoolRequests(state *core.State, summaries []*core.CreateNewPoolRequest) error
-	ProcessBlockAttestations(state *core.State, attestations []*core.Attestation) error
+	ProcessNewPoolRequests(state *core.State, blockBody *core.BlockBody) error
+	ProcessBlockAttestations(state *core.State, blockBody *core.BlockBody) error
 }
 
 type StateTransition struct {}

@@ -1,7 +1,6 @@
 package core
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/ulule/deepcopier"
 )
@@ -71,20 +70,10 @@ func IncreaseBPBalance(bp *BlockProducer, change uint64) {
 	bp.CDTBalance += change
 }
 
-// will return nil if not found
+// will return nil if not found or inactive
 func GetBlockProducer(state *State, id uint64) *BlockProducer {
 	for _, p := range state.BlockProducers {
-		if p.GetId() == id {
-			return p
-		}
-	}
-	return nil
-}
-
-// will return nil if not found
-func GetBlockProducerPubKey(state *State, pubKey []byte) *BlockProducer {
-	for _, p := range state.BlockProducers {
-		if bytes.Compare(p.PubKey, pubKey) == 0 {
+		if p.GetId() == id && p.Active {
 			return p
 		}
 	}

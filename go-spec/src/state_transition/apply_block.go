@@ -13,12 +13,12 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	if err := st.ProcessNewPoolRequests(newState, body.NewPoolReq); err != nil {
 		return nil,err
 	}
-	if err := st.ProcessBlockAttestations(newState, body.Attestations); err != nil {
+	if err := st.ProcessBlockAttestations(newState, body); err != nil {
 		return nil,err
 	}
 
 	// bump epoch
-	newState.CurrentEpoch = body.Epoch
+	newState.CurrentEpoch = core.TestConfig().SlotToEpoch(body.Slot) // TODO - dynamic config
 	// apply seed
 	newSeed, err := shared.MixSeed(
 		shared.SliceToByte32(oldState.Seeds[len(oldState.Seeds) - 1].Bytes), // previous seed

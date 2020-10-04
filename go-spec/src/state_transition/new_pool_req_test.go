@@ -4,6 +4,7 @@ import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
+	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/stretchr/testify/require"
 	"sort"
 	"testing"
@@ -25,7 +26,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	require.Equal(t, 6, len(newState.Pools))
 
 	// check rewards
-	participation := []byte{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1}
+	participation := bitfield.Bitlist{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1}
 	committee, err := shared.VaultCommittee(newState, 6, 1)
 	sort.Slice(committee, func(i int, j int) bool {
 		return committee[i] < committee[j]
@@ -35,7 +36,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	// test penalties/ rewards
 	for i := uint64(0) ; i < core.TestConfig().DKGParticipantsNumber ; i++ {
 		bp := core.GetBlockProducer(newState, committee[i])
-		if shared.IsBitSet(participation, i) {
+		if participation.BitAt(i) {
 			require.EqualValues(t, 2000, bp.CDTBalance)
 		} else {
 			require.EqualValues(t, 0, bp.CDTBalance)

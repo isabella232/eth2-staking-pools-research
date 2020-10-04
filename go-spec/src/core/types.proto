@@ -81,7 +81,7 @@ message BeaconDuty {
     uint64 Committee = 2;
     uint64 Slot = 3;
     bool Finalized = 4;
-    bytes Participation = 5; // 128 bit of the executors (by order) which executed this duty
+    bytes Participation = 5 [(gogoproto.moretags) = "ssz-max:\"3\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitlist"]; // 24 bit of the executors (by order) which executed this duty
 }
 
 message ExecutionSummary {

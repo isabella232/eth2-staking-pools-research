@@ -5,11 +5,14 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-ssz"
 )
 
 func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core.BlockHeader, body *core.BlockBody) error {
+	epoch := core.TestConfig().SlotToEpoch(body.Slot) // TODO - dynamic config
+
 	// check necessary vars are not nil
 	if len(body.Randao) != 32 {
 		return fmt.Errorf("RANDAO should be 32 byte")
@@ -19,12 +22,12 @@ func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core
 	}
 
 	// validate parent block root
-	if err := st.validateBlockRoots(state, body.ParentBlockRoot, body.Epoch); err != nil {
+	if err := st.validateBlockRoots(state, body.ParentBlockRoot, epoch); err != nil {
 		return err
 	}
 
 	// verify proposer is expected proposer
-	expectedProposer, err := core.GetBlockProposer(state, body.Epoch)
+	expectedProposer, err := shared.BlockProposer(state, epoch)
 	if err != nil {
 		return err
 	}
