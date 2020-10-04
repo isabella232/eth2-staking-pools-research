@@ -66,19 +66,3 @@ func TestBlockApplyConsistency(t *testing.T) {
 	require.NoError(t, err)
 	require.EqualValues(t, preRoot, post)
 }
-
-func TestBlockApplyPostRoot(t *testing.T) {
-	t.Skipf("need to test static state transition")
-	// TODO - need to test static state transition
-	//require.NoError(t, bls.Init(bls.BLS12_381))
-	//require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
-	//
-	//state := generateTestState(t)
-	//_, body := GenerateValidHeadAndBody(state)
-	//st := NewStateTransition()
-	//newState, err := st.ApplyBlock(state, body)
-	//require.NoError(t, err)
-	//
-	//fmt.Printf("%s\n", hex.EncodeToString(core.GetStateRoot(newState, newState.CurrentEpoch)))
-	//require.EqualValues(t, toByte(""), core.GetStateRoot(newState, newState.CurrentEpoch))
-}
