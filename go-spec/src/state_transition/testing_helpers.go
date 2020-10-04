@@ -293,10 +293,10 @@ func GenerateInvalidETH1HeadAndBody(state *core.State)(*core.BlockHeader, *core.
 	)
 }
 
-func GenerateInvalidETH2HeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
+func GenerateInsufficientAttSigsHeadAndBody(state *core.State)(*core.BlockHeader, *core.BlockBody) {
 	return generateHeaderAndBody(
 		state,
-		33,
+		35,
 		17,
 		SK,
 		"",
@@ -305,7 +305,7 @@ func GenerateInvalidETH2HeadAndBody(state *core.State)(*core.BlockHeader, *core.
 		true,
 		toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 		toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		nil,
+		generateAttestations(state,85, 35,0,true, 0 /* attestation */),
 	)
 }
 
@@ -375,7 +375,7 @@ func generateAttestations(
 		aggBits.SetBitAt(uint64(i), true)
 		signed ++
 
-		if signed > howManyBpSig {
+		if signed >= howManyBpSig {
 			break
 		}
 	}

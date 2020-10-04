@@ -64,6 +64,11 @@ func validateSignature(state *core.State, attestation *core.Attestation, slot ui
 		}
 	}
 
+	// threshold passed
+	if len(expectedCommittee) * 2 > 3 * len(pks) {
+		return fmt.Errorf("attestation did not pass threshold")
+	}
+
 	// verify
 	sig := &bls.Sign{}
 	err = sig.Deserialize(attestation.Signature)
