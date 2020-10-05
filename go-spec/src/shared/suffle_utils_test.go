@@ -206,7 +206,7 @@ func TestCommitteeShuffling(t *testing.T) {
 			require.NoError(t, err)
 			require.EqualValues(t, test.expectedVaultCommittee, pc)
 
-			voting,err := SlotCommittee(state, test.slot, test.committeeId)
+			voting,err := SlotCommitteeByIndex(state, test.slot, test.committeeId)
 			require.NoError(t, err)
 			require.EqualValues(t, test.expectedAttestationCommittee, voting)
 

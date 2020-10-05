@@ -30,7 +30,7 @@ func VaultCommittee(state *core.State, poolId uint64, epoch uint64) ([]uint64,er
 
 // Slot committee is chosen randomly by shuffling a seed + category (block voting committee)
 // The previous epoch's seed is used to choose the block voting committee as the current one (the block's epoch)
-func SlotCommittee(state *core.State, slot uint64, committeeIdx uint64)([]uint64, error) {
+func SlotCommitteeByIndex(state *core.State, slot uint64, committeeIdx uint64)([]uint64, error) {
 	epoch := params.SlotToEpoch(slot)
 	slotInEpoch := slot - epoch * params.ChainConfig.SlotsInEpoch
 
@@ -49,6 +49,14 @@ func SlotCommittee(state *core.State, slot uint64, committeeIdx uint64)([]uint64
 	}
 
 	return CommitteeStructure(shuffled)[slotInEpoch][committeeIdx], nil
+}
+
+func SlotCommitteeCount(state *core.State, slot uint64) int { // TODO - tests
+	epoch := params.SlotToEpoch(slot)
+	slotInEpoch := slot - epoch * params.ChainConfig.SlotsInEpoch
+
+	bps := GetActiveBlockProducers(state, epoch) // no need to shuffle as we only get structure
+	return len(CommitteeStructure(bps)[slotInEpoch])
 }
 
 func CommitteeStructure(activeBps []uint64) map[uint64][][]uint64 /* slot -> []committee */ {

@@ -65,7 +65,7 @@ func generateAttestations(
 		return nil
 	}
 
-	expectedCommittee, err := shared.SlotCommittee(state, data.Slot, uint64(data.CommitteeIndex))
+	expectedCommittee, err := shared.SlotCommitteeByIndex(state, data.Slot, uint64(data.CommitteeIndex))
 	if err != nil {
 		return nil
 	}

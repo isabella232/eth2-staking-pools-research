@@ -13,8 +13,8 @@ func TestProcessBlockAttestations(t *testing.T) {
 
 	state := generateTestState(t)
 	body := &core.BlockBody{
-		Slot:                 35,
-		Attestations:         generateAttestations(state,86, 35,0,true, 0 /* attestation */),
+		Slot:                 32,
+		Attestations:         generateAttestations(state,86, 32,0,true, 0 /* attestation */),
 	}
 
 	st := NewStateTransition()
@@ -27,8 +27,8 @@ func TestProcessBlockAttestationsWithoutThreshold(t *testing.T) {
 
 	state := generateTestState(t)
 	body := &core.BlockBody{
-		Slot:                 35,
-		Attestations:         generateAttestations(state,85, 35,0,true, 0 /* attestation */),
+		Slot:                 32,
+		Attestations:         generateAttestations(state,85, 32,0,true, 0 /* attestation */),
 	}
 
 	st := NewStateTransition()
