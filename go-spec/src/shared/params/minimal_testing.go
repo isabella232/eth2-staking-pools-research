@@ -1,11 +1,17 @@
 package params
 
-import "github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+import (
+	"encoding/hex"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+)
 
 func testConfig() *core.PoolsChainConfig {
-	return &core.PoolsChainConfig{
-		VaultSize:             24,
+	genesisSeed,_ := hex.DecodeString("sdddseedseedseedseedseedseedseed")
 
+	return &core.PoolsChainConfig{
+		GenesisSeed: 	       genesisSeed,
+
+		VaultSize:             24,
 		BaseEth2DutyReward:    100,
 		DKGReward:             1000,
 

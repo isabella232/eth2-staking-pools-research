@@ -4,13 +4,15 @@ package state;
 option go_package = ".;core";
 
 message PoolsChainConfig {
-  uint64 VaultSize = 1;
-  uint64 BaseEth2DutyReward = 2;
-  uint64 DKGReward = 3; // TODO - change naming
+  bytes GenesisSeed = 1; // should be auto calculated somehow
+
+  uint64 VaultSize = 2;
+  uint64 BaseEth2DutyReward = 3;
+  uint64 DKGReward = 4; // TODO - change naming
 
   // slots and epochs
-  uint64 SlotsInEpoch = 4;
-  uint64 MinAttestationCommitteeSize = 5;
-  uint64 MaxAttestationCommitteeSize = 6;
-  uint64 MinAttestationInclusionDelay = 7;
+  uint64 SlotsInEpoch = 5;
+  uint64 MinAttestationCommitteeSize = 6;
+  uint64 MaxAttestationCommitteeSize = 7;
+  uint64 MinAttestationInclusionDelay = 8;
 }

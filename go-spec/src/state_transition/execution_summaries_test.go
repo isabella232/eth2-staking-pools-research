@@ -17,7 +17,16 @@ func TestFinalizedAttestation(t *testing.T) {
 	state := generateTestState(t)
 	body := &core.BlockBody{
 		Slot:                 33,
-		Attestations:         generateAttestations(state,128, 33,0,true, 0 /* attestation */),
+		Attestations:         generateAttestations(
+			state,
+			128,
+			33,
+			0,
+			1,
+			0,
+			true,
+			0, /* attestation */
+			),
 	}
 	st := NewStateTransition()
 
@@ -47,7 +56,16 @@ func TestNotFinalizedAttestation(t *testing.T) {
 	state := generateTestState(t)
 	body := &core.BlockBody{
 		Slot:                 33,
-		Attestations:         generateAttestations(state,128, 33,0,false, 0 /* attestation */),
+		Attestations:         generateAttestations(
+			state,
+			128,
+			33,
+			0,
+			1,
+			0,
+			false,
+			0, /* attestation */
+			),
 	}
 
 	st := NewStateTransition()
@@ -73,7 +91,16 @@ func TestFinalizedProposal(t *testing.T) {
 	state := generateTestState(t)
 	body := &core.BlockBody{
 		Slot:                 33,
-		Attestations:         generateAttestations(state,128, 33,0,true, 1 /* proposal */),
+		Attestations:         generateAttestations(
+			state,
+			128,
+			33,
+			0,
+			1,
+			0,
+			true,
+			1, /* proposal */
+			),
 	}
 	st := NewStateTransition()
 
@@ -103,7 +130,16 @@ func TestNotFinalizedProposal(t *testing.T) {
 	state := generateTestState(t)
 	body := core.BlockBody{
 		Slot:                 33,
-		Attestations:         generateAttestations(state,128, 33,0,false, 1 /* proposal */),
+		Attestations:         generateAttestations(
+			state,
+			128,
+			33,
+			0,
+			1,
+			0,
+			false,
+			1, /* proposal */
+			),
 	}
 
 	st := NewStateTransition()

@@ -60,6 +60,16 @@ func (st *StateTransition) processAttestation(state *core.State, attestation *co
 		return err
 	}
 
+	// match aggregation bits with committee
+	expectedCommittee, err := shared.SlotCommitteeByIndex(state, attestation.Data.Slot, uint64(attestation.Data.CommitteeIndex))
+	if err != nil {
+		return err
+	}
+	if len(expectedCommittee) != len(attestation.AggregationBits) {
+		return fmt.Errorf("aggregation bits != committee size")
+	}
+
+
 	// process execution summaries
 	if err := st.processExecutionSummaries(state, attestation.Data.ExecutionSummaries); err != nil {
 		return err
@@ -84,7 +94,7 @@ func validateAttestationData(state *core.State, data *core.AttestationData) erro
 	}
 
 	if params.SlotToEpoch(data.Slot) != data.Target.Epoch {
-		return fmt.Errorf("target slot incorrect")
+		return fmt.Errorf("target slot not in the correct epoch")
 	}
 
 	if data.Slot + params.ChainConfig.MinAttestationInclusionDelay > state.CurrentSlot {

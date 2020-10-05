@@ -35,7 +35,13 @@ func SlotCommitteeByIndex(state *core.State, slot uint64, committeeIdx uint64)([
 	slotInEpoch := slot - epoch * params.ChainConfig.SlotsInEpoch
 
 	// TODO - handle integer overflow
-	seed, err := GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
+	var seed []byte
+	var err error
+	if epoch == 0 {
+		seed = params.ChainConfig.GenesisSeed // TODO - double check
+	} else {
+		seed, err = GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
+	}
 	if err != nil {
 		return []uint64{}, err
 	}
@@ -46,6 +52,11 @@ func SlotCommitteeByIndex(state *core.State, slot uint64, committeeIdx uint64)([
 	)
 	if err != nil {
 		return nil, err
+	}
+
+	retAll := CommitteeStructure(shuffled)[slotInEpoch]
+	if uint64(len(retAll)) < committeeIdx {
+		return nil, fmt.Errorf("committee index out of range")
 	}
 
 	return CommitteeStructure(shuffled)[slotInEpoch][committeeIdx], nil

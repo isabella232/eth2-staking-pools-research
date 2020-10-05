@@ -25,6 +25,8 @@ func generateAttestations(
 	state *core.State,
 	howManyBpSig uint64,
 	slot uint64,
+	sourceEpoch uint64,
+	targetEpoch uint64,
 	committeeIdx uint32,
 	finalized bool,
 	dutyType int32, // 0 - attestation, 1 - proposal, 2 - aggregation
@@ -35,11 +37,11 @@ func generateAttestations(
 		CommitteeIndex:       committeeIdx,
 		BeaconBlockRoot:      []byte("block root"),
 		Source:               &core.Checkpoint{
-			Epoch:                0,
+			Epoch:                sourceEpoch,
 			Root:                 []byte{},
 		},
 		Target:               &core.Checkpoint{
-			Epoch:                1,
+			Epoch:                targetEpoch,
 			Root:                 []byte{},
 		},
 		ExecutionSummaries:   []*core.ExecutionSummary{
@@ -71,7 +73,7 @@ func generateAttestations(
 	}
 
 	var aggregatedSig *bls.Sign
-	aggBits := make(bitfield.Bitlist, params.ChainConfig.MaxAttestationCommitteeSize) // for bytes
+	aggBits := make(bitfield.Bitlist, len(expectedCommittee)) // for bytes
 	signed := uint64(0)
 	for i, bpId := range expectedCommittee {
 		bp := shared.GetBlockProducer(state, bpId)
@@ -211,6 +213,14 @@ func generateTestState(t *testing.T) *core.State {
 			&core.SlotAndBytes{
 				Slot:                31,
 				Bytes:                []byte("seedseedseedseedseedseedseedseed"),
+			},
+			&core.SlotAndBytes{
+				Slot:                63,
+				Bytes:                []byte("seedseedseedseedseedseedseedsedd"),
+			},
+			&core.SlotAndBytes{
+				Slot:                95,
+				Bytes:                []byte("seedseedseedseedseedseedseedsddd"),
 			},
 		},
 		BlockRoots: 	[]*core.SlotAndBytes{
