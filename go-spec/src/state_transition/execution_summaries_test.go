@@ -2,6 +2,8 @@ package state_transition
 
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/stretchr/testify/require"
@@ -24,12 +26,12 @@ func TestFinalizedAttestation(t *testing.T) {
 
 	// check rewards
 	participation := bitfield.Bitlist{1,3,88}
-	committee := core.GetPool(state, 3).SortedCommittee
+	committee := shared.GetPool(state, 3).SortedCommittee
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().VaultSize; i++ { // pool id = 3
-		bp := core.GetBlockProducer(state, committee[i])
+	for i := uint64(0) ; i < params.ChainConfig.VaultSize; i++ { // pool id = 3
+		bp := shared.GetBlockProducer(state, committee[i])
 		if participation.BitAt(i) {
 			require.EqualValues(t, 1100, bp.CDTBalance)
 		} else {
@@ -54,12 +56,12 @@ func TestNotFinalizedAttestation(t *testing.T) {
 	require.NoError(t, err)
 
 	// check rewards
-	committee := core.GetPool(state, 3).SortedCommittee
+	committee := shared.GetPool(state, 3).SortedCommittee
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().VaultSize; i++ { // pool id = 3
-		bp := core.GetBlockProducer(state, committee[i])
+	for i := uint64(0) ; i < params.ChainConfig.VaultSize; i++ { // pool id = 3
+		bp := shared.GetBlockProducer(state, committee[i])
 		require.EqualValues(t, 800, bp.CDTBalance)
 	}
 }
@@ -80,12 +82,12 @@ func TestFinalizedProposal(t *testing.T) {
 
 	// check rewards
 	participation := bitfield.Bitlist{1,3,88}
-	committee := core.GetPool(state, 3).SortedCommittee
+	committee := shared.GetPool(state, 3).SortedCommittee
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().VaultSize; i++ { // pool id = 3
-		bp := core.GetBlockProducer(state, committee[i])
+	for i := uint64(0) ; i < params.ChainConfig.VaultSize; i++ { // pool id = 3
+		bp := shared.GetBlockProducer(state, committee[i])
 		if participation.BitAt(i) {
 			require.EqualValues(t, 1200, bp.CDTBalance)
 		} else {
@@ -110,12 +112,12 @@ func TestNotFinalizedProposal(t *testing.T) {
 	require.NoError(t, err)
 
 	// check rewards
-	committee := core.GetPool(state, 3).SortedCommittee
+	committee := shared.GetPool(state, 3).SortedCommittee
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().VaultSize; i++ { // pool id = 3
-		bp := core.GetBlockProducer(state, committee[i])
+	for i := uint64(0) ; i < params.ChainConfig.VaultSize; i++ { // pool id = 3
+		bp := shared.GetBlockProducer(state, committee[i])
 		require.EqualValues(t, 600, bp.CDTBalance)
 	}
 }

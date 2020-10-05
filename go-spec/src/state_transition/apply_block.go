@@ -7,7 +7,10 @@ import (
 )
 
 func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody) (newState *core.State, err error) {
-	newState = core.CopyState(oldState)
+	newState = shared.CopyState(oldState)
+
+	// bump epoch
+	newState.CurrentSlot = body.Slot
 
 	// process
 	if err := st.ProcessNewPoolRequests(newState, body.NewPoolReq); err != nil {
@@ -17,8 +20,6 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 		return nil,err
 	}
 
-	// bump epoch
-	newState.CurrentSlot = body.Slot
 	// apply seed
 	newSeed, err := shared.MixSeed(
 		shared.SliceToByte32(oldState.Seeds[len(oldState.Seeds) - 1].Bytes), // previous seed

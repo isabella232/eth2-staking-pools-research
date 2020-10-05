@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/prysmaticlabs/go-ssz"
@@ -43,8 +44,8 @@ func generateAttestations(
 		},
 		ExecutionSummaries:   []*core.ExecutionSummary{
 			&core.ExecutionSummary{
-				PoolId:               3,
-				Epoch:                core.TestConfig().SlotToEpoch(slot),
+				PoolId: 3,
+				Epoch:  params.SlotToEpoch(slot),
 				Duties:               []*core.BeaconDuty{
 					&core.BeaconDuty{
 						Type:                 dutyType, // attestation
@@ -70,10 +71,10 @@ func generateAttestations(
 	}
 
 	var aggregatedSig *bls.Sign
-	aggBits := make(bitfield.Bitlist, core.TestConfig().MaxAttestationCommitteeSize) // for bytes
+	aggBits := make(bitfield.Bitlist, params.ChainConfig.MaxAttestationCommitteeSize) // for bytes
 	signed := uint64(0)
 	for i, bpId := range expectedCommittee {
-		bp := core.GetBlockProducer(state, bpId)
+		bp := shared.GetBlockProducer(state, bpId)
 		sk := &bls.SecretKey{}
 		sk.SetHexString(hex.EncodeToString([]byte(fmt.Sprintf("%d", bp.Id))))
 
@@ -165,7 +166,7 @@ func generateTestState(t *testing.T) *core.State {
 	pools := make([]*core.Pool, 128)
 
 	// block producers
-	bps := make([]*core.BlockProducer, len(pools) * int(core.TestConfig().VaultSize))
+	bps := make([]*core.BlockProducer, len(pools) * int(params.ChainConfig.VaultSize))
 	for i := 0 ; i < len(bps) ; i++ {
 		sk := &bls.SecretKey{}
 		sk.SetHexString(hex.EncodeToString([]byte(fmt.Sprintf("%d", uint64(i)))))
@@ -186,9 +187,9 @@ func generateTestState(t *testing.T) *core.State {
 
 	// vaults (pool)
 	for i := 0 ; i < len(pools) ; i++ {
-		executors := make([]uint64, core.TestConfig().VaultSize)
-		for j := 0 ; j < int(core.TestConfig().VaultSize) ; j++ {
-			executors[j] = bps[i*int(core.TestConfig().VaultSize) + j].GetId()
+		executors := make([]uint64, params.ChainConfig.VaultSize)
+		for j := 0 ; j < int(params.ChainConfig.VaultSize) ; j++ {
+			executors[j] = bps[i*int(params.ChainConfig.VaultSize) + j].GetId()
 		} // no need to sort as they are already
 
 		sk := &bls.SecretKey{}

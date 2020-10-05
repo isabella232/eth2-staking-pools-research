@@ -3,6 +3,7 @@ package state_transition
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/stretchr/testify/require"
@@ -47,8 +48,8 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().VaultSize ; i++ {
-		bp := core.GetBlockProducer(state, committee[i])
+	for i := uint64(0) ; i < params.ChainConfig.VaultSize ; i++ {
+		bp := shared.GetBlockProducer(state, committee[i])
 		if participation.BitAt(i) {
 			require.EqualValues(t, 2000, bp.CDTBalance)
 		} else {
@@ -57,11 +58,11 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	}
 
 	// leader reward
-	bp := core.GetBlockProducer(state, 1)
+	bp := shared.GetBlockProducer(state, 1)
 	require.EqualValues(t, 4000, bp.CDTBalance)
 
 	// pool data
-	pool := core.GetPool(state, 129)
+	pool := shared.GetPool(state, 129)
 	require.NotNil(t, pool)
 	require.EqualValues(t, toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), pool.PubKey)
 	require.EqualValues(t, committee, pool.SortedCommittee)
@@ -103,13 +104,13 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, err)
 
 	// test penalties/ rewards
-	for i := uint64(0) ; i < core.TestConfig().VaultSize ; i++ {
-		bp := core.GetBlockProducer(state, committee[i])
+	for i := uint64(0) ; i < params.ChainConfig.VaultSize ; i++ {
+		bp := shared.GetBlockProducer(state, committee[i])
 		require.EqualValues(t, 0, bp.CDTBalance)
 	}
 
 	// leader reward
-	bp := core.GetBlockProducer(state, 1)
+	bp := shared.GetBlockProducer(state, 1)
 	require.EqualValues(t, 1000, bp.CDTBalance)
 }
 

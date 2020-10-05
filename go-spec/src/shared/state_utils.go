@@ -1,42 +1,44 @@
-package core
+package shared
 
 import (
 	"fmt"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/ulule/deepcopier"
 )
 
-func CopyState(state *State) *State {
-	newBlockRoots := make([]*SlotAndBytes, len(state.BlockRoots))
+func CopyState(state *core.State) *core.State {
+	newBlockRoots := make([]*core.SlotAndBytes, len(state.BlockRoots))
 	for i, r := range state.BlockRoots {
-		newBlockRoots[i] = &SlotAndBytes{}
+		newBlockRoots[i] = &core.SlotAndBytes{}
 		deepcopier.Copy(r).To(newBlockRoots[i])
 	}
 
-	newStateRoots := make([]*SlotAndBytes, len(state.StateRoots))
+	newStateRoots := make([]*core.SlotAndBytes, len(state.StateRoots))
 	for i, r := range state.StateRoots {
-		newStateRoots[i] = &SlotAndBytes{}
+		newStateRoots[i] = &core.SlotAndBytes{}
 		deepcopier.Copy(r).To(newStateRoots[i])
 	}
 
-	newSeeds := make([]*SlotAndBytes, len(state.Seeds))
+	newSeeds := make([]*core.SlotAndBytes, len(state.Seeds))
 	for i, r := range state.Seeds {
-		newSeeds[i] = &SlotAndBytes{}
+		newSeeds[i] = &core.SlotAndBytes{}
 		deepcopier.Copy(r).To(newSeeds[i])
 	}
 
-	newBPs := make([]*BlockProducer, len(state.BlockProducers))
+	newBPs := make([]*core.BlockProducer, len(state.BlockProducers))
 	for i, bp := range state.BlockProducers {
-		newBPs[i] = &BlockProducer{}
+		newBPs[i] = &core.BlockProducer{}
 		deepcopier.Copy(bp).To(newBPs[i])
 	}
 
-	newPools := make([]*Pool, len(state.Pools))
+	newPools := make([]*core.Pool, len(state.Pools))
 	for i, p := range state.Pools {
-		newPools[i] = &Pool{}
+		newPools[i] = &core.Pool{}
 		deepcopier.Copy(p).To(newPools[i])
 	}
 
-	return &State{
+	return &core.State{
 		GenesisTime:    state.GenesisTime,
 		CurrentSlot:   state.CurrentSlot,
 		BlockRoots:     newBlockRoots,
@@ -47,8 +49,21 @@ func CopyState(state *State) *State {
 	}
 }
 
+func GetCurrentEpoch(state *core.State) uint64 {
+	return params.SlotToEpoch(state.CurrentSlot)
+}
+
+func GetPreviousEpoch(state *core.State) (uint64, error) {
+	current := params.SlotToEpoch(state.CurrentSlot)
+	if current != 0 {
+		return current - 1, nil
+	} else {
+		return 0, fmt.Errorf("current peoch is 0, no previous epoch")
+	}
+}
+
 // will return an 0 length byte array if not found
-func GetStateRoot(state *State, slot uint64) []byte {
+func GetStateRoot(state *core.State, slot uint64) []byte {
 	for _, r := range state.StateRoots {
 		if r.Slot == slot {
 			return r.Bytes
@@ -57,7 +72,7 @@ func GetStateRoot(state *State, slot uint64) []byte {
 	return []byte{}
 }
 
-func DecreaseBPBalance(bp *BlockProducer, change uint64) error {
+func DecreaseBPBalance(bp *core.BlockProducer, change uint64) error {
 	if bp.CDTBalance < change {
 		return fmt.Errorf("BP %d dosen't have enonugh Balance (%d) to decrease (%d)", bp.Id, bp.CDTBalance, change)
 	}
@@ -66,12 +81,12 @@ func DecreaseBPBalance(bp *BlockProducer, change uint64) error {
 	return nil
 }
 
-func IncreaseBPBalance(bp *BlockProducer, change uint64) {
+func IncreaseBPBalance(bp *core.BlockProducer, change uint64) {
 	bp.CDTBalance += change
 }
 
 // will return nil if not found or inactive
-func GetBlockProducer(state *State, id uint64) *BlockProducer {
+func GetBlockProducer(state *core.State, id uint64) *core.BlockProducer {
 	for _, p := range state.BlockProducers {
 		if p.GetId() == id && p.Active {
 			return p
@@ -80,7 +95,7 @@ func GetBlockProducer(state *State, id uint64) *BlockProducer {
 	return nil
 }
 
-func GetActiveBlockProducers(state *State, epoch uint64) []uint64 {
+func GetActiveBlockProducers(state *core.State, epoch uint64) []uint64 {
 	var activeBps []uint64
 	for _, bp := range state.BlockProducers {
 		if bp.Active || bp.GetExitEpoch() > epoch {
@@ -91,7 +106,7 @@ func GetActiveBlockProducers(state *State, epoch uint64) []uint64 {
 }
 
 // will return nil if not found
-func GetPool(state *State, id uint64) *Pool {
+func GetPool(state *core.State, id uint64) *core.Pool {
 	for _, p := range state.Pools {
 		if p.GetId() == id {
 			return p
@@ -102,8 +117,8 @@ func GetPool(state *State, id uint64) *Pool {
 
 // Returns the seed after randao was applied on the last slot of the epoch
 // will return error if not found
-func GetEpochSeed(state *State, epoch uint64) ([]byte, error) {
-	targetSlot := epoch * TestConfig().SlotsInEpoch - 1 + TestConfig().SlotsInEpoch
+func GetEpochSeed(state *core.State, epoch uint64) ([]byte, error) {
+	targetSlot := epoch * params.ChainConfig.SlotsInEpoch - 1 + params.ChainConfig.SlotsInEpoch
 	seed, err := GetSeed(state, targetSlot)
 	if err != nil {
 		return []byte{}, fmt.Errorf("seed for epoch %d not found", epoch)
@@ -112,7 +127,7 @@ func GetEpochSeed(state *State, epoch uint64) ([]byte, error) {
 }
 
 // returns seed for a slot
-func GetSeed(state *State, slot uint64) ([]byte, error) {
+func GetSeed(state *core.State, slot uint64) ([]byte, error) {
 	for _, d := range state.Seeds {
 		if d.Slot == slot {
 			return d.Bytes, nil

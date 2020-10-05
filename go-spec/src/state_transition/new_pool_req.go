@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"sort"
 )
 
 func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []*core.CreateNewPoolRequest) error {
 	for _, req := range requests {
-		leader := core.GetBlockProducer(state, req.StartEpoch)
+		leader := shared.GetBlockProducer(state, req.StartEpoch)
 		if leader == nil {
 			return fmt.Errorf("could not find new pool req leader")
 		}
@@ -18,7 +19,7 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 		if req.LeaderBlockProducer != leader.Id {
 			return fmt.Errorf("new pool req leader incorrect")
 		}
-		if core.GetPool(state, req.Id) != nil {
+		if shared.GetPool(state, req.Id) != nil {
 			return fmt.Errorf("new pool id == req id, this is already exists")
 		}
 		// TODO - check that network has enough capitalization
@@ -56,15 +57,15 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 
 			// reward/ penalty
 			for i := 0 ; i < len(committee) ; i ++ {
-				bp := core.GetBlockProducer(state, committee[i])
+				bp := shared.GetBlockProducer(state, committee[i])
 				if bp == nil {
 					return fmt.Errorf("could not find BP %d", committee[i])
 				}
 				partic := req.GetParticipation()
 				if partic[:].BitAt(uint64(i)) {
-					core.IncreaseBPBalance(bp, core.TestConfig().DKGReward)
+					shared.IncreaseBPBalance(bp, params.ChainConfig.DKGReward)
 				} else {
-					err := core.DecreaseBPBalance(bp, core.TestConfig().DKGReward)
+					err := shared.DecreaseBPBalance(bp, params.ChainConfig.DKGReward)
 					if err != nil {
 						return err
 					}
@@ -72,15 +73,15 @@ func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []
 			}
 
 			// special reward for leader
-			core.IncreaseBPBalance(leader, 3* core.TestConfig().DKGReward)
+			shared.IncreaseBPBalance(leader, 3* params.ChainConfig.DKGReward)
 		case 2: // un-successful
 			// TODO - better define how the un-successful status is assigned.
 			for i := 0 ; i < len(committee) ; i ++ {
-				bp := core.GetBlockProducer(state, committee[i])
+				bp := shared.GetBlockProducer(state, committee[i])
 				if bp == nil {
 					return fmt.Errorf("could not find BP %d", committee[i])
 				}
-				err := core.DecreaseBPBalance(bp, core.TestConfig().DKGReward)
+				err := shared.DecreaseBPBalance(bp, params.ChainConfig.DKGReward)
 				if err != nil {
 					return err
 				}

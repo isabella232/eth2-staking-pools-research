@@ -1,0 +1,16 @@
+syntax = "proto3";
+package state;
+
+option go_package = ".;core";
+
+message PoolsChainConfig {
+  uint64 VaultSize = 1;
+  uint64 BaseEth2DutyReward = 2;
+  uint64 DKGReward = 3; // TODO - change naming
+
+  // slots and epochs
+  uint64 SlotsInEpoch = 4;
+  uint64 MinAttestationCommitteeSize = 5;
+  uint64 MaxAttestationCommitteeSize = 6;
+  uint64 MinAttestationInclusionDelay = 7;
+}

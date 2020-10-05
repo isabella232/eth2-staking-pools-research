@@ -2,6 +2,7 @@ package state_transition
 
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-ssz"
 	"github.com/stretchr/testify/require"
@@ -17,7 +18,7 @@ func TestStateCopying(t *testing.T) {
 	preRoot, err := ssz.HashTreeRoot(state)
 	require.NoError(t, err)
 
-	newState := core.CopyState(state)
+	newState := shared.CopyState(state)
 	require.NoError(t, err)
 
 	// test new state and old state ssz
@@ -26,12 +27,12 @@ func TestStateCopying(t *testing.T) {
 	require.EqualValues(t, preRoot, newStateRoot)
 
 	// test manipulating prams on new state copying
-	bp := core.GetBlockProducer(newState, 0)
+	bp := shared.GetBlockProducer(newState, 0)
 	bp.CDTBalance = 100000
-	require.NotEqualValues(t, core.GetBlockProducer(state, 0).CDTBalance, 100000)
+	require.NotEqualValues(t, shared.GetBlockProducer(state, 0).CDTBalance, 100000)
 
-	core.GetPool(newState, 0).Active = false
-	require.NotEqualValues(t, core.GetPool(state, 0).Active, core.GetPool(newState, 0).Active)
+	shared.GetPool(newState, 0).Active = false
+	require.NotEqualValues(t, shared.GetPool(state, 0).Active, shared.GetPool(newState, 0).Active)
 
 	// test old state root not changed
 	postRoot, err := ssz.HashTreeRoot(state)
@@ -63,10 +64,10 @@ func TestBlockApplyConsistency(t *testing.T) {
 		require.NoError(t, err)
 
 		if i != 0 {
-			require.EqualValues(t, postRoot, core.GetStateRoot(newState, 1))
+			require.EqualValues(t, postRoot, shared.GetStateRoot(newState, 1))
 		}
 
-		postRoot = core.GetStateRoot(newState, 1)
+		postRoot = shared.GetStateRoot(newState, 1)
 	}
 
 	post,err := ssz.HashTreeRoot(state)

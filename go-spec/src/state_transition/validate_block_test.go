@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-ssz"
 	"github.com/stretchr/testify/require"
@@ -218,7 +219,7 @@ func TestBlockPostValidation(t *testing.T) {
 
 			st := NewStateTransition()
 			newState, err := st.ApplyBlock(state, test.body)
-			fmt.Printf("%s\n", hex.EncodeToString(core.GetStateRoot(newState, test.body.Slot)))
+			fmt.Printf("%s\n", hex.EncodeToString(shared.GetStateRoot(newState, test.body.Slot)))
 			require.NoError(t, err)
 
 			if test.expectedError != nil {

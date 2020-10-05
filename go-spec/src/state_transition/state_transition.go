@@ -3,6 +3,7 @@ package state_transition
 import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 )
 
 type IStateTransition interface {
@@ -33,7 +34,7 @@ func CalculateAndInsertStateRootToBlock(state *core.State, body *core.BlockBody)
 		return []byte{}, err
 	}
 
-	root := core.GetStateRoot(newState, newState.CurrentSlot)
+	root := shared.GetStateRoot(newState, newState.CurrentSlot)
 	if len(root) == 0 {
 		return []byte{}, fmt.Errorf("could not find statet root for epoch %d", newState.CurrentSlot)
 	}

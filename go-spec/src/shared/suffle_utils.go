@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 )
 
 // Vault committee is a randomly selected committee of BPs that are chosen to generate the pool's keys via DKG
@@ -12,34 +13,34 @@ import (
 // The previous epoch's seed is used to choose the DKG committee as the current one (the block's epoch)
 func VaultCommittee(state *core.State, poolId uint64, epoch uint64) ([]uint64,error) {
 	// TODO - handle integer overflow
-	seed, err := core.GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
+	seed, err := GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return []uint64{}, err
 	}
 	shuffled, err := shuffleActiveBPs(
-		core.GetActiveBlockProducers(state, epoch),
+		GetActiveBlockProducers(state, epoch),
 		SliceToByte32(seed),
 		[]byte(fmt.Sprintf("pool %d committee", poolId)),
 	)
 	if err != nil {
 		return nil, err
 	}
-	return shuffled[0:core.TestConfig().VaultSize], nil
+	return shuffled[0:params.ChainConfig.VaultSize], nil
 }
 
 // Slot committee is chosen randomly by shuffling a seed + category (block voting committee)
 // The previous epoch's seed is used to choose the block voting committee as the current one (the block's epoch)
 func SlotCommittee(state *core.State, slot uint64, committeeIdx uint64)([]uint64, error) {
-	epoch := core.TestConfig().SlotToEpoch(slot)
-	slotInEpoch := slot - epoch * core.TestConfig().SlotsInEpoch
+	epoch := params.SlotToEpoch(slot)
+	slotInEpoch := slot - epoch * params.ChainConfig.SlotsInEpoch
 
 	// TODO - handle integer overflow
-	seed, err := core.GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
+	seed, err := GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return []uint64{}, err
 	}
 	shuffled, err :=  shuffleActiveBPs(
-		core.GetActiveBlockProducers(state, epoch),
+		GetActiveBlockProducers(state, epoch),
 		SliceToByte32(seed),
 		[]byte("slot committee"),
 	)
@@ -51,7 +52,7 @@ func SlotCommittee(state *core.State, slot uint64, committeeIdx uint64)([]uint64
 }
 
 func CommitteeStructure(activeBps []uint64) map[uint64][][]uint64 /* slot -> []committee */ {
-	cntCommittees := uint64(len(activeBps)) / core.TestConfig().MinAttestationCommitteeSize
+	cntCommittees := uint64(len(activeBps)) / params.ChainConfig.MinAttestationCommitteeSize
 
 	// divide equally all BPs into committees
 	committees := make([][]uint64, cntCommittees)
@@ -77,7 +78,7 @@ func CommitteeStructure(activeBps []uint64) map[uint64][][]uint64 /* slot -> []c
 		ret[slot] = append(ret[slot], c)
 
 		slot++
-		if slot >= core.TestConfig().SlotsInEpoch { // reset to first slot
+		if slot >= params.ChainConfig.SlotsInEpoch { // reset to first slot
 			slot = 0
 		}
 	}
@@ -88,16 +89,16 @@ func CommitteeStructure(activeBps []uint64) map[uint64][][]uint64 /* slot -> []c
 // Block producer is chosen randomly by shuffling a seed + category (block proposer)
 // The previous epoch's seed is used to choose the block producer as the current one (the block's epoch)
 func BlockProposer(state *core.State, slot uint64) (uint64, error) {
-	epoch := core.TestConfig().SlotToEpoch(slot)
-	slotInEpoch := slot - epoch * core.TestConfig().SlotsInEpoch
+	epoch := params.SlotToEpoch(slot)
+	slotInEpoch := slot - epoch * params.ChainConfig.SlotsInEpoch
 
-	seed, err := core.GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
+	seed, err := GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return 0, err
 	}
 
 	lst, err := shuffleActiveBPs(
-		core.GetActiveBlockProducers(state, epoch),
+		GetActiveBlockProducers(state, epoch),
 		SliceToByte32(seed),
 		[]byte("block proposer"),
 	)

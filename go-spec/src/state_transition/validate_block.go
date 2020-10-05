@@ -44,7 +44,7 @@ func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core
 	}
 
 	// validate signature
-	proposer := core.GetBlockProducer(state, proposerId)
+	proposer := shared.GetBlockProducer(state, proposerId)
 	if proposer == nil {
 		return fmt.Errorf("proposer not found")
 	}
@@ -64,13 +64,13 @@ func (st *StateTransition) PreApplyValidateBlock(state *core.State, header *core
 
 	// TODO - validate RANDAO
 
-	// TODO - validate block?
+	// TODO - validate block slot?
 
 	return nil
 }
 
 func (st *StateTransition) PostApplyValidateBlock(newState *core.State, header *core.BlockHeader, body *core.BlockBody) error {
-	root := core.GetStateRoot(newState, newState.CurrentSlot)
+	root := shared.GetStateRoot(newState, newState.CurrentSlot)
 	if len(root) == 0 {
 		return fmt.Errorf("could not find statet root for epoch %d", newState.CurrentSlot)
 	}
