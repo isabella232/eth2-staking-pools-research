@@ -55,12 +55,64 @@ func (st *StateTransition) processAttestation(state *core.State, attestation *co
 	if err := validateAttestationData(state, attestation.Data); err != nil {
 		return err
 	}
-
+	if err := validateAggregationBits(state, attestation); err != nil {
+		return err
+	}
+	if err := appendPendingAttestation(state, attestation); err != nil {
+		return err
+	}
 	if err := validateSignature(state, attestation, attestation.Data.Slot); err != nil {
 		return err
 	}
 
-	// match aggregation bits with committee
+	// process execution summaries
+	if err := st.processExecutionSummaries(state, attestation.Data.ExecutionSummaries); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//    pending_attestation = PendingAttestation(
+//        data=data,
+//        aggregation_bits=attestation.aggregation_bits,
+//        inclusion_delay=state.slot - data.slot,
+//        proposer_index=get_beacon_proposer_index(state),
+//    )
+//
+//    if data.target.epoch == get_current_epoch(state):
+//        assert data.source == state.current_justified_checkpoint
+//        state.current_epoch_attestations.append(pending_attestation)
+//    else:
+//        assert data.source == state.previous_justified_checkpoint
+//        state.previous_epoch_attestations.append(pending_attestation)
+func appendPendingAttestation(state *core.State, attestation *core.Attestation) error {
+	proposer, err := shared.BlockProposer(state, attestation.Data.Slot)
+	if err != nil {
+		return err
+	}
+	pendingAtt := &core.PendingAttestation{
+		AggregationBits:      attestation.AggregationBits,
+		Data:                 attestation.Data,
+		InclusionDelay:       state.CurrentSlot - attestation.Data.Slot,
+		ProposerIndex:        proposer,
+	}
+
+	if attestation.Data.Target.Epoch == params.SlotToEpoch(state.CurrentSlot) {
+		if !core.CheckpointsEqual(attestation.Data.Source, state.CurrentJustifiedCheckpoint) {
+			return fmt.Errorf("source doesn't equal current justified checkpoint")
+		}
+		state.CurrentEpochAttestations = append(state.CurrentEpochAttestations, pendingAtt)
+	} else {
+		if !core.CheckpointsEqual(attestation.Data.Source, state.PreviousJustifiedCheckpoint) {
+			return fmt.Errorf("source doesn't equal previous justified checkpoint")
+		}
+		state.PreviousEpochAttestations = append(state.PreviousEpochAttestations, pendingAtt)
+	}
+	return nil
+}
+
+func validateAggregationBits(state *core.State, attestation *core.Attestation) error {
 	expectedCommittee, err := shared.SlotCommitteeByIndex(state, attestation.Data.Slot, uint64(attestation.Data.CommitteeIndex))
 	if err != nil {
 		return err
@@ -68,13 +120,6 @@ func (st *StateTransition) processAttestation(state *core.State, attestation *co
 	if len(expectedCommittee) != len(attestation.AggregationBits) {
 		return fmt.Errorf("aggregation bits != committee size")
 	}
-
-
-	// process execution summaries
-	if err := st.processExecutionSummaries(state, attestation.Data.ExecutionSummaries); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -111,6 +156,8 @@ func validateAttestationData(state *core.State, data *core.AttestationData) erro
 	return nil
 }
 
+//    # Check signature
+//    assert is_valid_indexed_attestation(state, get_indexed_attestation(state, attestation))
 func validateSignature(state *core.State, attestation *core.Attestation, slot uint64) error {
 	// reconstruct committee
 	expectedCommittee, err := shared.SlotCommitteeByIndex(state, slot, uint64(attestation.Data.CommitteeIndex))

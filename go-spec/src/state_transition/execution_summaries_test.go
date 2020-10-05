@@ -21,8 +21,8 @@ func TestFinalizedAttestation(t *testing.T) {
 			state,
 			128,
 			33,
-			0,
-			1,
+			&core.Checkpoint{Epoch: 0, Root: []byte{}},
+			&core.Checkpoint{Epoch: 1, Root: []byte{}},
 			0,
 			true,
 			0, /* attestation */
@@ -60,8 +60,8 @@ func TestNotFinalizedAttestation(t *testing.T) {
 			state,
 			128,
 			33,
-			0,
-			1,
+			&core.Checkpoint{Epoch: 0, Root: []byte{}},
+			&core.Checkpoint{Epoch: 1, Root: []byte{}},
 			0,
 			false,
 			0, /* attestation */
@@ -95,8 +95,8 @@ func TestFinalizedProposal(t *testing.T) {
 			state,
 			128,
 			33,
-			0,
-			1,
+			&core.Checkpoint{Epoch: 0, Root: []byte{}},
+			&core.Checkpoint{Epoch: 1, Root: []byte{}},
 			0,
 			true,
 			1, /* proposal */
@@ -134,8 +134,8 @@ func TestNotFinalizedProposal(t *testing.T) {
 			state,
 			128,
 			33,
-			0,
-			1,
+			&core.Checkpoint{Epoch: 0, Root: []byte{}},
+			&core.Checkpoint{Epoch: 1, Root: []byte{}},
 			0,
 			false,
 			1, /* proposal */

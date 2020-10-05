@@ -3,6 +3,7 @@ package state_transition
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-ssz"
 	"github.com/stretchr/testify/require"
@@ -55,8 +56,8 @@ func TestBlockApplyConsistency(t *testing.T) {
 			state,
 			128,
 			32,
-			0,
-			1,
+			&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
+			&core.Checkpoint{Epoch: 1, Root: []byte{}},
 			0,
 			true,
 			0, /* attestation */

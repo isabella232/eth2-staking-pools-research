@@ -10,6 +10,7 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	newState = shared.CopyState(oldState)
 
 	// bump epoch
+	previousSlot := newState.CurrentSlot
 	newState.CurrentSlot = body.Slot
 
 	// process
@@ -21,8 +22,12 @@ func (st *StateTransition) ApplyBlock(oldState *core.State, body *core.BlockBody
 	}
 
 	// apply seed
+	prevSeed, err := shared.GetSeed(newState, previousSlot)
+	if err != nil {
+		return nil, err
+	}
 	newSeed, err := shared.MixSeed(
-		shared.SliceToByte32(oldState.Seeds[len(oldState.Seeds) - 1].Bytes), // previous seed
+		shared.SliceToByte32(prevSeed), // previous seed
 		shared.SliceToByte32(body.Randao[:32]))
 	if err != nil {
 		return nil, err

@@ -25,8 +25,8 @@ func generateAttestations(
 	state *core.State,
 	howManyBpSig uint64,
 	slot uint64,
-	sourceEpoch uint64,
-	targetEpoch uint64,
+	sourceCheckpoint *core.Checkpoint,
+	targetCheckpoint *core.Checkpoint,
 	committeeIdx uint32,
 	finalized bool,
 	dutyType int32, // 0 - attestation, 1 - proposal, 2 - aggregation
@@ -36,14 +36,8 @@ func generateAttestations(
 		Slot:                 slot,
 		CommitteeIndex:       committeeIdx,
 		BeaconBlockRoot:      []byte("block root"),
-		Source:               &core.Checkpoint{
-			Epoch:                sourceEpoch,
-			Root:                 []byte{},
-		},
-		Target:               &core.Checkpoint{
-			Epoch:                targetEpoch,
-			Root:                 []byte{},
-		},
+		Source:               sourceCheckpoint,
+		Target:               targetCheckpoint,
 		ExecutionSummaries:   []*core.ExecutionSummary{
 			&core.ExecutionSummary{
 				PoolId: 3,
@@ -215,6 +209,10 @@ func generateTestState(t *testing.T) *core.State {
 				Bytes:                []byte("seedseedseedseedseedseedseedseed"),
 			},
 			&core.SlotAndBytes{
+				Slot:                33,
+				Bytes:                []byte("seedseedseedseedseedseedseedseed"),
+			},
+			&core.SlotAndBytes{
 				Slot:                63,
 				Bytes:                []byte("seedseedseedseedseedseedseedsedd"),
 			},
@@ -238,6 +236,14 @@ func generateTestState(t *testing.T) *core.State {
 				Slot:                0,
 				Bytes:                toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e41"),
 			},
+		},
+
+		PreviousEpochAttestations: []*core.PendingAttestation{},
+		CurrentEpochAttestations:[]*core.PendingAttestation{},
+		JustificationBits: []byte{0},
+		CurrentJustifiedCheckpoint: &core.Checkpoint{
+			Epoch:                0,
+			Root:                 params.ChainConfig.ZeroHash,
 		},
 	}
 

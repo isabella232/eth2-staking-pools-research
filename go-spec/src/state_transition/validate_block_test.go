@@ -180,7 +180,7 @@ func TestBlockPostValidation(t *testing.T) {
 				Randao:               toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 			},
 			proposerId: 2713,
-			postStateRoot: toByte("83912d4e1063873194fbc625a38c16e80c6da5abe4035a9d9af6cd342e017170"),
+			postStateRoot: toByte("1fbf8ba42600abfd3185f95ed278b4169e141bdb96c0e8e0c6bdf257a8eb1701"),
 			expectedError: nil,
 		},
 		{

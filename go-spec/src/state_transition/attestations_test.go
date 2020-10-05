@@ -3,6 +3,7 @@ package state_transition
 import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -26,8 +27,8 @@ func TestAttestationProcessing(t *testing.T) {
 					state,
 					86,
 					32,
-					0,
-					1,
+					&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
+					&core.Checkpoint{Epoch: 1, Root: []byte{}},
 					0,
 					true,
 					0, /* attestation */
@@ -43,8 +44,8 @@ func TestAttestationProcessing(t *testing.T) {
 					state,
 					85,
 					32,
-					0,
-					1,
+					&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
+					&core.Checkpoint{Epoch: 1, Root: []byte{}},
 					0,
 					true,
 					0, /* attestation */
@@ -60,8 +61,8 @@ func TestAttestationProcessing(t *testing.T) {
 					state,
 					128,
 					32,
-					0,
-					5,
+					&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
+					&core.Checkpoint{Epoch: 5, Root: []byte{}},
 					0,
 					true,
 					0, /* attestation */
@@ -77,8 +78,8 @@ func TestAttestationProcessing(t *testing.T) {
 					state,
 					128,
 					100,
-					0,
-					1,
+					&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
+					&core.Checkpoint{Epoch: 1, Root: []byte{}},
 					0,
 					true,
 					0, /* attestation */
@@ -94,8 +95,8 @@ func TestAttestationProcessing(t *testing.T) {
 					state,
 					128,
 					33,
-					0,
-					1,
+					&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
+					&core.Checkpoint{Epoch: 1, Root: []byte{}},
 					0,
 					true,
 					0, /* attestation */
@@ -111,8 +112,8 @@ func TestAttestationProcessing(t *testing.T) {
 					state,
 					128,
 					0,
-					0,
-					0,
+					&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
+					&core.Checkpoint{Epoch: 0, Root: []byte{}},
 					0,
 					true,
 					0, /* attestation */
