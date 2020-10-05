@@ -19,6 +19,8 @@ func testConfig() *core.PoolsChainConfig {
 		MinAttestationCommitteeSize: 128,
 		MaxAttestationCommitteeSize: 2048,
 		MinAttestationInclusionDelay: 1,
+
+		ZeroHash: make([]byte, 32),
 	}
 }
 

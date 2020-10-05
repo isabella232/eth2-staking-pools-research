@@ -111,6 +111,7 @@ func BlockProposer(state *core.State, slot uint64) (uint64, error) {
 	epoch := params.SlotToEpoch(slot)
 	slotInEpoch := slot - epoch * params.ChainConfig.SlotsInEpoch
 
+	// TODO - what seed should we take? last epoch? last finalized epoch?
 	seed, err := GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
 	if err != nil {
 		return 0, err

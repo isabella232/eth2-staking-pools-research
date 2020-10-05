@@ -4,49 +4,74 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
+	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/ulule/deepcopier"
 )
 
 func CopyState(state *core.State) *core.State {
-	newBlockRoots := make([]*core.SlotAndBytes, len(state.BlockRoots))
+	ret := &core.State{}
+
+	ret.CurrentSlot = state.CurrentSlot
+
+	ret.BlockRoots = make([]*core.SlotAndBytes, len(state.BlockRoots))
 	for i, r := range state.BlockRoots {
-		newBlockRoots[i] = &core.SlotAndBytes{}
-		deepcopier.Copy(r).To(newBlockRoots[i])
+		ret.BlockRoots[i] = &core.SlotAndBytes{}
+		deepcopier.Copy(r).To(ret.BlockRoots[i])
 	}
 
-	newStateRoots := make([]*core.SlotAndBytes, len(state.StateRoots))
+	ret.StateRoots = make([]*core.SlotAndBytes, len(state.StateRoots))
 	for i, r := range state.StateRoots {
-		newStateRoots[i] = &core.SlotAndBytes{}
-		deepcopier.Copy(r).To(newStateRoots[i])
+		ret.StateRoots[i] = &core.SlotAndBytes{}
+		deepcopier.Copy(r).To(ret.StateRoots[i])
 	}
 
-	newSeeds := make([]*core.SlotAndBytes, len(state.Seeds))
+	ret.Seeds = make([]*core.SlotAndBytes, len(state.Seeds))
 	for i, r := range state.Seeds {
-		newSeeds[i] = &core.SlotAndBytes{}
-		deepcopier.Copy(r).To(newSeeds[i])
+		ret.Seeds[i] = &core.SlotAndBytes{}
+		deepcopier.Copy(r).To(ret.Seeds[i])
 	}
 
-	newBPs := make([]*core.BlockProducer, len(state.BlockProducers))
+	ret.BlockProducers = make([]*core.BlockProducer, len(state.BlockProducers))
 	for i, bp := range state.BlockProducers {
-		newBPs[i] = &core.BlockProducer{}
-		deepcopier.Copy(bp).To(newBPs[i])
+		ret.BlockProducers[i] = &core.BlockProducer{}
+		deepcopier.Copy(bp).To(ret.BlockProducers[i])
 	}
 
-	newPools := make([]*core.Pool, len(state.Pools))
+	ret.Pools = make([]*core.Pool, len(state.Pools))
 	for i, p := range state.Pools {
-		newPools[i] = &core.Pool{}
-		deepcopier.Copy(p).To(newPools[i])
+		ret.Pools[i] = &core.Pool{}
+		deepcopier.Copy(p).To(ret.Pools[i])
 	}
 
-	return &core.State{
-		GenesisTime:    state.GenesisTime,
-		CurrentSlot:   state.CurrentSlot,
-		BlockRoots:     newBlockRoots,
-		StateRoots:     newStateRoots,
-		Seeds:          newSeeds,
-		BlockProducers: newBPs,
-		Pools:          newPools,
+	ret.PreviousEpochAttestations = make([]*core.PendingAttestation, len(state.PreviousEpochAttestations))
+	for i, pe := range state.PreviousEpochAttestations {
+		ret.PreviousEpochAttestations[i] = &core.PendingAttestation{}
+		deepcopier.Copy(pe).To(ret.PreviousEpochAttestations[i])
 	}
+
+	ret.CurrentEpochAttestations = make([]*core.PendingAttestation, len(state.CurrentEpochAttestations))
+	for i, pe := range state.CurrentEpochAttestations {
+		ret.CurrentEpochAttestations[i] = &core.PendingAttestation{}
+		deepcopier.Copy(pe).To(ret.CurrentEpochAttestations[i])
+	}
+
+	ret.JustificationBits = make(bitfield.Bitvector4, len(state.JustificationBits))
+	deepcopier.Copy(state.JustificationBits).To(ret.JustificationBits)
+
+	if state.PreviousJustifiedCheckpoint != nil {
+		ret.PreviousJustifiedCheckpoint = &core.Checkpoint{}
+		deepcopier.Copy(state.PreviousJustifiedCheckpoint).To(ret.PreviousJustifiedCheckpoint)
+	}
+
+	ret.CurrentJustifiedCheckpoint = &core.Checkpoint{}
+	deepcopier.Copy(state.CurrentJustifiedCheckpoint).To(ret.CurrentJustifiedCheckpoint)
+
+	if state.FinalizedCheckpoint != nil {
+		ret.FinalizedCheckpoint = &core.Checkpoint{}
+		deepcopier.Copy(state.FinalizedCheckpoint).To(ret.FinalizedCheckpoint)
+	}
+
+	return ret
 }
 
 func GetCurrentEpoch(state *core.State) uint64 {
