@@ -16,9 +16,17 @@ message State {
     repeated SlotAndBytes StateRoots = 4;
     repeated SlotAndBytes Seeds = 5;
 
+    // Finalization & justification
+    repeated PendingAttestation PreviousEpochAttestations = 6;
+    repeated PendingAttestation CurrentEpochAttestations = 7;
+    bytes JustificationBits = 8 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitvector4"];
+    Checkpoint PreviousJustifiedCheckpoint = 9;
+    Checkpoint CurrentJustifiedCheckpoint = 10;
+    Checkpoint FinalizedCheckpoint = 11;
+
     // network
-    repeated BlockProducer BlockProducers = 6;
-    repeated Pool Pools = 7;
+    repeated BlockProducer BlockProducers = 12;
+    repeated Pool Pools = 13;
 }
 
 message BlockProducer {
@@ -51,6 +59,13 @@ message BlockHeader {
     bytes BlockRoot = 1;
     bytes StateRoot = 2;
     bytes Signature = 3;
+}
+
+message PendingAttestation {
+    bytes aggregation_bits = 1 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitlist"];
+    AttestationData data = 2;
+    uint64 InclusionDelay = 3;
+    uint64 ProposerIndex = 4;
 }
 
 message Attestation {

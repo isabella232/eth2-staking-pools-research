@@ -15,4 +15,7 @@ message PoolsChainConfig {
   uint64 MinAttestationCommitteeSize = 6;
   uint64 MaxAttestationCommitteeSize = 7;
   uint64 MinAttestationInclusionDelay = 8;
+
+  // initial value constants
+  bytes ZeroHash = 9;
 }
