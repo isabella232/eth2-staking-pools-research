@@ -16,24 +16,21 @@ func TestCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	body := &core.BlockBody{
-		Slot:                 33,
-		NewPoolReq:           []*core.CreateNewPoolRequest{
-			{
-				Id:                  129,
-				Status:              1, // completed
-				StartEpoch:          1,
-				EndEpoch:            2,
-				LeaderBlockProducer: 1,
-				CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
-				Participation:       bitfield.Bitlist{43,12,89},
-			},
+	req := []*core.CreateNewPoolRequest{
+		{
+			Id:                  129,
+			Status:              1, // completed
+			StartEpoch:          1,
+			EndEpoch:            2,
+			LeaderBlockProducer: 1,
+			CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
+			Participation:       bitfield.Bitlist{43,12,89},
 		},
 	}
 
 	st := NewStateTransition()
 
-	err := st.ProcessNewPoolRequests(state, body.NewPoolReq)
+	err := st.processNewPoolRequests(state, req)
 	require.NoError(t, err)
 
 	// check created
@@ -73,24 +70,21 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	body := &core.BlockBody{
-		Slot:                 33,
-		NewPoolReq:           []*core.CreateNewPoolRequest{
-			{
-				Id:                  129,
-				Status:              2, // completed
-				StartEpoch:          1,
-				EndEpoch:            2,
-				LeaderBlockProducer: 1,
-				CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
-				Participation:       bitfield.Bitlist{43,12,89},
-			},
+	req := []*core.CreateNewPoolRequest{
+		{
+			Id:                  129,
+			Status:              2, // completed
+			StartEpoch:          1,
+			EndEpoch:            2,
+			LeaderBlockProducer: 1,
+			CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
+			Participation:       bitfield.Bitlist{43, 12, 89},
 		},
 	}
 
 	st := NewStateTransition()
 
-	err := st.ProcessNewPoolRequests(state, body.NewPoolReq)
+	err := st.processNewPoolRequests(state, req)
 	require.NoError(t, err)
 
 	// check not created
@@ -119,23 +113,20 @@ func TestCreatedNewPoolReqWithExistingId(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	body := &core.BlockBody{
-		Slot:                 33,
-		NewPoolReq:           []*core.CreateNewPoolRequest{
-			{
-				Id:                  127,
-				Status:              2, // completed
-				StartEpoch:          1,
-				EndEpoch:            2,
-				LeaderBlockProducer: 1,
-				CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
-				Participation:       bitfield.Bitlist{43,12,89},
-			},
+	req := []*core.CreateNewPoolRequest{
+		{
+			Id:                  127,
+			Status:              2, // completed
+			StartEpoch:          1,
+			EndEpoch:            2,
+			LeaderBlockProducer: 1,
+			CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
+			Participation:       bitfield.Bitlist{43,12,89},
 		},
 	}
 
 	st := NewStateTransition()
 
-	err := st.ProcessNewPoolRequests(state, body.NewPoolReq)
+	err := st.processNewPoolRequests(state, req)
 	require.Error(t, err, "new pool id == req id, this is already exists")
 }

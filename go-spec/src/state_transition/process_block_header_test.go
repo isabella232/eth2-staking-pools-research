@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/prysmaticlabs/go-ssz"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestProcessBlockHeader(t *testing.T) {
+	require.NoError(t, bls.Init(bls.BLS12_381))
+	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 	tests := []struct{
 		name              string
 		block             *core.PoolBlock
@@ -156,6 +159,7 @@ func TestProcessBlockHeader(t *testing.T) {
 			// sign
 			sk := []byte(fmt.Sprintf("%d", test.proposerId))
 			sig, err := shared.SignBlock(test.block, sk, []byte("domain")) // TODO - dynamic domain
+			require.NoError(t, err)
 
 			if !test.useCorretBodyRoot {
 				root[0] = 0

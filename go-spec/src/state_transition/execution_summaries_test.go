@@ -15,22 +15,19 @@ func TestFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	body := &core.BlockBody{
-		Slot:                 33,
-		Attestations:         generateAttestations(
-			state,
-			128,
-			33,
-			&core.Checkpoint{Epoch: 0, Root: []byte{}},
-			&core.Checkpoint{Epoch: 1, Root: []byte{}},
-			0,
-			true,
-			0, /* attestation */
-			),
-	}
+	atts := generateAttestations(
+		state,
+		128,
+		33,
+		&core.Checkpoint{Epoch: 0, Root: []byte{}},
+		&core.Checkpoint{Epoch: 1, Root: []byte{}},
+		0,
+		true,
+		0, /* attestation */
+	)
 	st := NewStateTransition()
 
-	err := st.processExecutionSummaries(state, body.Attestations[0].Data.ExecutionSummaries)
+	err := st.processExecutionSummaries(state, atts[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
@@ -54,23 +51,20 @@ func TestNotFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	body := &core.BlockBody{
-		Slot:                 33,
-		Attestations:         generateAttestations(
-			state,
-			128,
-			33,
-			&core.Checkpoint{Epoch: 0, Root: []byte{}},
-			&core.Checkpoint{Epoch: 1, Root: []byte{}},
-			0,
-			false,
-			0, /* attestation */
-			),
-	}
+	atts := generateAttestations(
+		state,
+		128,
+		33,
+		&core.Checkpoint{Epoch: 0, Root: []byte{}},
+		&core.Checkpoint{Epoch: 1, Root: []byte{}},
+		0,
+		false,
+		0, /* attestation */
+	)
 
 	st := NewStateTransition()
 
-	err := st.processExecutionSummaries(state, body.Attestations[0].Data.ExecutionSummaries)
+	err := st.processExecutionSummaries(state, atts[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
@@ -89,22 +83,19 @@ func TestFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	body := &core.BlockBody{
-		Slot:                 33,
-		Attestations:         generateAttestations(
-			state,
-			128,
-			33,
-			&core.Checkpoint{Epoch: 0, Root: []byte{}},
-			&core.Checkpoint{Epoch: 1, Root: []byte{}},
-			0,
-			true,
-			1, /* proposal */
-			),
-	}
+	att := generateAttestations(
+		state,
+		128,
+		33,
+		&core.Checkpoint{Epoch: 0, Root: []byte{}},
+		&core.Checkpoint{Epoch: 1, Root: []byte{}},
+		0,
+		true,
+		1, /* proposal */
+	)
 	st := NewStateTransition()
 
-	err := st.processExecutionSummaries(state, body.Attestations[0].Data.ExecutionSummaries)
+	err := st.processExecutionSummaries(state, att[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
@@ -128,23 +119,20 @@ func TestNotFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	body := core.BlockBody{
-		Slot:                 33,
-		Attestations:         generateAttestations(
-			state,
-			128,
-			33,
-			&core.Checkpoint{Epoch: 0, Root: []byte{}},
-			&core.Checkpoint{Epoch: 1, Root: []byte{}},
-			0,
-			false,
-			1, /* proposal */
-			),
-	}
+	att := generateAttestations(
+		state,
+		128,
+		33,
+		&core.Checkpoint{Epoch: 0, Root: []byte{}},
+		&core.Checkpoint{Epoch: 1, Root: []byte{}},
+		0,
+		false,
+		1, /* proposal */
+	)
 
 	st := NewStateTransition()
 
-	err := st.processExecutionSummaries(state, body.Attestations[0].Data.ExecutionSummaries)
+	err := st.processExecutionSummaries(state, att[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards

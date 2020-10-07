@@ -76,6 +76,7 @@ func TestBlockPostValidation(t *testing.T) {
 			// sign
 			sk := []byte(fmt.Sprintf("%d", test.proposerId))
 			sig, err := shared.SignBlock(test.block, sk, []byte("domain")) // TODO - dynamic domain
+			require.NoError(t, err)
 
 			// header
 			signed := &core.SignedPoolBlock{

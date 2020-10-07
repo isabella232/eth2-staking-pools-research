@@ -1,6 +1,7 @@
 package state_transition
 
 import (
+	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
@@ -46,31 +47,47 @@ func TestBlockApplyConsistency(t *testing.T) {
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t)
-	body := &core.BlockBody{
-		Proposer:        2713,
-		Slot:            33,
-		ParentBlockRoot: toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		Randao:          toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
-		NewPoolReq:      nil,
-		Attestations:         generateAttestations(
-			state,
-			128,
-			32,
-			&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
-			&core.Checkpoint{Epoch: 1, Root: []byte{}},
-			0,
-			true,
-			0, /* attestation */
+	block := &core.PoolBlock{
+		Slot:                 33,
+		Proposer:             2713,
+		ParentRoot:           toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		StateRoot:            nil,
+		Body:                 &core.PoolBlockBody{
+			RandaoReveal:          toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
+			NewPoolReq:      nil,
+			Attestations:         generateAttestations(
+				state,
+				128,
+				32,
+				&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
+				&core.Checkpoint{Epoch: 1, Root: []byte{}},
+				0,
+				true,
+				0, /* attestation */
 			),
+		},
 	}
+
+	// sign
+	sig, err := shared.SignBlock(
+		block,
+		[]byte(fmt.Sprintf("%d", 2713)),
+		[]byte("domain"))
+	require.NoError(t, err)
+	signed := &core.SignedPoolBlock{
+		Block:                block,
+		Signature:            sig.Serialize(),
+	}
+
 
 	preRoot,err := ssz.HashTreeRoot(state)
 	require.NoError(t, err)
 
 	var postRoot []byte
 	for i := 0 ; i < 10 ; i++ {
+		newState := shared.CopyState(state)
 		st := NewStateTransition()
-		newState, err := st.ProcessBlock(state, body)
+		err := st.ProcessBlock(newState, signed)
 		require.NoError(t, err)
 
 		if i != 0 {
