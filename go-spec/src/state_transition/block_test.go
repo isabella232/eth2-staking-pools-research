@@ -47,11 +47,11 @@ func TestBlockApplyConsistency(t *testing.T) {
 
 	state := generateTestState(t)
 	body := &core.BlockBody{
-		Proposer:             2713,
-		Slot:                 33,
-		ParentBlockRoot:      toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-		Randao:               toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
-		NewPoolReq:           nil,
+		Proposer:        2713,
+		Slot:            33,
+		ParentBlockRoot: toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		Randao:          toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
+		NewPoolReq:      nil,
 		Attestations:         generateAttestations(
 			state,
 			128,
@@ -70,7 +70,7 @@ func TestBlockApplyConsistency(t *testing.T) {
 	var postRoot []byte
 	for i := 0 ; i < 10 ; i++ {
 		st := NewStateTransition()
-		newState, err := st.ApplyBlock(state, body)
+		newState, err := st.ProcessBlock(state, body)
 		require.NoError(t, err)
 
 		if i != 0 {

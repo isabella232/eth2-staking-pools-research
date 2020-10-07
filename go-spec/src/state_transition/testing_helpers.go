@@ -97,64 +97,6 @@ func generateAttestations(
 	}
 }
 
-func generateHeaderAndBody(
-	state *core.State,
-	slot uint64,
-	proposer uint64,
-	skStr string,
-	headerBodyRoot string,
-	createPoolStatus uint32,
-	createPoolReqId uint64,
-	includeCreatePool bool,
-	randao []byte,
-	parentBlockRoot []byte,
-	attestations []*core.Attestation,
-	) (*core.BlockHeader, *core.BlockBody) {
-	body := &core.BlockBody{
-		Proposer:           proposer,
-		Slot:               slot,
-		ParentBlockRoot:    parentBlockRoot,
-		Randao: randao,
-	}
-
-	if includeCreatePool {
-		body.NewPoolReq = append(body.NewPoolReq, &core.CreateNewPoolRequest{
-			Id:                  createPoolReqId,
-			Status:              createPoolStatus, // started
-			StartEpoch:          1,
-			EndEpoch:            2,
-			LeaderBlockProducer: 1,
-			CreatePubKey:        toByte("a3b9110ec26cbb02e6182fab4dcb578d17411f26e41f16aad99cfce51e9bc76ce5e7de00a831bbcadd1d7bc0235c945d"), // priv: 3ef5411174c7d9672652bf4ffc342af3720cc23e52c377b95927871645435f41
-			Participation:       []byte{43,12,89,35,99,16,63,13,33,0,1,3,88,12,43,1},
-		})
-	}
-
-	if attestations != nil {
-		body.Attestations = attestations
-	}
-
-	// calculate and set state root after applying block
-	stateRoot, err := CalculateAndInsertStateRootToBlock(state ,body)
-	if err != nil {
-		return nil, nil
-	}
-
-	sk := &bls.SecretKey{}
-	sk.SetHexString(skStr)
-
-	root, _ := ssz.HashTreeRoot(body)
-	if len(headerBodyRoot) > 0 {
-		root = shared.SliceToByte32(toByte(headerBodyRoot))
-	}
-	sig := sk.SignByte(root[:])
-
-	return &core.BlockHeader{
-		BlockRoot:            root[:],
-		StateRoot: 			  stateRoot,
-		Signature:            sig.Serialize(),
-	}, body
-}
-
 func generateTestState(t *testing.T) *core.State {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))

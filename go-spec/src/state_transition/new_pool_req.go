@@ -8,7 +8,7 @@ import (
 	"sort"
 )
 
-func (st *StateTransition) ProcessNewPoolRequests(state *core.State, requests []*core.CreateNewPoolRequest) error {
+func (st *StateTransition) processNewPoolRequests(state *core.State, requests []*core.CreateNewPoolRequest) error {
 	for _, req := range requests {
 		leader := shared.GetBlockProducer(state, req.StartEpoch)
 		if leader == nil {

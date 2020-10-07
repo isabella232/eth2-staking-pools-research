@@ -10,23 +10,24 @@ message State {
     // time
     uint64 GenesisTime = 1;
     uint64 CurrentSlot = 2;
+    PoolBlockHeader LatestBlockHeader = 3;
 
     // past
-    repeated SlotAndBytes BlockRoots = 3;
-    repeated SlotAndBytes StateRoots = 4;
-    repeated SlotAndBytes Seeds = 5;
+    repeated SlotAndBytes BlockRoots = 4;
+    repeated SlotAndBytes StateRoots = 5;
+    repeated SlotAndBytes Seeds = 6;
 
     // Finalization & justification
-    repeated PendingAttestation PreviousEpochAttestations = 6;
-    repeated PendingAttestation CurrentEpochAttestations = 7;
-    bytes JustificationBits = 8 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitvector4"];
-    Checkpoint PreviousJustifiedCheckpoint = 9;
-    Checkpoint CurrentJustifiedCheckpoint = 10;
-    Checkpoint FinalizedCheckpoint = 11;
+    repeated PendingAttestation PreviousEpochAttestations = 7;
+    repeated PendingAttestation CurrentEpochAttestations = 8;
+    bytes JustificationBits = 9 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitvector4"];
+    Checkpoint PreviousJustifiedCheckpoint = 10;
+    Checkpoint CurrentJustifiedCheckpoint = 11;
+    Checkpoint FinalizedCheckpoint = 12;
 
     // network
-    repeated BlockProducer BlockProducers = 12;
-    repeated Pool Pools = 13;
+    repeated BlockProducer BlockProducers = 13;
+    repeated Pool Pools = 14;
 }
 
 message BlockProducer {
@@ -46,19 +47,36 @@ message Pool {
     repeated uint64 SortedCommittee = 4;
 }
 
-message BlockBody {
-    uint64 Proposer = 1;
-    uint64 Slot = 2;
-    bytes ParentBlockRoot = 3;
-    bytes Randao = 4;
-    repeated CreateNewPoolRequest NewPoolReq = 5;
-    repeated Attestation attestations = 6;
+message PoolBlockBody {
+    bytes RandaoReveal = 1;
+    repeated Attestation attestations = 2;
+    repeated CreateNewPoolRequest NewPoolReq = 3;
 }
 
-message BlockHeader {
-    bytes BlockRoot = 1;
-    bytes StateRoot = 2;
-    bytes Signature = 3;
+message PoolBlock {
+    uint64 Slot = 1;
+    uint64 Proposer = 2;
+    bytes ParentRoot = 3;
+    bytes StateRoot = 4;
+    PoolBlockBody Body = 5;
+}
+
+message SignedPoolBlock {
+    PoolBlock Block = 1;
+    bytes Signature = 2;
+}
+
+message PoolBlockHeader {
+    uint64 Slot = 1;
+    uint64 ProposerIndex = 2;
+    bytes ParentRoot = 3;
+    bytes StateRoot = 4;
+    bytes BodyRoot = 5;
+}
+
+message SignedPoolBlockHeader {
+    PoolBlockHeader Header = 1;
+    bytes Signature = 2;
 }
 
 message PendingAttestation {

@@ -9,8 +9,7 @@ import (
 	"github.com/prysmaticlabs/go-ssz"
 )
 
-func (st *StateTransition) ProcessBlockAttestations(state *core.State, blockBody *core.BlockBody) error {
-	attestations := blockBody.Attestations
+func (st *StateTransition) processBlockAttestations(state *core.State, attestations []*core.Attestation) error {
 	for _, att := range attestations {
 		if err := st.processAttestation(state, att); err != nil {
 			return err
