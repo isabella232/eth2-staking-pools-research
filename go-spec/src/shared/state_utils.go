@@ -9,6 +9,10 @@ import (
 )
 
 func CopyState(state *core.State) *core.State {
+	if state == nil {
+		return nil
+	}
+
 	ret := &core.State{}
 
 	ret.CurrentSlot = state.CurrentSlot
@@ -69,6 +73,11 @@ func CopyState(state *core.State) *core.State {
 	if state.FinalizedCheckpoint != nil {
 		ret.FinalizedCheckpoint = &core.Checkpoint{}
 		deepcopier.Copy(state.FinalizedCheckpoint).To(ret.FinalizedCheckpoint)
+	}
+
+	if state.LatestBlockHeader != nil {
+		ret.LatestBlockHeader = &core.PoolBlockHeader{}
+		deepcopier.Copy(state.LatestBlockHeader).To(ret.LatestBlockHeader)
 	}
 
 	return ret

@@ -74,11 +74,6 @@ message PoolBlockHeader {
     bytes BodyRoot = 5;
 }
 
-message SignedPoolBlockHeader {
-    PoolBlockHeader Header = 1;
-    bytes Signature = 2;
-}
-
 message PendingAttestation {
     bytes aggregation_bits = 1 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitlist"];
     AttestationData data = 2;
