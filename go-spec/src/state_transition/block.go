@@ -43,51 +43,6 @@ func (st *StateTransition) processBlockForStateRoot(state *core.State, signedBlo
 	return nil
 }
 
-func processBlockHeaderNoVerify(state *core.State, signedBlock *core.SignedPoolBlock) error {
-	block := signedBlock.Block
-
-	// slot
-	if state.CurrentSlot != block.Slot {
-		return fmt.Errorf("block slot doesn't match state slot")
-	}
-
-	// proposer
-	expectedProposer, err := shared.BlockProposer(state, block.Slot)
-	if err != nil {
-		return err
-	}
-	proposerId :=  block.GetProposer()
-	if expectedProposer != proposerId {
-		return fmt.Errorf("block expectedProposer is worng, expected %d but received %d", expectedProposer, proposerId)
-	}
-
-	// parent
-	root,err := ssz.HashTreeRoot(state.LatestBlockHeader)
-	if err != nil {
-		return err
-	}
-	if !bytes.Equal(block.ParentRoot, root[:]) {
-		fmt.Errorf("parent block root doesn't match")
-	}
-
-	// save
-	root,err = ssz.HashTreeRoot(block)
-	if err != nil {
-		return err
-	}
-	state.LatestBlockHeader = &core.PoolBlockHeader{
-		Slot:                 block.Slot,
-		ProposerIndex:        block.Proposer,
-		ParentRoot:           block.ParentRoot,
-		StateRoot:            block.StateRoot,
-		BodyRoot:             root[:],
-	}
-
-	// TODO - verify proposer is not slashed
-
-	return nil
-}
-
 // ProcessBlockHeader validates a block by its header.
 //
 // Spec pseudocode definition:
@@ -112,6 +67,50 @@ func processBlockHeaderNoVerify(state *core.State, signedBlock *core.SignedPoolB
 //    assert not proposer.slashed
 //    # Verify proposer signature
 //    assert bls_verify(proposer.pubkey, signing_root(block), block.signature, get_domain(state, DOMAIN_BEACON_PROPOSER))
+func processBlockHeaderNoVerify(state *core.State, signedBlock *core.SignedPoolBlock) error {
+	block := signedBlock.Block
+
+	// slot
+	if state.CurrentSlot != block.Slot {
+		return fmt.Errorf("block slot doesn't match state slot")
+	}
+
+	// proposer
+	expectedProposer, err := shared.BlockProposer(state, block.Slot)
+	if err != nil {
+		return err
+	}
+	proposerId :=  block.GetProposer()
+	if expectedProposer != proposerId {
+		return fmt.Errorf("block expectedProposer is worng, expected %d but received %d", expectedProposer, proposerId)
+	}
+
+	// parent
+	root,err := ssz.HashTreeRoot(state.LatestBlockHeader)
+	if err != nil {
+		return err
+	}
+	if !bytes.Equal(block.ParentRoot, root[:]) {
+		return fmt.Errorf("parent block root doesn't match")
+	}
+
+	// save
+	root,err = ssz.HashTreeRoot(block.Body)
+	if err != nil {
+		return err
+	}
+	state.LatestBlockHeader = &core.PoolBlockHeader{
+		Slot:                 block.Slot,
+		ProposerIndex:        block.Proposer,
+		ParentRoot:           block.ParentRoot,
+		BodyRoot:             root[:],
+	}
+
+	// TODO - verify proposer is not slashed
+
+	return nil
+}
+
 func processBlockHeader(state *core.State, signedBlock *core.SignedPoolBlock) error {
 	if err := processBlockHeaderNoVerify(state, signedBlock); err != nil {
 		return err

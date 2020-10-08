@@ -10,6 +10,7 @@ import (
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/prysmaticlabs/go-ssz"
 	"github.com/stretchr/testify/require"
+	"github.com/ulule/deepcopier"
 	"testing"
 )
 
@@ -142,44 +143,12 @@ func generateTestState(t *testing.T) *core.State {
 	}
 
 	ret := &core.State {
-		CurrentSlot:33,
+		CurrentSlot: 0,
 		Pools: pools,
 		BlockProducers: bps,
-		Seeds:          []*core.SlotAndBytes{
-			&core.SlotAndBytes{
-				Slot:                31,
-				Bytes:                []byte("seedseedseedseedseedseedseedseed"),
-			},
-			&core.SlotAndBytes{
-				Slot:                33,
-				Bytes:                []byte("seedseedseedseedseedseedseedseed"),
-			},
-			&core.SlotAndBytes{
-				Slot:                63,
-				Bytes:                []byte("seedseedseedseedseedseedseedsedd"),
-			},
-			&core.SlotAndBytes{
-				Slot:                95,
-				Bytes:                []byte("seedseedseedseedseedseedseedsddd"),
-			},
-		},
-		BlockRoots: 	[]*core.SlotAndBytes{
-			&core.SlotAndBytes{
-				Slot:                0,
-				Bytes:                toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
-			},
-			&core.SlotAndBytes{
-				Slot:                34,
-				Bytes:                toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e41"),
-			},
-		},
-		StateRoots: 	[]*core.SlotAndBytes{
-			&core.SlotAndBytes{
-				Slot:                0,
-				Bytes:                toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e41"),
-			},
-		},
-
+		Seeds:          []*core.SlotAndBytes{},
+		BlockRoots: 	[]*core.SlotAndBytes{},
+		StateRoots: 	[]*core.SlotAndBytes{},
 		PreviousEpochAttestations: []*core.PendingAttestation{},
 		CurrentEpochAttestations:[]*core.PendingAttestation{},
 		JustificationBits: []byte{0},
@@ -189,15 +158,79 @@ func generateTestState(t *testing.T) *core.State {
 		},
 	}
 
-	root, err := ssz.HashTreeRoot(ret)
-	if err != nil {
-		return nil
-	}
-
-	ret.StateRoots = append(ret.StateRoots, &core.SlotAndBytes{
-		Slot:                0,
-		Bytes:                root[:],
-	})
+	ret, _ = generateAndApplyBlocks(ret, 5)
 
 	return ret
+}
+
+// will generate and save blocks from slot 0 until maxBlocks
+func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, error) {
+	var previousBlockHeader *core.PoolBlockHeader
+	for i := 0 ; i < maxBlocks ; i++ {
+		// get proposer
+		pID, err := shared.BlockProposer(state, uint64(i))
+		if err != nil {
+			return nil, err
+		}
+
+		// state root
+		stateRoot,err := ssz.HashTreeRoot(state)
+		if err != nil {
+			return nil, err
+		}
+
+		// parent
+		if previousBlockHeader != nil {
+			previousBlockHeader.StateRoot =  stateRoot[:]
+		}
+		parentRoot,err := ssz.HashTreeRoot(previousBlockHeader)
+		if err != nil {
+			return nil, err
+		}
+
+		block := &core.PoolBlock{
+			Slot:                 uint64(i),
+			Proposer:             pID,
+			ParentRoot:           parentRoot[:],
+			StateRoot:            params.ChainConfig.ZeroHash, // temp
+			Body:                 &core.PoolBlockBody{
+				RandaoReveal:         nil,
+				Attestations:         []*core.Attestation{},
+				NewPoolReq:           []*core.CreateNewPoolRequest{},
+			},
+		}
+
+		// process
+		st := NewStateTransition()
+
+		// compute state root
+		root, err := st.ComputeStateRoot(state, &core.SignedPoolBlock{
+			Block:                block,
+			Signature:            []byte{},
+		})
+		if err != nil {
+			return nil, err
+		}
+		block.StateRoot = root[:]
+
+		// sign
+		sig, err := shared.SignBlock(block, []byte(fmt.Sprintf("%d", pID)), []byte("domain")) // TODO - dynamic domain
+		if err != nil {
+			return nil, err
+		}
+
+		// execute
+		state, err = st.ExecuteStateTransition(state, &core.SignedPoolBlock{
+			Block:                block,
+			Signature:            sig.Serialize(),
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		// copy to previousBlockRoot
+		previousBlockHeader = &core.PoolBlockHeader{}
+		deepcopier.Copy(state.LatestBlockHeader).To(previousBlockHeader)
+	}
+	return state, nil
 }

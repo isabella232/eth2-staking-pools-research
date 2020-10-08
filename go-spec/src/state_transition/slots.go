@@ -43,20 +43,20 @@ func (st *StateTransition) ProcessSlots(state *core.State, slot uint64) error {
 //    state.block_roots[state.slot % SLOTS_PER_HISTORICAL_ROOT] = previous_block_root
 func processSlot(state *core.State) error {
 	// state root
-	root, err := ssz.HashTreeRoot(state)
+	stateRoot, err := ssz.HashTreeRoot(state)
 	if err != nil {
 		return err
 	}
 	state.StateRoots = append(state.StateRoots, &core.SlotAndBytes{
 		Slot:                 state.CurrentSlot,
-		Bytes:                root[:],// TODO - SLOTS_PER_HISTORICAL_ROOT
+		Bytes:                stateRoot[:],// TODO - SLOTS_PER_HISTORICAL_ROOT
 	})
 
 	// update latest header
-	state.LatestBlockHeader.StateRoot = root[:]
+	state.LatestBlockHeader.StateRoot = stateRoot[:]
 
 	// add block root
-	root, err = ssz.HashTreeRoot(state.LatestBlockHeader)
+	root, err := ssz.HashTreeRoot(state.LatestBlockHeader)
 	if err != nil {
 		return err
 	}

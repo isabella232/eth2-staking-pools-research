@@ -81,11 +81,11 @@ func NewStateTransition() *StateTransition { return &StateTransition{} }
 func (st *StateTransition)ExecuteStateTransition(state *core.State, signedBlock *core.SignedPoolBlock) (newState *core.State, err error) {
 	newState = shared.CopyState(state)
 
-	if err := st.ProcessSlots(state, signedBlock.Block.Slot); err != nil {
+	if err := st.ProcessSlots(newState, signedBlock.Block.Slot); err != nil {
 		return nil, err
 	}
 
-	if err := st.ProcessBlock(state, signedBlock); err != nil {
+	if err := st.ProcessBlock(newState, signedBlock); err != nil {
 		return nil, err
 	}
 
@@ -107,7 +107,6 @@ func (st *StateTransition) ComputeStateRoot(state *core.State, signedBlock *core
 	if err := st.ProcessSlots(stateCopy, signedBlock.Block.Slot); err != nil {
 		return [32]byte{}, err
 	}
-
 	if err := st.processBlockForStateRoot(stateCopy, signedBlock); err != nil {
 		return [32]byte{}, err
 	}
