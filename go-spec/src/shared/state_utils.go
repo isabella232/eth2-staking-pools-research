@@ -143,21 +143,15 @@ func GetPool(state *core.State, id uint64) *core.Pool {
 // Returns the seed after randao was applied on the last slot of the epoch
 // will return error if not found
 func GetEpochSeed(state *core.State, epoch uint64) ([]byte, error) {
-	targetSlot := epoch * params.ChainConfig.SlotsInEpoch - 1 + params.ChainConfig.SlotsInEpoch
-	seed, err := GetSeed(state, targetSlot)
-	if err != nil {
-		return []byte{}, fmt.Errorf("seed for epoch %d not found", epoch)
+	if epoch == 0 {
+		return params.ChainConfig.GenesisSeed, nil
 	}
-	return seed, nil
-}
 
-// returns seed for a slot
-func GetSeed(state *core.State, slot uint64) ([]byte, error) {
+	targetSlot := epoch * params.ChainConfig.SlotsInEpoch - 1 + params.ChainConfig.SlotsInEpoch
 	for _, d := range state.Seeds {
-		if d.Slot == slot {
+		if d.Slot == targetSlot {
 			return d.Bytes, nil
 		}
 	}
-	return []byte{}, fmt.Errorf("seed for slot %d not found", slot)
+	return []byte{}, fmt.Errorf("seed for slot %d not found", targetSlot)
 }
-

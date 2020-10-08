@@ -38,7 +38,7 @@ func SlotCommitteeByIndex(state *core.State, slot uint64, committeeIdx uint64)([
 	var seed []byte
 	var err error
 	if epoch == 0 {
-		seed = params.ChainConfig.GenesisSeed // TODO - double check
+		seed, err = GetEpochSeed(state, epoch) // will return genesis seed
 	} else {
 		seed, err = GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
 	}
@@ -112,7 +112,13 @@ func BlockProposer(state *core.State, slot uint64) (uint64, error) {
 	slotInEpoch := slot - epoch * params.ChainConfig.SlotsInEpoch
 
 	// TODO - what seed should we take? last epoch? last finalized epoch?
-	seed, err := GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
+	var seed []byte
+	var err error
+	if epoch == 0 {
+		seed, err = GetEpochSeed(state, epoch) // will return genesis seed
+	} else {
+		seed, err = GetEpochSeed(state, epoch - 1) // we always use the seed from previous epoch
+	}
 	if err != nil {
 		return 0, err
 	}
