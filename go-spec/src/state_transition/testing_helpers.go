@@ -98,7 +98,7 @@ func generateAttestations(
 	}
 }
 
-func generateTestState(t *testing.T) *core.State {
+func generateTestState(t *testing.T, headSlot int) *core.State {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
@@ -158,7 +158,7 @@ func generateTestState(t *testing.T) *core.State {
 		},
 	}
 
-	ret, _ = generateAndApplyBlocks(ret, 5)
+	ret, _ = generateAndApplyBlocks(ret, headSlot)
 
 	return ret
 }

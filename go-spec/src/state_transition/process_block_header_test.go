@@ -150,7 +150,7 @@ func TestProcessBlockHeader(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			state := generateTestState(t)
+			state := generateTestState(t, 3)
 
 			// block root
 			root,err := ssz.HashTreeRoot(test.block)

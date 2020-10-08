@@ -15,7 +15,7 @@ func TestStateCopying(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	state := generateTestState(t)
+	state := generateTestState(t, 3)
 
 	preRoot, err := ssz.HashTreeRoot(state)
 	require.NoError(t, err)
@@ -46,7 +46,7 @@ func TestBlockApplyConsistency(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	state := generateTestState(t)
+	state := generateTestState(t, 3)
 	block := &core.PoolBlock{
 		Slot:                 33,
 		Proposer:             2713,

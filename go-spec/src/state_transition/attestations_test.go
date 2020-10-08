@@ -13,7 +13,7 @@ func TestAttestationProcessing(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	state := generateTestState(t)
+	state := generateTestState(t, 3)
 	tests := []struct{
 		name string
 		block *core.PoolBlock
@@ -172,7 +172,7 @@ func TestAttestationProcessing(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func (t *testing.T) {
-			state := generateTestState(t)
+			state := generateTestState(t, 3)
 			st := NewStateTransition()
 
 			if test.expectedError != nil {

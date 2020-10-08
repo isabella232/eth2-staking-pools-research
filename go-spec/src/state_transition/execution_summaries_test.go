@@ -14,7 +14,7 @@ func TestFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	state := generateTestState(t)
+	state := generateTestState(t, 3)
 	atts := generateAttestations(
 		state,
 		128,
@@ -50,7 +50,7 @@ func TestNotFinalizedAttestation(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	state := generateTestState(t)
+	state := generateTestState(t, 3)
 	atts := generateAttestations(
 		state,
 		128,
@@ -82,7 +82,7 @@ func TestFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	state := generateTestState(t)
+	state := generateTestState(t, 3)
 	att := generateAttestations(
 		state,
 		128,
@@ -118,7 +118,7 @@ func TestNotFinalizedProposal(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	state := generateTestState(t)
+	state := generateTestState(t, 3)
 	att := generateAttestations(
 		state,
 		128,
