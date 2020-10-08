@@ -18,6 +18,15 @@ func (st *StateTransition) processBlockAttestations(state *core.State, attestati
 	return nil
 }
 
+func (st *StateTransition) processAttestation(state *core.State, attestation *core.Attestation) error {
+	if err := processAttestationNoSigVerify(st, state, attestation); err != nil {
+		return err
+	}
+	if err := validateAttestationSignature(state, attestation, attestation.Data.Slot); err != nil {
+		return err
+	}
+	return nil
+}
 
 // ProcessAttestation verifies an input attestation can pass through processing using the given beacon state.
 //
@@ -49,8 +58,7 @@ func (st *StateTransition) processBlockAttestations(state *core.State, attestati
 //
 //    # Check signature
 //    assert is_valid_indexed_attestation(state, get_indexed_attestation(state, attestation))
-func (st *StateTransition) processAttestation(state *core.State, attestation *core.Attestation) error {
-	// TODO - validate epoch, slot, inclusion distance
+func processAttestationNoSigVerify(st *StateTransition, state *core.State, attestation *core.Attestation) error {
 	if err := validateAttestationData(state, attestation.Data); err != nil {
 		return err
 	}
@@ -60,15 +68,9 @@ func (st *StateTransition) processAttestation(state *core.State, attestation *co
 	if err := appendPendingAttestation(state, attestation); err != nil {
 		return err
 	}
-	if err := validateSignature(state, attestation, attestation.Data.Slot); err != nil {
-		return err
-	}
-
-	// process execution summaries
 	if err := st.processExecutionSummaries(state, attestation.Data.ExecutionSummaries); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -157,7 +159,7 @@ func validateAttestationData(state *core.State, data *core.AttestationData) erro
 
 //    # Check signature
 //    assert is_valid_indexed_attestation(state, get_indexed_attestation(state, attestation))
-func validateSignature(state *core.State, attestation *core.Attestation, slot uint64) error {
+func validateAttestationSignature(state *core.State, attestation *core.Attestation, slot uint64) error {
 	// reconstruct committee
 	expectedCommittee, err := shared.SlotCommitteeByIndex(state, slot, uint64(attestation.Data.CommitteeIndex))
 	if err != nil {
