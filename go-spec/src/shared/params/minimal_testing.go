@@ -10,14 +10,15 @@ func testConfig() *core.PoolsChainConfig {
 
 	return &core.PoolsChainConfig{
 		GenesisSeed: 	       genesisSeed,
+		GenesisEpoch: 		   0,
 
-		VaultSize:             24,
+		VaultSize:             4,
 		BaseEth2DutyReward:    100,
 		DKGReward:             1000,
 
 		SlotsInEpoch:                32,
-		MinAttestationCommitteeSize: 128,
-		MaxAttestationCommitteeSize: 2048,
+		MinAttestationCommitteeSize: 16,
+		MaxAttestationCommitteeSize: 256,
 		MinAttestationInclusionDelay: 1,
 
 		ZeroHash: make([]byte, 32),

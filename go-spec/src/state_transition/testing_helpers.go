@@ -102,7 +102,7 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
-	pools := make([]*core.Pool, 128)
+	pools := make([]*core.Pool, 12)
 
 	// block producers
 	bps := make([]*core.BlockProducer, len(pools) * int(params.ChainConfig.VaultSize))
@@ -158,7 +158,10 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 		},
 	}
 
-	ret, _ = generateAndApplyBlocks(ret, headSlot)
+	ret, err := generateAndApplyBlocks(ret, headSlot)
+	if err != nil {
+
+	}
 
 	return ret
 }
@@ -167,6 +170,7 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, error) {
 	var previousBlockHeader *core.PoolBlockHeader
 	for i := 0 ; i < maxBlocks ; i++ {
+
 		// get proposer
 		pID, err := shared.BlockProposer(state, uint64(i))
 		if err != nil {

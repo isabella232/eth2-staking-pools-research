@@ -2,6 +2,7 @@ package state_transition
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
@@ -91,7 +92,7 @@ func processBlockHeaderNoVerify(state *core.State, signedBlock *core.SignedPoolB
 		return err
 	}
 	if !bytes.Equal(block.ParentRoot, root[:]) {
-		return fmt.Errorf("parent block root doesn't match")
+		return fmt.Errorf("parent block root doesn't match, expected %s", hex.EncodeToString(root[:]))
 	}
 
 	// save

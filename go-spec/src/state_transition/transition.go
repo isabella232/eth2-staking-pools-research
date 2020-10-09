@@ -2,6 +2,7 @@ package state_transition
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
@@ -94,7 +95,7 @@ func (st *StateTransition)ExecuteStateTransition(state *core.State, signedBlock 
 		return nil, err
 	}
 	if !bytes.Equal(signedBlock.Block.StateRoot, postStateRoot[:]) {
-		return nil, fmt.Errorf("new block state root is wrong")
+		return nil, fmt.Errorf("new block state root is wrong, expected %s", hex.EncodeToString(postStateRoot[:]))
 	}
 
 	return newState, nil
@@ -107,6 +108,7 @@ func (st *StateTransition) ComputeStateRoot(state *core.State, signedBlock *core
 	if err := st.ProcessSlots(stateCopy, signedBlock.Block.Slot); err != nil {
 		return [32]byte{}, err
 	}
+
 	if err := st.processBlockForStateRoot(stateCopy, signedBlock); err != nil {
 		return [32]byte{}, err
 	}

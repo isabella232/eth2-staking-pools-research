@@ -34,7 +34,7 @@ message BlockProducer {
     uint64 Id = 1;
     bytes PubKey = 2;
     uint64 CDTBalance = 3;
-    uint64 Stake = 4;
+    uint64 Stake = 4; // In ETH
     bool Slashed = 5;
     bool Active = 6;
     uint64 ExitEpoch = 7;

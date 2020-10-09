@@ -71,7 +71,3 @@ func processSlot(state *core.State) error {
 func canProcessEpoch(state *core.State) bool {
 	return (state.CurrentSlot + 1) % params.ChainConfig.SlotsInEpoch == 0
 }
-
-func processEpoch(state *core.State) error {
-	return nil
-}

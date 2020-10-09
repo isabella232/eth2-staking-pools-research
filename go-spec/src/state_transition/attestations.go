@@ -130,10 +130,7 @@ func validateAggregationBits(state *core.State, attestation *core.Attestation) e
 //    assert data.index < get_committee_count_per_slot(state, data.target.epoch)
 func validateAttestationData(state *core.State, data *core.AttestationData) error {
 	currentEpoch := shared.GetCurrentEpoch(state)
-	previousEpoch, err := shared.GetPreviousEpoch(state)
-	if err != nil {
-		return err
-	}
+	previousEpoch := shared.GetPreviousEpoch(state)
 
 	if data.Target.Epoch != currentEpoch && data.Target.Epoch != previousEpoch {
 		return fmt.Errorf("taregt not in current/ previous epoch")

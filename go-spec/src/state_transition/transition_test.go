@@ -41,28 +41,28 @@ func TestBlockPostValidation(t *testing.T) {
 		{
 			name: "valid post state root",
 			block: &core.PoolBlock{
-				Proposer:        1733,
+				Proposer:        27,
 				Slot:            4,
 				Body: &core.PoolBlockBody{
 					RandaoReveal:         toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 				},
-				ParentRoot: toByte("bf354521176004e10d162c05a5146b275950a4e933add0c09922ecab9114aecc"),
-				StateRoot: toByte("772ec926506570bff504535ef90e136a1b2a1c49a8de491eee6135be9f02e3ff"),
+				ParentRoot: toByte("ddfc878b39d0e6807c673b2775788ebba122c37786bea8b23a407c532ce309fe"),
+				StateRoot: toByte("70069e2e57bf907263fa1edf3e272b65a5652a89a388c35586d70e28fcc19977"),
 			},
 			expectedError: nil,
 		},
 		{
 			name: "invalid post state root",
 			block: &core.PoolBlock{
-				Proposer:        1733,
+				Proposer:        27,
 				Slot:            4,
 				Body: &core.PoolBlockBody{
 					RandaoReveal:         toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 				},
-				ParentRoot: toByte("bf354521176004e10d162c05a5146b275950a4e933add0c09922ecab9114aecc"),
-				StateRoot: toByte("772ec926506570bff504535ef90e136a1b2a1c49a8de491eee6135be9f02e3fe"),
+				ParentRoot: toByte("ddfc878b39d0e6807c673b2775788ebba122c37786bea8b23a407c532ce309fe"),
+				StateRoot: toByte("70069e2e57bf907263fa1edf3e272b65a5652a89a388c35586d70e28fcc19976"),
 			},
-			expectedError: fmt.Errorf("new block state root is wrong"),
+			expectedError: fmt.Errorf("new block state root is wrong, expected 70069e2e57bf907263fa1edf3e272b65a5652a89a388c35586d70e28fcc19977"),
 		},
 	}
 

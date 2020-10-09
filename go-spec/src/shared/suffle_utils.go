@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
+	"github.com/prysmaticlabs/go-bitfield"
 )
 
 // Vault committee is a randomly selected committee of BPs that are chosen to generate the pool's keys via DKG
@@ -60,6 +61,17 @@ func SlotCommitteeByIndex(state *core.State, slot uint64, committeeIdx uint64)([
 	}
 
 	return CommitteeStructure(shuffled)[slotInEpoch][committeeIdx], nil
+}
+
+// returns the committee indexes for which bf[i] is set to 1
+func AttestingIndices(bf bitfield.Bitfield, committee []uint64) []uint64 {
+	indices := make([]uint64, 0, bf.Count())
+	for _, idx := range bf.BitIndices() {
+		if idx < len(committee) {
+			indices = append(indices, committee[idx])
+		}
+	}
+	return indices
 }
 
 func SlotCommitteeCount(state *core.State, slot uint64) int { // TODO - tests

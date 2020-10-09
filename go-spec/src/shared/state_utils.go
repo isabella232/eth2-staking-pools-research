@@ -87,13 +87,25 @@ func GetCurrentEpoch(state *core.State) uint64 {
 	return params.SlotToEpoch(state.CurrentSlot)
 }
 
-func GetPreviousEpoch(state *core.State) (uint64, error) {
-	current := params.SlotToEpoch(state.CurrentSlot)
-	if current != 0 {
-		return current - 1, nil
-	} else {
-		return 0, fmt.Errorf("current peoch is 0, no previous epoch")
+func GetPreviousEpoch(state *core.State) uint64 {
+	if GetCurrentEpoch(state) == params.ChainConfig.GenesisEpoch {
+		return params.ChainConfig.GenesisEpoch
 	}
+	return GetCurrentEpoch(state) - 1
+}
+
+// Return the block root at the start of a recent ``epoch``.
+func GetBlockRoot(state *core.State, epoch uint64) *core.SlotAndBytes {
+	targetSlot := epoch * params.ChainConfig.SlotsInEpoch
+
+	// TODO - assert slot < state.slot <= slot + SLOTS_PER_HISTORICAL_ROOT
+
+	for _, blk := range state.BlockRoots {
+		if blk.Slot == targetSlot {
+			return blk
+		}
+	}
+	return nil
 }
 
 // will return an 0 length byte array if not found

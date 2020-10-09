@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/herumi/bls-eth-go-binary/bls"
@@ -14,7 +15,7 @@ func SignBlock(block *core.PoolBlock, sk []byte, domain []byte) (*bls.Sign, erro
 	}
 
 	privKey := bls.SecretKey{}
-	err = privKey.Deserialize(sk)
+	err = privKey.SetHexString(hex.EncodeToString(sk))
 	if err != nil {
 		return nil, err
 	}
