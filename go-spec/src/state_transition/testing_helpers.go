@@ -152,9 +152,13 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 		PreviousEpochAttestations: []*core.PendingAttestation{},
 		CurrentEpochAttestations:[]*core.PendingAttestation{},
 		JustificationBits: []byte{0},
+		PreviousJustifiedCheckpoint: &core.Checkpoint{
+			Epoch:                0,
+			Root:                 params.ChainConfig.ZeroHash, // TODO is it zero hash?
+		},
 		CurrentJustifiedCheckpoint: &core.Checkpoint{
 			Epoch:                0,
-			Root:                 params.ChainConfig.ZeroHash,
+			Root:                 params.ChainConfig.ZeroHash, // TODO is it zero hash?
 		},
 	}
 

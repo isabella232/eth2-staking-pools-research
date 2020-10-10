@@ -15,6 +15,9 @@ import (
 //	process_slashings(state)
 //	process_final_updates(state)
 func processEpoch(state *core.State) error {
+	if err := processJustificationAndFinalization(state); err != nil {
+		return err
+	}
 	return nil
 }
 
