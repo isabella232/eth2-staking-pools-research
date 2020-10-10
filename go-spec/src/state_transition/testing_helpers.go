@@ -117,7 +117,7 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 		bps[i] = &core.BlockProducer{
 			Id:      uint64(i),
 			CDTBalance: 1000,
-			Stake:   0,
+			Stake:   32,
 			Slashed: false,
 			Active:  true,
 			PubKey:  sk.GetPublicKey().Serialize(),
@@ -159,11 +159,58 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 	}
 
 	ret, err := generateAndApplyBlocks(ret, headSlot)
-	if err != nil {
-
-	}
+	if err != nil { fmt.Printf("%s", err.Error()) }
 
 	return ret
+}
+
+// will populate the prev and current pending attestations for processing
+func populateJustificationAndFinalization(
+		state *core.State,
+		epoch uint64,
+		endSlot uint64, // end slot for attestations
+		participationRate float64,
+		targetCheckpoint *core.Checkpoint,
+	) error {
+
+	slotPointer := epoch * params.ChainConfig.SlotsInEpoch // points at first slot
+	pendingAttArray := make([]*core.PendingAttestation, 0)
+	setPendingAttArray := func(att []*core.PendingAttestation) {
+		if epoch == shared.GetCurrentEpoch(state) {
+			state.CurrentEpochAttestations = att
+		} else {
+			state.PreviousEpochAttestations = att
+		}
+	}
+
+	for slotPointer <= endSlot {
+		for cIndx := 0 ; cIndx < shared.SlotCommitteeCount(state, slotPointer) ; cIndx ++ {
+			committee, err := shared.SlotCommitteeByIndex(state, slotPointer, uint64(cIndx))
+			if err != nil {
+				return err
+			}
+			targetParticipation := uint64(float64(len(committee)) * participationRate)
+
+			aggBits := make(bitfield.Bitlist, params.ChainConfig.MaxAttestationCommitteeSize)
+			for i := uint64(0); i < targetParticipation; i ++ {
+				aggBits.SetBitAt(i, true)
+			}
+
+			pendingAttArray = append(pendingAttArray, &core.PendingAttestation{
+				AggregationBits:      aggBits,
+				Data:                 &core.AttestationData{
+					Slot:                 slotPointer,
+					CommitteeIndex:       uint32(cIndx),
+					Target:               targetCheckpoint,
+				},
+			})
+		}
+		slotPointer ++
+	}
+
+	setPendingAttArray(pendingAttArray)
+
+	return nil
 }
 
 // will generate and save blocks from slot 0 until maxBlocks
@@ -198,7 +245,7 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 			ParentRoot:           parentRoot[:],
 			StateRoot:            params.ChainConfig.ZeroHash, // temp
 			Body:                 &core.PoolBlockBody{
-				RandaoReveal:         nil,
+				RandaoReveal:         params.ChainConfig.ZeroHash,
 				Attestations:         []*core.Attestation{},
 				NewPoolReq:           []*core.CreateNewPoolRequest{},
 			},

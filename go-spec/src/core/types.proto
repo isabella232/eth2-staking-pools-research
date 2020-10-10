@@ -15,7 +15,7 @@ message State {
     // past
     repeated SlotAndBytes BlockRoots = 4;
     repeated SlotAndBytes StateRoots = 5;
-    repeated SlotAndBytes Seeds = 6;
+    repeated SlotAndBytes Seeds = 6; // TODO - change to randao reveals
 
     // Finalization & justification
     repeated PendingAttestation PreviousEpochAttestations = 7;
