@@ -48,9 +48,9 @@ func TestBlockApplyConsistency(t *testing.T) {
 
 	state := generateTestState(t, 3)
 	block := &core.PoolBlock{
-		Slot:                 33,
-		Proposer:             2713,
-		ParentRoot:           toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e40"),
+		Slot:                 2,
+		Proposer:             13,
+		ParentRoot:           toByte("332863d85bdafc9e5ccaeec92d12f00452bd9e3d71b80af4a0cab9df35c5e56f"),
 		StateRoot:            nil,
 		Body:                 &core.PoolBlockBody{
 			RandaoReveal:          toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
@@ -58,9 +58,9 @@ func TestBlockApplyConsistency(t *testing.T) {
 			Attestations:         generateAttestations(
 				state,
 				128,
-				32,
+				1,
 				&core.Checkpoint{Epoch: 0, Root: params.ChainConfig.ZeroHash},
-				&core.Checkpoint{Epoch: 1, Root: []byte{}},
+				&core.Checkpoint{Epoch: 0, Root: []byte{}},
 				0,
 				true,
 				0, /* attestation */
@@ -71,7 +71,7 @@ func TestBlockApplyConsistency(t *testing.T) {
 	// sign
 	sig, err := shared.SignBlock(
 		block,
-		[]byte(fmt.Sprintf("%d", 2713)),
+		[]byte(fmt.Sprintf("%d", 13)),
 		[]byte("domain"))
 	require.NoError(t, err)
 	signed := &core.SignedPoolBlock{

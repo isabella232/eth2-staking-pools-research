@@ -7,17 +7,17 @@ import (
 	"testing"
 )
 
-func TestEpoch2Justification(t *testing.T) {
+func TestEpochJustification(t *testing.T) {
 	require.NoError(t, bls.Init(bls.BLS12_381))
 	require.NoError(t, bls.SetETHmode(bls.EthModeDraft07))
 
 	state := generateTestState(t, 95)
 	err := populateJustificationAndFinalization(state, 2, 95, 1, &core.Checkpoint{
 		Epoch:                2,
-		Root:                 toByte("74a631caa345567967d5998fd21c1d17513976c8d53e286525968e52e3e54499"),
+		Root:                 toByte("155bb576077c9a88f5f71f6ae1c235d368b39e1da2b3d99efd60239ad622e58e"),
 	})
 
 	require.NoError(t, err)
 	require.NoError(t, processJustificationAndFinalization(state))
-	require.EqualValues(t, toByte("74a631caa345567967d5998fd21c1d17513976c8d53e286525968e52e3e54499"), state.CurrentJustifiedCheckpoint.Root)
+	require.EqualValues(t, toByte("155bb576077c9a88f5f71f6ae1c235d368b39e1da2b3d99efd60239ad622e58e"), state.CurrentJustifiedCheckpoint.Root)
 }

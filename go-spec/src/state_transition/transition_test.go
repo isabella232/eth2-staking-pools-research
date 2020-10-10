@@ -32,7 +32,7 @@ func TestRandaoSeedMix(t *testing.T) {
 }
 
 
-func TestBlockPostValidation(t *testing.T) {
+func TestStateTransitionExecution(t *testing.T) {
 	tests := []struct{
 		name          string
 		block         *core.PoolBlock
@@ -41,28 +41,28 @@ func TestBlockPostValidation(t *testing.T) {
 		{
 			name: "valid post state root",
 			block: &core.PoolBlock{
-				Proposer:        27,
-				Slot:            4,
+				Proposer:        13,
+				Slot:            2,
 				Body: &core.PoolBlockBody{
 					RandaoReveal:         toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 				},
-				ParentRoot: toByte("ddfc878b39d0e6807c673b2775788ebba122c37786bea8b23a407c532ce309fe"),
-				StateRoot: toByte("70069e2e57bf907263fa1edf3e272b65a5652a89a388c35586d70e28fcc19977"),
+				ParentRoot: toByte("332863d85bdafc9e5ccaeec92d12f00452bd9e3d71b80af4a0cab9df35c5e56f"),
+				StateRoot: toByte("88dddf841498565dab6c89568f9f9151f9f7239f64b948e287920c66a0a77d68"),
 			},
 			expectedError: nil,
 		},
 		{
 			name: "invalid post state root",
 			block: &core.PoolBlock{
-				Proposer:        27,
-				Slot:            4,
+				Proposer:        13,
+				Slot:            2,
 				Body: &core.PoolBlockBody{
 					RandaoReveal:         toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 				},
-				ParentRoot: toByte("ddfc878b39d0e6807c673b2775788ebba122c37786bea8b23a407c532ce309fe"),
+				ParentRoot: toByte("332863d85bdafc9e5ccaeec92d12f00452bd9e3d71b80af4a0cab9df35c5e56f"),
 				StateRoot: toByte("70069e2e57bf907263fa1edf3e272b65a5652a89a388c35586d70e28fcc19976"),
 			},
-			expectedError: fmt.Errorf("new block state root is wrong, expected 70069e2e57bf907263fa1edf3e272b65a5652a89a388c35586d70e28fcc19977"),
+			expectedError: fmt.Errorf("new block state root is wrong, expected 88dddf841498565dab6c89568f9f9151f9f7239f64b948e287920c66a0a77d68"),
 		},
 	}
 
