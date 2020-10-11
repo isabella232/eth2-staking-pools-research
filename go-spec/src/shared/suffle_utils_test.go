@@ -179,11 +179,11 @@ func TestCommitteeShuffling(t *testing.T) {
 		Seeds:                []*core.SlotAndBytes{
 			&core.SlotAndBytes{
 				Slot:               31,
-				Bytes:                 []byte("seedseedseedseedseedseedseedseed"),
+				Bytes:              []byte("seedseedseedseedseedseedseedseed"),
 			},
 			&core.SlotAndBytes{
 				Slot:               63,
-				Bytes:                 []byte("sdddseedseedseedseedseedseedseed"),
+				Bytes:              []byte("sdddseedseedseedseedseedseedseed"),
 			},
 		},
 		BlockProducers:       bps,
