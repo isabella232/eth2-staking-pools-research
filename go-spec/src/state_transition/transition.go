@@ -7,6 +7,7 @@ import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/prysmaticlabs/go-ssz"
+	"log"
 )
 
 type IStateTransition interface {
@@ -80,6 +81,7 @@ type StateTransition struct {}
 func NewStateTransition() *StateTransition { return &StateTransition{} }
 
 func (st *StateTransition)ExecuteStateTransition(state *core.State, signedBlock *core.SignedPoolBlock) (newState *core.State, err error) {
+	log.Printf("processing block at slot %d\n", signedBlock.Block.Slot)
 	newState = shared.CopyState(state)
 
 	if err := st.ProcessSlots(newState, signedBlock.Block.Slot); err != nil {

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/prysmaticlabs/go-ssz"
 )
 
@@ -134,37 +133,5 @@ func verifyBlockSig(state *core.State, signedBlock *core.SignedPoolBlock) error 
 	if err := shared.VerifyBlockSigningRoot(block, proposer.GetPubKey(), signedBlock.Signature, []byte("domain")); err != nil { // TODO - domain not hard coded
 		return err
 	}
-	return nil
-}
-
-func processRANDAO (state *core.State, block *core.PoolBlock) error {
-	return processRANDAONoVerify(state, block) // TODO - temp solution, follow https://github.com/ethereum/annotated-spec/blob/master/phase0/beacon-chain.md#randao
-}
-
-func processRANDAONoVerify(state *core.State, block *core.PoolBlock) error {
-	var newSeed [32]byte
-	var err error
-	if block.Slot == 0 {
-		newSeed, err = shared.MixSeed(
-			shared.SliceToByte32(params.ChainConfig.GenesisSeed), // previous seed
-			shared.SliceToByte32(block.Body.RandaoReveal),
-		)
-		if err != nil {
-			return err
-		}
-	} else {
-		newSeed, err = shared.MixSeed(
-			shared.SliceToByte32(state.Seeds[len(state.Seeds) - 1].Bytes), // previous seed
-			shared.SliceToByte32(block.Body.RandaoReveal),
-		)
-		if err != nil {
-			return err
-		}
-	}
-
-	state.Seeds = append(state.Seeds, &core.SlotAndBytes{
-		Slot:                state.CurrentSlot,
-		Bytes:               newSeed[:],
-	})
 	return nil
 }

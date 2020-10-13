@@ -14,13 +14,6 @@ const totalSize = seedSize + roundSize + positionWindowSize
 
 var maxShuffleListSize uint32 = 1 << 31
 
-func MixSeed(a [32]byte, b [32]byte) ([32]byte,error) {
-	for i := range a {
-		a[i] ^= b[i]
-	}
-	return a, nil
-}
-
 // ShuffledIndex returns `p(index)` in a pseudorandom permutation `p` of `0...list_size - 1` with ``seed`` as entropy.
 // We utilize 'swap or not' shuffling in this implementation; we are allocating the memory with the seed that stays
 // constant between iterations instead of reallocating it each iteration as in the spec. This implementation is based

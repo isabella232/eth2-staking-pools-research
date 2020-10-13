@@ -176,3 +176,7 @@ func GetEpochSeed(state *core.State, epoch uint64) ([]byte, error) {
 	}
 	return []byte{}, fmt.Errorf("seed for slot %d not found", targetSlot)
 }
+
+func GetLatestRandaoMix(state *core.State) []byte {
+	return state.Seeds[len(state.Seeds) - 1].Bytes
+}

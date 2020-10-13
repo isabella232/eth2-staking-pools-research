@@ -146,7 +146,12 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 		CurrentSlot: 0,
 		Pools: pools,
 		BlockProducers: bps,
-		Seeds:          []*core.SlotAndBytes{},
+		Seeds:          []*core.SlotAndBytes{
+			&core.SlotAndBytes{
+				Slot:	0,
+				Bytes:	params.ChainConfig.ZeroHash, // beacon chain uses an eth1 block hash as first seed
+			},
+		},
 		BlockRoots: 	[]*core.SlotAndBytes{},
 		StateRoots: 	[]*core.SlotAndBytes{},
 		PreviousEpochAttestations: []*core.PendingAttestation{},
@@ -227,6 +232,7 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 		if err != nil {
 			return nil, err
 		}
+		sk := []byte(fmt.Sprintf("%d", pID))
 
 		// state root
 		stateRoot,err := ssz.HashTreeRoot(state)
@@ -243,13 +249,19 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 			return nil, err
 		}
 
+		// randao
+		randaoReveal, err := signRandao(state, sk)
+		if err != nil {
+			return nil, err
+		}
+
 		block := &core.PoolBlock{
 			Slot:                 uint64(i),
 			Proposer:             pID,
 			ParentRoot:           parentRoot[:],
-			StateRoot:            params.ChainConfig.ZeroHash, // temp
+			StateRoot:            params.ChainConfig.ZeroHash,
 			Body:                 &core.PoolBlockBody{
-				RandaoReveal:         params.ChainConfig.ZeroHash,
+				RandaoReveal:         randaoReveal.Serialize(),
 				Attestations:         []*core.Attestation{},
 				NewPoolReq:           []*core.CreateNewPoolRequest{},
 			},
@@ -269,7 +281,7 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 		block.StateRoot = root[:]
 
 		// sign
-		sig, err := shared.SignBlock(block, []byte(fmt.Sprintf("%d", pID)), []byte("domain")) // TODO - dynamic domain
+		sig, err := shared.SignBlock(block, sk, []byte("domain")) // TODO - dynamic domain
 		if err != nil {
 			return nil, err
 		}
@@ -288,4 +300,12 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 		deepcopier.Copy(state.LatestBlockHeader).To(previousBlockHeader)
 	}
 	return state, nil
+}
+
+func signRandao(state *core.State, sk []byte) (*bls.Sign, error) {
+	data, domain, err := shared.RANDAOSigningData(state)
+	if err != nil {
+		return nil, err
+	}
+	return shared.SignRandao(data, domain, sk)
 }

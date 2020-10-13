@@ -15,39 +15,6 @@ func getSeed(str string) [32]byte {
 	return ret
 }
 
-func TestSeedMix(t *testing.T) {
-	t.SkipNow()
-	/*tests := []struct {
-		testName string
-		seed [32]byte
-		epoch uint32
-		expected string
-	}{
-		{
-			testName: "epoch 1",
-			seed: getSeed("b581262ce281d1e9deaf2f0158d7cd05217f1196d95956c5f55d837ccc3c8a9"),
-			epoch:1,
-			expected: "ddffebc6e10e909165778df614d648b50b81b8647b79121da2c1142a1bb5b6a6",
-		},
-		{
-			testName: "epoch 2",
-			seed: getSeed("b581262ce281d1e9deaf2f0158d7cd05217f1196d95956c5f55d837ccc3c8a9"),
-			epoch:2,
-			expected: "f536fd5464af265f824e9a62144e69ecc5ef0749e5be6743dd69e28b2362e6c4",
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.testName, func (t *testing.T) {
-			res,err := MixSeed(test.seed, test.epoch)
-			require.NoError(t,err)
-
-			require.Equal(t, test.expected, hex.EncodeToString(res[:]))
-		})
-	}*/
-
-}
-
 func TestDeterministicShuffling(t *testing.T) {
 	tests := []struct {
 		testName string
