@@ -88,7 +88,7 @@ func processAttestationNoSigVerify(st *StateTransition, state *core.State, attes
 //        assert data.source == state.previous_justified_checkpoint
 //        state.previous_epoch_attestations.append(pending_attestation)
 func appendPendingAttestation(state *core.State, attestation *core.Attestation) error {
-	proposer, err := shared.BlockProposer(state, attestation.Data.Slot)
+	proposer, err := shared.GetBlockProposerIndex(state)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func appendPendingAttestation(state *core.State, attestation *core.Attestation) 
 		ProposerIndex:        proposer,
 	}
 
-	if attestation.Data.Target.Epoch == params.SlotToEpoch(state.CurrentSlot) {
+	if attestation.Data.Target.Epoch == shared.ComputeEpochAtSlot(state.CurrentSlot) {
 		if !core.CheckpointsEqual(attestation.Data.Source, state.CurrentJustifiedCheckpoint) {
 			return fmt.Errorf("source doesn't equal current justified checkpoint")
 		}
@@ -114,7 +114,7 @@ func appendPendingAttestation(state *core.State, attestation *core.Attestation) 
 }
 
 func validateAggregationBits(state *core.State, attestation *core.Attestation) error {
-	expectedCommittee, err := shared.SlotCommitteeByIndex(state, attestation.Data.Slot, uint64(attestation.Data.CommitteeIndex))
+	expectedCommittee, err := shared.GetAttestationCommittee(state, attestation.Data.Slot, uint64(attestation.Data.CommitteeIndex))
 	if err != nil {
 		return err
 	}
@@ -136,7 +136,7 @@ func validateAttestationData(state *core.State, data *core.AttestationData) erro
 		return fmt.Errorf("taregt not in current/ previous epoch")
 	}
 
-	if params.SlotToEpoch(data.Slot) != data.Target.Epoch {
+	if shared.ComputeEpochAtSlot(data.Slot) != data.Target.Epoch {
 		return fmt.Errorf("target slot not in the correct epoch")
 	}
 
@@ -147,7 +147,7 @@ func validateAttestationData(state *core.State, data *core.AttestationData) erro
 		return fmt.Errorf("slot to submit att. has passed")
 	}
 
-	if data.CommitteeIndex >= uint32(shared.SlotCommitteeCount(state, data.Slot)) {
+	if data.CommitteeIndex >= uint32(shared.GetCommitteeCountPerSlot(state, data.Slot)) {
 		return fmt.Errorf("committee index out of range")
 	}
 
@@ -158,7 +158,7 @@ func validateAttestationData(state *core.State, data *core.AttestationData) erro
 //    assert is_valid_indexed_attestation(state, get_indexed_attestation(state, attestation))
 func validateAttestationSignature(state *core.State, attestation *core.Attestation, slot uint64) error {
 	// reconstruct committee
-	expectedCommittee, err := shared.SlotCommitteeByIndex(state, slot, uint64(attestation.Data.CommitteeIndex))
+	expectedCommittee, err := shared.GetAttestationCommittee(state, attestation.Data.Slot, uint64(attestation.Data.CommitteeIndex))
 	if err != nil {
 		return err
 	}

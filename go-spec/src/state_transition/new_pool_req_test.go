@@ -38,7 +38,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 
 	// check rewards
 	participation := bitfield.Bitlist{43,12}
-	committee, err := shared.VaultCommittee(state, 13, 1)
+	committee, err := shared.GetVaultCommittee(state, 13, 1)
 	sort.Slice(committee, func(i int, j int) bool {
 		return committee[i] < committee[j]
 	})
@@ -91,7 +91,7 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 	require.Equal(t, 12, len(state.Pools))
 
 	// check penalties
-	committee, err := shared.VaultCommittee(state, 13, 1)
+	committee, err := shared.GetVaultCommittee(state, 13, 1)
 	sort.Slice(committee, func(i int, j int) bool {
 		return committee[i] < committee[j]
 	})

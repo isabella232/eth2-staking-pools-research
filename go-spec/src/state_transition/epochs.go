@@ -44,17 +44,25 @@ func processJustificationAndFinalization(state *core.State) error {
 		return err
 	}
 	if prev.AttestingBalance * 3 >= prev.ActiveBalance * 2 {
+		root, err := shared.GetBlockRoot(state, previousEpoch)
+		if err != nil {
+			return err
+		}
 		state.CurrentJustifiedCheckpoint = &core.Checkpoint{
 			Epoch:                previousEpoch,
-			Root:                 shared.GetBlockRoot(state, previousEpoch).Bytes,
+			Root:                 root.Bytes,
 		}
 		newBits.SetBitAt(1, true)
 		state.JustificationBits = newBits
 	}
 	if current.AttestingBalance * 3 >= current.ActiveBalance * 2 {
+		root, err := shared.GetBlockRoot(state, currentEpoch)
+		if err != nil {
+			return err
+		}
 		state.CurrentJustifiedCheckpoint = &core.Checkpoint{
 			Epoch:                currentEpoch,
-			Root:                 shared.GetBlockRoot(state, currentEpoch).Bytes,
+			Root:                 root.Bytes,
 		}
 		newBits.SetBitAt(0, true)
 		state.JustificationBits = newBits
@@ -99,8 +107,12 @@ func calculateAttestingBalances(state *core.State) (prev *Balances, current *Bal
 		// filter matching att. by target root
 		matchingAtt := make([]*core.PendingAttestation, 0)
 		for _, att := range attestations {
-			if blkRoot := shared.GetBlockRoot(state, epoch); blkRoot != nil {
-				if bytes.Equal(att.Data.Target.Root, blkRoot.Bytes) {
+			root, err := shared.GetBlockRoot(state, epoch)
+			if err != nil {
+				return nil, err
+			}
+			if  root != nil {
+				if bytes.Equal(att.Data.Target.Root, root.Bytes) {
 					matchingAtt = append(matchingAtt, att)
 				}
 			} else {
@@ -117,7 +129,7 @@ func calculateAttestingBalances(state *core.State) (prev *Balances, current *Bal
 
 		// calculate attesting balance and indices
 		for _, att := range matchingAtt {
-			committee, err := shared.SlotCommitteeByIndex(state, att.Data.Slot, uint64(att.Data.CommitteeIndex))
+			committee, err := shared.GetAttestationCommittee(state, att.Data.Slot, uint64(att.Data.CommitteeIndex))
 			if err != nil {
 				return nil, err
 			}

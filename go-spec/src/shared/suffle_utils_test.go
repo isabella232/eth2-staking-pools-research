@@ -254,7 +254,7 @@ func TestCommitteeShuffling(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			pc,err := VaultCommittee(state, test.poolId, test.epoch)
+			pc,err := GetVaultCommittee(state, test.poolId, test.epoch)
 			require.NoError(t, err)
 			require.EqualValues(t, test.expectedVaultCommittee, pc)
 

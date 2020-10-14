@@ -28,7 +28,7 @@ func (st *StateTransition) processNewPoolRequests(state *core.State, requests []
 		// TODO - what if a BP doesn't have enough CDT for penalties?
 
 		// get DKG participants
-		committee, err := shared.VaultCommittee(state, req.Id, req.StartEpoch)
+		committee, err := shared.GetVaultCommittee(state, req.Id, req.StartEpoch)
 		if err != nil {
 			return err
 		}
@@ -41,7 +41,7 @@ func (st *StateTransition) processNewPoolRequests(state *core.State, requests []
 			// TODO if i'm the DKG leader act uppon it
 		case 1: // successful
 			// get committee
-			committee, err := shared.VaultCommittee(state, req.Id, req.StartEpoch)
+			committee, err := shared.GetVaultCommittee(state, req.Id, req.StartEpoch)
 			sort.Slice(committee, func(i int, j int) bool {
 				return committee[i] < committee[j]
 			})

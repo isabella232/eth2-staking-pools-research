@@ -4,25 +4,36 @@ package state;
 option go_package = ".;core";
 
 message PoolsChainConfig {
-  bytes GenesisSeed = 1; // should be auto calculated somehow
-  uint64 GenesisEpoch = 2;
+  bytes GenesisSeed = 10; // should be auto calculated somehow
+  uint64 GenesisEpoch = 11;
 
-  uint64 VaultSize = 3;
-  uint64 BaseEth2DutyReward = 4;
-  uint64 DKGReward = 5; // TODO - change naming
+  uint64 VaultSize = 20;
+  uint64 BaseEth2DutyReward = 21;
+  uint64 DKGReward = 22; // TODO - change naming
 
   // slots and epochs
-  uint64 SlotsInEpoch = 6;
-  uint64 MinAttestationCommitteeSize = 7;
-  uint64 MaxAttestationCommitteeSize = 8;
-  uint64 MinAttestationInclusionDelay = 9;
+  uint64 SlotsInEpoch = 30;
+  uint64 MinAttestationCommitteeSize = 31;
+  uint64 MaxAttestationCommitteeSize = 32;
+  uint64 MaxCommitteesPerSlot = 33;
+  uint64 MinAttestationInclusionDelay = 34;
+  uint64 SlotsPerHistoricalRoot = 35;
+  uint64 EpochsPerHistoricalVector = 36;
+  uint64 MinPerEpochChurnLimit = 37;
+  uint64 ChurnLimitQuotient = 38;
 
   // initial value constants
-  bytes ZeroHash = 10;
+  bytes ZeroHash = 40;
 
   // domain
-  bytes DomainBeaconProposer = 11;
-  bytes DomainBeaconAttester = 12;
-  bytes DomainRandao = 13;
-  bytes GenesisForkVersion = 14;
+  bytes DomainBeaconProposer = 50;
+  bytes DomainBeaconAttester = 51;
+  bytes DomainRandao = 52;
+  bytes GenesisForkVersion = 53;
+
+  // other
+  uint64 FarFutureEpoch = 60;
+  uint64 MaxEffectiveBalance = 61;
+  uint64 MaxSeedLookahead = 62;
+  uint64 MinSeedLookahead = 63;
 }

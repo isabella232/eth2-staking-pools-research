@@ -39,7 +39,7 @@ func generateAttestations(
 		ExecutionSummaries:   []*core.ExecutionSummary{
 			&core.ExecutionSummary{
 				PoolId: 3,
-				Epoch:  params.SlotToEpoch(slot),
+				Epoch:  shared.ComputeEpochAtSlot(slot),
 				Duties:               []*core.BeaconDuty{
 					&core.BeaconDuty{
 						Type:                 dutyType, // attestation
@@ -59,7 +59,7 @@ func generateAttestations(
 		return nil
 	}
 
-	expectedCommittee, err := shared.SlotCommitteeByIndex(state, data.Slot, uint64(data.CommitteeIndex))
+	expectedCommittee, err := shared.GetAttestationCommittee(state, data.Slot, uint64(data.CommitteeIndex))
 	if err != nil {
 		return nil
 	}
@@ -189,8 +189,9 @@ func populateJustificationAndFinalization(
 	}
 
 	for slotPointer <= endSlot {
-		for cIndx := 0 ; cIndx < shared.SlotCommitteeCount(state, slotPointer) ; cIndx ++ {
-			committee, err := shared.SlotCommitteeByIndex(state, slotPointer, uint64(cIndx))
+
+		for cIndx := uint64(0) ; cIndx < shared.GetCommitteeCountPerSlot(state, slotPointer) ; cIndx ++ {
+			committee, err := shared.GetAttestationCommittee(state, slotPointer, cIndx)
 			if err != nil {
 				return err
 			}
@@ -223,7 +224,7 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 	var previousBlockHeader *core.PoolBlockHeader
 	for i := 0 ; i < maxBlocks ; i++ {
 		// get proposer
-		pID, err := shared.BlockProposer(state, uint64(i))
+		pID, err := shared.GetBlockProposerIndex(state)
 		if err != nil {
 			return nil, err
 		}

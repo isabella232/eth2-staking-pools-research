@@ -28,7 +28,12 @@ func testConfig() *core.PoolsChainConfig {
 		SlotsInEpoch:                32,
 		MinAttestationCommitteeSize: 16,
 		MaxAttestationCommitteeSize: 16,
+		MaxCommitteesPerSlot: 2^6, // 64
 		MinAttestationInclusionDelay: 1,
+		SlotsPerHistoricalRoot: 2 ^ 13, // ~27H
+		EpochsPerHistoricalVector: 2 ^ 16, // ~36 days
+		MinPerEpochChurnLimit: 4,
+		ChurnLimitQuotient: 2^16, // 65,536
 
 		ZeroHash: make([]byte, 32),
 
@@ -36,14 +41,14 @@ func testConfig() *core.PoolsChainConfig {
 		DomainBeaconAttester: Bytes4(1),
 		DomainRandao: Bytes4(2),
 		GenesisForkVersion: []byte{},
+
+		FarFutureEpoch: 2^64-1,
+		MaxEffectiveBalance: 2^5 * 10^9, // 32 ETH
+		MaxSeedLookahead: 2^2, // 4 epochs
+		MinSeedLookahead: 1, // 1 epoch
 	}
 }
 
 func UseMinimalTestConfig() {
 	ChainConfig = testConfig()
-}
-
-// utils func
-func SlotToEpoch(slot uint64) uint64 {
-	return slot/ ChainConfig.SlotsInEpoch
 }

@@ -12,13 +12,13 @@ const positionWindowSize = int8(4)
 const pivotViewSize = seedSize + roundSize
 const totalSize = seedSize + roundSize + positionWindowSize
 
-var maxShuffleListSize uint32 = 1 << 31
+var maxShuffleListSize uint64 = 1 << 31
 
 // ShuffledIndex returns `p(index)` in a pseudorandom permutation `p` of `0...list_size - 1` with ``seed`` as entropy.
 // We utilize 'swap or not' shuffling in this implementation; we are allocating the memory with the seed that stays
 // constant between iterations instead of reallocating it each iteration as in the spec. This implementation is based
 // on the original implementation from protolambda, https://github.com/protolambda/eth2-shuffle
-func ShuffledIndex(index uint32, indexCount uint32, seed [32]byte, shuffleRoundCount uint8) (uint32, error) {
+func ShuffledIndex(index uint64, indexCount uint64, seed [32]byte, shuffleRoundCount uint64) (uint64, error) {
 	return computeShuffledIndex(index, indexCount, seed, true /* shuffle */, shuffleRoundCount)
 }
 
@@ -36,7 +36,7 @@ func ShuffledIndex(index uint32, indexCount uint32, seed [32]byte, shuffleRoundC
 //   - change byteV every 8 iterations.
 //   - we start at the edges, and work back to the mirror point.
 //     this makes us process each pear exactly once (instead of unnecessarily twice, like in the spec).
-func ShuffleList(input []uint64, seed [32]byte, shuffleRoundCount uint8) ([]uint64, error) {
+func ShuffleList(input []uint64, seed [32]byte, shuffleRoundCount uint64) ([]uint64, error) {
 	return innerShuffleList(input, seed, true /* shuffle */, shuffleRoundCount)
 }
 
@@ -60,7 +60,7 @@ func ShuffleList(input []uint64, seed [32]byte, shuffleRoundCount uint8) ([]uint
 //        index = flip if bit else index
 //
 //    return ValidatorIndex(index)
-func computeShuffledIndex(index uint32, indexCount uint32, seed [32]byte, shuffle bool, shuffleRoundCount uint8) (uint32, error) {
+func computeShuffledIndex(index uint64, indexCount uint64, seed [32]byte, shuffle bool, shuffleRoundCount uint64) (uint64, error) {
 	if index >= indexCount {
 		return 0, fmt.Errorf("input index %d out of bounds: %d",
 			index, indexCount)
@@ -69,7 +69,7 @@ func computeShuffledIndex(index uint32, indexCount uint32, seed [32]byte, shuffl
 		return 0, fmt.Errorf("list size %d out of bounds",
 			indexCount)
 	}
-	rounds := shuffleRoundCount
+	rounds := uint8(shuffleRoundCount)
 	round := uint8(0)
 	if !shuffle {
 		// Starting last round and iterating through the rounds in reverse, un-swaps everything,
@@ -96,7 +96,7 @@ func computeShuffledIndex(index uint32, indexCount uint32, seed [32]byte, shuffl
 		}
 		// Add position except its last byte to []buf for randomness,
 		// it will be used later to select a bit from the resulting hash.
-		binary.LittleEndian.PutUint32(posBuffer[:8], position>>8)
+		binary.LittleEndian.PutUint64(posBuffer[:8], position>>8)
 		copy(buf[pivotViewSize:], posBuffer[:4])
 		source := hashfunc(buf)
 		// Effectively keep the first 5 bits of the byte value of the position,
@@ -125,20 +125,20 @@ func computeShuffledIndex(index uint32, indexCount uint32, seed [32]byte, shuffl
 
 
 // shuffles or unshuffles, shuffle=false to un-shuffle.
-func innerShuffleList(input []uint64, seed [32]byte, shuffle bool, shuffleRoundCount uint8) ([]uint64, error) {
+func innerShuffleList(input []uint64, seed [32]byte, shuffle bool, shuffleRoundCount uint64) ([]uint64, error) {
 	if len(input) <= 1 {
 		return input, nil
 	}
-	if uint32(len(input)) > maxShuffleListSize {
+	if uint64(len(input)) > maxShuffleListSize {
 		return nil, fmt.Errorf("list size %d out of bounds",
 			len(input))
 	}
-	rounds := shuffleRoundCount
+	rounds := uint8(shuffleRoundCount)
 	hashfunc := sha256.Sum256
 	if rounds == 0 {
 		return input, nil
 	}
-	listSize := uint32(len(input))
+	listSize := uint64(len(input))
 	buf := make([]byte, totalSize, totalSize)
 	r := uint8(0)
 	if !shuffle {
@@ -153,7 +153,7 @@ func innerShuffleList(input []uint64, seed [32]byte, shuffle bool, shuffleRoundC
 		binary.LittleEndian.PutUint32(buf[pivotViewSize:], uint32(pivot>>8))
 		source := hashfunc(buf)
 		byteV := source[(pivot&0xff)>>3]
-		for i, j := uint32(0), pivot; i < mirror; i, j = i+1, j-1 {
+		for i, j := uint64(0), pivot; i < mirror; i, j = i+1, j-1 {
 			byteV, source = swapOrNot(buf, byteV, i, input, j, source, hashfunc)
 		}
 		// Now repeat, but for the part after the pivot.
@@ -182,8 +182,8 @@ func innerShuffleList(input []uint64, seed [32]byte, shuffle bool, shuffleRoundC
 
 // swapOrNot describes the main algorithm behind the shuffle where we swap bytes in the inputted value
 // depending on if the conditions are met.
-func swapOrNot(buf []byte, byteV byte, i uint32, input []uint64,
-	j uint32, source [32]byte, hashFunc func([]byte) [32]byte) (byte, [32]byte) {
+func swapOrNot(buf []byte, byteV byte, i uint64, input []uint64,
+	j uint64, source [32]byte, hashFunc func([]byte) [32]byte) (byte, [32]byte) {
 	if j&0xff == 0xff {
 		// just overwrite the last part of the buffer, reuse the start (seed, round)
 		binary.LittleEndian.PutUint32(buf[pivotViewSize:], uint32(j>>8))
@@ -202,6 +202,6 @@ func swapOrNot(buf []byte, byteV byte, i uint32, input []uint64,
 
 // fromBytes8 returns an integer which is stored in the little-endian format(8, 'little')
 // from a byte array.
-func fromBytes8(x []byte) uint32 {
-	return binary.LittleEndian.Uint32(x)
+func fromBytes8(x []byte) uint64 {
+	return binary.LittleEndian.Uint64(x)
 }

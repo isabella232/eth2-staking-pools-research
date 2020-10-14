@@ -78,7 +78,7 @@ func processBlockHeaderNoVerify(state *core.State, signedBlock *core.SignedPoolB
 	}
 
 	// proposer
-	expectedProposer, err := shared.BlockProposer(state, block.Slot)
+	expectedProposer, err := shared.GetBlockProposerIndex(state)
 	if err != nil {
 		return err
 	}

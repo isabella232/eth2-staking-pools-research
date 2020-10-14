@@ -39,6 +39,9 @@ message BlockProducer {
     bool Slashed = 5;
     bool Active = 6;
     uint64 ExitEpoch = 7;
+    uint64 ActivationEpoch = 8;
+    uint64 ActivationEligibilityEpoch = 9;
+    uint64 WithdrawableEpoch = 10;
 }
 
 message Pool {
@@ -139,4 +142,9 @@ message StateCommitment {
     repeated bytes Committee = 3; // see https://github.com/ethereum/annotated-spec/blob/master/phase1/beacon-chain.md#compactcommittee
     bytes AuxCommitteesRoot = 4;
     repeated bytes NextCommittee = 5;
+}
+
+message ForkData {
+    bytes CurrentVersion = 1;
+    bytes GenesisValidatorRoot = 2;
 }

@@ -121,7 +121,7 @@ func VerifySignature(root []byte, pubKey []byte, sigByts []byte) (bool, error) {
 //    return compute_domain(domain_type, fork_version, state.genesis_validators_root)
 func Domain(epoch uint64, domainType []byte, genesisRoot []byte) ([]byte, error) {
 	// TODO - add fork version
-	return ComputeDomain(domainType, nil, genesisRoot), nil
+	return ComputeDomain(domainType, nil, genesisRoot)
 }
 
 // def compute_domain(domain_type: DomainType, fork_version: Version=None, genesis_validators_root: Root=None) -> Domain:
@@ -134,7 +134,7 @@ func Domain(epoch uint64, domainType []byte, genesisRoot []byte) ([]byte, error)
 //        genesis_validators_root = Root()  # all bytes zero by default
 //    fork_data_root = compute_fork_data_root(fork_version, genesis_validators_root)
 //    return Domain(domain_type + fork_data_root[:28])
-func ComputeDomain(domainType []byte, forkVersion []byte, genesisValidatorRoot []byte) []byte {
+func ComputeDomain(domainType []byte, forkVersion []byte, genesisValidatorRoot []byte) ([]byte, error) {
 	domainBytes := [4]byte{}
 	copy(domainBytes[:], domainType[0:4])
 
@@ -146,10 +146,48 @@ func ComputeDomain(domainType []byte, forkVersion []byte, genesisValidatorRoot [
 	}
 	forkBytes := make([]byte, 4)
 	copy(forkBytes[:], forkVersion)
-	forkDataRoot := make([]byte, 32) // TODO - fork data root
+	forkDataRoot, err := ComputeForkDataRoot(forkVersion, genesisValidatorRoot)
+	if err != nil {
+		return nil, err
+	}
 
 	var b []byte
 	b = append(b, domainType[:4]...)
 	b = append(b, forkDataRoot[:28]...)
-	return b
+	return b, nil
+}
+
+/**
+def compute_fork_data_root(current_version: Version, genesis_validators_root: Root) -> Root:
+    """
+    Return the 32-byte fork data root for the ``current_version`` and ``genesis_validators_root``.
+    This is used primarily in signature domains to avoid collisions across forks/chains.
+    """
+    return hash_tree_root(ForkData(
+        current_version=current_version,
+        genesis_validators_root=genesis_validators_root,
+    ))
+ */
+func ComputeForkDataRoot(version []byte, root []byte) ([32]byte, error) {
+	return ssz.HashTreeRoot(&core.ForkData{
+		CurrentVersion:       version,
+		GenesisValidatorRoot: root,
+	})
+}
+
+/**
+def compute_fork_digest(current_version: Version, genesis_validators_root: Root) -> ForkDigest:
+    """
+    Return the 4-byte fork digest for the ``current_version`` and ``genesis_validators_root``.
+    This is a digest primarily used for domain separation on the p2p layer.
+    4-bytes suffices for practical separation of forks/chains.
+    """
+    return ForkDigest(compute_fork_data_root(current_version, genesis_validators_root)[:4])
+ */
+func ComputeForkDigest(version []byte, root []byte) ([4]byte, error) {
+	dataRoot, err := ComputeForkDataRoot(version, root)
+	if err != nil {
+		return [4]byte{}, err
+	}
+	return ToBytes4(dataRoot[:]), nil
 }

@@ -3,7 +3,6 @@ package shared
 import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
-	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/ulule/deepcopier"
 )
@@ -83,31 +82,6 @@ func CopyState(state *core.State) *core.State {
 	return ret
 }
 
-func GetCurrentEpoch(state *core.State) uint64 {
-	return params.SlotToEpoch(state.CurrentSlot)
-}
-
-func GetPreviousEpoch(state *core.State) uint64 {
-	if GetCurrentEpoch(state) == params.ChainConfig.GenesisEpoch {
-		return params.ChainConfig.GenesisEpoch
-	}
-	return GetCurrentEpoch(state) - 1
-}
-
-// Return the block root at the start of a recent ``epoch``.
-func GetBlockRoot(state *core.State, epoch uint64) *core.SlotAndBytes {
-	targetSlot := epoch * params.ChainConfig.SlotsInEpoch
-
-	// TODO - assert slot < state.slot <= slot + SLOTS_PER_HISTORICAL_ROOT
-
-	for _, blk := range state.BlockRoots {
-		if blk.Slot == targetSlot {
-			return blk
-		}
-	}
-	return nil
-}
-
 // will return an 0 length byte array if not found
 func GetStateRoot(state *core.State, slot uint64) []byte {
 	for _, r := range state.StateRoots {
@@ -141,16 +115,6 @@ func GetBlockProducer(state *core.State, id uint64) *core.BlockProducer {
 	return nil
 }
 
-func GetActiveBlockProducers(state *core.State, epoch uint64) []uint64 {
-	var activeBps []uint64
-	for _, bp := range state.BlockProducers {
-		if bp.Active || bp.GetExitEpoch() > epoch {
-			activeBps = append(activeBps, bp.GetId())
-		}
-	}
-	return activeBps
-}
-
 // will return nil if not found
 func GetPool(state *core.State, id uint64) *core.Pool {
 	for _, p := range state.Pools {
@@ -161,22 +125,3 @@ func GetPool(state *core.State, id uint64) *core.Pool {
 	return nil
 }
 
-// Returns the seed after randao was applied on the last slot of the epoch
-// will return error if not found
-func GetEpochSeed(state *core.State, epoch uint64) ([]byte, error) {
-	if epoch == 0 {
-		return params.ChainConfig.GenesisSeed, nil
-	}
-
-	targetSlot := epoch * params.ChainConfig.SlotsInEpoch - 1 + params.ChainConfig.SlotsInEpoch
-	for _, d := range state.Randao {
-		if d.Slot == targetSlot {
-			return d.Bytes, nil
-		}
-	}
-	return []byte{}, fmt.Errorf("seed for slot %d not found", targetSlot)
-}
-
-func GetLatestRandaoMix(state *core.State) []byte {
-	return state.Randao[len(state.Randao) - 1].Bytes
-}
