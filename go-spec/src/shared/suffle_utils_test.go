@@ -176,7 +176,7 @@ func TestCommitteeShuffling(t *testing.T) {
 		CurrentSlot:          35,
 		BlockRoots:           nil,
 		StateRoots:           nil,
-		Seeds:                []*core.SlotAndBytes{
+		Randao:                []*core.SlotAndBytes{
 			&core.SlotAndBytes{
 				Slot:               31,
 				Bytes:              []byte("seedseedseedseedseedseedseedseed"),

@@ -1,9 +1,11 @@
 package state_transition
 
 import (
+	"encoding/binary"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/ulule/deepcopier"
 )
 
@@ -23,7 +25,7 @@ func processRANDAO (state *core.State, block *core.PoolBlock) error {
 		return fmt.Errorf("could not find BP")
 	}
 
-	data, domain, err := shared.RANDAOSigningData(state)
+	data, domain, err := RANDAOSigningData(state)
 	if err != nil {
 		return err
 	}
@@ -32,7 +34,7 @@ func processRANDAO (state *core.State, block *core.PoolBlock) error {
 		return err
 	}
 	if !res {
-		return fmt.Errorf("sig not verified")
+		return fmt.Errorf("randao sig not verified")
 	}
 
 	return processRANDAONoVerify(state, block)
@@ -60,9 +62,22 @@ func processRANDAONoVerify(state *core.State, block *core.PoolBlock) error {
 		latestMix[i] ^= x
 	}
 
-	state.Seeds = append(state.Seeds, &core.SlotAndBytes{
+	state.Randao = append(state.Randao, &core.SlotAndBytes{
 		Slot:                state.CurrentSlot,
 		Bytes:               latestMix,
 	})
 	return nil
+}
+
+func RANDAOSigningData(state *core.State) (data []byte, domain []byte, err error)  {
+	epoch := shared.GetCurrentEpoch(state)
+	data = make([]byte, 8) // 64 bit
+	binary.LittleEndian.PutUint64(data, epoch)
+
+	domain, err = shared.Domain(epoch, params.ChainConfig.DomainRandao, state.GenesisValidatorsRoot)
+	if err != nil {
+		return nil,nil, err
+	}
+
+	return data, domain, nil
 }

@@ -14,9 +14,6 @@ import (
 	"testing"
 )
 
-var SK = "59aaaa8f68aad68552512feb1e27438ddbe2730ea416bb3337b579317610d703"
-var PK = "846b207d6eb0377ac74db3f7bc295a02340d784431a7cf14dddcd5610c2925facef5763fcaf4358434f92bc9a2906744"
-
 func toByte(str string) []byte {
 	ret, _ := hex.DecodeString(str)
 	return ret
@@ -110,10 +107,6 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 		sk := &bls.SecretKey{}
 		sk.SetHexString(hex.EncodeToString([]byte(fmt.Sprintf("%d", uint64(i)))))
 
-		if i == 17 { // is the block producer for this state
-			sk.SetHexString(SK)
-		}
-
 		bps[i] = &core.BlockProducer{
 			Id:      uint64(i),
 			CDTBalance: 1000,
@@ -146,7 +139,7 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 		CurrentSlot: 0,
 		Pools: pools,
 		BlockProducers: bps,
-		Seeds:          []*core.SlotAndBytes{
+		Randao:          []*core.SlotAndBytes{
 			&core.SlotAndBytes{
 				Slot:	0,
 				Bytes:	params.ChainConfig.ZeroHash, // beacon chain uses an eth1 block hash as first seed
@@ -168,7 +161,10 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 	}
 
 	ret, err := generateAndApplyBlocks(ret, headSlot)
-	if err != nil { fmt.Printf("%s", err.Error()) }
+	if err != nil {
+		fmt.Printf("%s\n", err.Error())
+		return nil
+	}
 
 	return ret
 }
@@ -226,7 +222,6 @@ func populateJustificationAndFinalization(
 func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, error) {
 	var previousBlockHeader *core.PoolBlockHeader
 	for i := 0 ; i < maxBlocks ; i++ {
-
 		// get proposer
 		pID, err := shared.BlockProposer(state, uint64(i))
 		if err != nil {
@@ -281,7 +276,11 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 		block.StateRoot = root[:]
 
 		// sign
-		sig, err := shared.SignBlock(block, sk, []byte("domain")) // TODO - dynamic domain
+		blockDomain, err := shared.Domain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+		if err != nil {
+			return nil, err
+		}
+		sig, err := shared.SignBlock(block, sk, blockDomain) // TODO - dynamic domain
 		if err != nil {
 			return nil, err
 		}
@@ -303,7 +302,12 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 }
 
 func signRandao(state *core.State, sk []byte) (*bls.Sign, error) {
-	data, domain, err := shared.RANDAOSigningData(state)
+	// We bump the slot by one to accurately calculate the epoch as when this
+	// randao reveal will be verified the state.CurrentSlot will be +1
+	copyState := shared.CopyState(state)
+	copyState.CurrentSlot ++
+
+	data, domain, err := RANDAOSigningData(copyState)
 	if err != nil {
 		return nil, err
 	}

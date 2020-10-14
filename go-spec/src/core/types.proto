@@ -8,26 +8,27 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 message State {
     // time
-    uint64 GenesisTime = 1;
-    uint64 CurrentSlot = 2;
-    PoolBlockHeader LatestBlockHeader = 3;
+    uint64 GenesisTime = 10;
+    uint64 CurrentSlot = 11;
+    PoolBlockHeader LatestBlockHeader = 12;
 
     // past
-    repeated SlotAndBytes BlockRoots = 4;
-    repeated SlotAndBytes StateRoots = 5;
-    repeated SlotAndBytes Seeds = 6; // TODO - change to randao reveals
+    repeated SlotAndBytes BlockRoots = 21;
+    repeated SlotAndBytes StateRoots = 22;
+    repeated SlotAndBytes Randao = 23;
+    bytes GenesisValidatorsRoot = 24;
 
     // Finalization & justification
-    repeated PendingAttestation PreviousEpochAttestations = 7;
-    repeated PendingAttestation CurrentEpochAttestations = 8;
-    bytes JustificationBits = 9 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitvector4"];
-    Checkpoint PreviousJustifiedCheckpoint = 10;
-    Checkpoint CurrentJustifiedCheckpoint = 11;
-    Checkpoint FinalizedCheckpoint = 12;
+    repeated PendingAttestation PreviousEpochAttestations = 31;
+    repeated PendingAttestation CurrentEpochAttestations = 32;
+    bytes JustificationBits = 33 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitvector4"];
+    Checkpoint PreviousJustifiedCheckpoint = 34;
+    Checkpoint CurrentJustifiedCheckpoint = 35;
+    Checkpoint FinalizedCheckpoint = 36;
 
     // network
-    repeated BlockProducer BlockProducers = 13;
-    repeated Pool Pools = 14;
+    repeated BlockProducer BlockProducers = 41;
+    repeated Pool Pools = 42;
 }
 
 message BlockProducer {

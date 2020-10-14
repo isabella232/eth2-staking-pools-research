@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/prysmaticlabs/go-ssz"
 )
 
@@ -124,13 +125,18 @@ func processBlockHeader(state *core.State, signedBlock *core.SignedPoolBlock) er
 
 func verifyBlockSig(state *core.State, signedBlock *core.SignedPoolBlock) error {
 	block := signedBlock.Block
+	epoch := shared.GetCurrentEpoch(state)
 
 	// verify sig
 	proposer := shared.GetBlockProducer(state, block.GetProposer())
 	if proposer == nil {
 		return fmt.Errorf("proposer not found")
 	}
-	if err := shared.VerifyBlockSigningRoot(block, proposer.GetPubKey(), signedBlock.Signature, []byte("domain")); err != nil { // TODO - domain not hard coded
+	domain, err := shared.Domain(epoch, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+	if err != nil {
+		return err
+	}
+	if err := shared.VerifyBlockSigningRoot(block, proposer.GetPubKey(), signedBlock.Signature, domain); err != nil { // TODO - domain not hard coded
 		return err
 	}
 	return nil

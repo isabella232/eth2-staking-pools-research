@@ -19,4 +19,10 @@ message PoolsChainConfig {
 
   // initial value constants
   bytes ZeroHash = 10;
+
+  // domain
+  bytes DomainBeaconProposer = 11;
+  bytes DomainBeaconAttester = 12;
+  bytes DomainRandao = 13;
+  bytes GenesisForkVersion = 14;
 }

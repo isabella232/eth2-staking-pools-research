@@ -29,10 +29,10 @@ func CopyState(state *core.State) *core.State {
 		deepcopier.Copy(r).To(ret.StateRoots[i])
 	}
 
-	ret.Seeds = make([]*core.SlotAndBytes, len(state.Seeds))
-	for i, r := range state.Seeds {
-		ret.Seeds[i] = &core.SlotAndBytes{}
-		deepcopier.Copy(r).To(ret.Seeds[i])
+	ret.Randao = make([]*core.SlotAndBytes, len(state.Randao))
+	for i, r := range state.Randao {
+		ret.Randao[i] = &core.SlotAndBytes{}
+		deepcopier.Copy(r).To(ret.Randao[i])
 	}
 
 	ret.BlockProducers = make([]*core.BlockProducer, len(state.BlockProducers))
@@ -169,7 +169,7 @@ func GetEpochSeed(state *core.State, epoch uint64) ([]byte, error) {
 	}
 
 	targetSlot := epoch * params.ChainConfig.SlotsInEpoch - 1 + params.ChainConfig.SlotsInEpoch
-	for _, d := range state.Seeds {
+	for _, d := range state.Randao {
 		if d.Slot == targetSlot {
 			return d.Bytes, nil
 		}
@@ -178,5 +178,5 @@ func GetEpochSeed(state *core.State, epoch uint64) ([]byte, error) {
 }
 
 func GetLatestRandaoMix(state *core.State) []byte {
-	return state.Seeds[len(state.Seeds) - 1].Bytes
+	return state.Randao[len(state.Randao) - 1].Bytes
 }

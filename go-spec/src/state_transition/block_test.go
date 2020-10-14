@@ -50,10 +50,10 @@ func TestBlockApplyConsistency(t *testing.T) {
 	block := &core.PoolBlock{
 		Slot:                 2,
 		Proposer:             13,
-		ParentRoot:           toByte("332863d85bdafc9e5ccaeec92d12f00452bd9e3d71b80af4a0cab9df35c5e56f"),
+		ParentRoot:           toByte("71dcfc4567f947c7c396f293a615b3e46554a83595703399107d1b87d6b6ae3c"),
 		StateRoot:            nil,
 		Body:                 &core.PoolBlockBody{
-			RandaoReveal:          toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
+			RandaoReveal:          toByte("b99d58464b006350d5348891225744c3e0c683598e27a2bc8088db6d068580a5aa53c63a55894803f0b0e189870d85d204ba1caf80ef102a012d04784e3ec1726adb234a01400b4e471715d13b43f6b336c8638be7f8ab4fb050d118161e9a36"),
 			NewPoolReq:      nil,
 			Attestations:         generateAttestations(
 				state,
@@ -69,10 +69,12 @@ func TestBlockApplyConsistency(t *testing.T) {
 	}
 
 	// sign
+	blockDomain, err := shared.Domain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+	require.NoError(t, err)
 	sig, err := shared.SignBlock(
 		block,
 		[]byte(fmt.Sprintf("%d", 13)),
-		[]byte("domain"))
+		blockDomain)
 	require.NoError(t, err)
 	signed := &core.SignedPoolBlock{
 		Block:                block,

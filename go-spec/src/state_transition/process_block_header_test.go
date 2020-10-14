@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -26,7 +27,7 @@ func TestProcessBlockHeader(t *testing.T) {
 				Body: &core.PoolBlockBody{
 					RandaoReveal:         toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 				},
-				ParentRoot: toByte("332863d85bdafc9e5ccaeec92d12f00452bd9e3d71b80af4a0cab9df35c5e56f"),
+				ParentRoot: toByte("71dcfc4567f947c7c396f293a615b3e46554a83595703399107d1b87d6b6ae3c"),
 			},
 			signerBP:          13,
 			expectedError:     nil,
@@ -39,10 +40,10 @@ func TestProcessBlockHeader(t *testing.T) {
 				Body: &core.PoolBlockBody{
 					RandaoReveal:         toByte("97c4116516e77c522344aa3c3c223db0c14bad05aa005be63aadd19341e0cc6d"),
 				},
-				ParentRoot: toByte("332863d85bdafc9e5ccaeec92d12f00452bd9e3d71b80af4a0cab9df35c5e56f"),
+				ParentRoot: toByte("71dcfc4567f947c7c396f293a615b3e46554a83595703399107d1b87d6b6ae3c"),
 			},
 			signerBP: 12,
-			expectedError: fmt.Errorf("sig not verified"),
+			expectedError: fmt.Errorf("block sig not verified"),
 		},
 		{
 			name: "wrong proposer",
@@ -121,7 +122,7 @@ func TestProcessBlockHeader(t *testing.T) {
 				ParentRoot: toByte("75141b2e032f1b045ab9c7998dfd7238044e40eed0b2c526c33340643e871e42"),
 			},
 			signerBP: 13,
-			expectedError: fmt.Errorf("parent block root doesn't match, expected 332863d85bdafc9e5ccaeec92d12f00452bd9e3d71b80af4a0cab9df35c5e56f"),
+			expectedError: fmt.Errorf("parent block root doesn't match, expected 71dcfc4567f947c7c396f293a615b3e46554a83595703399107d1b87d6b6ae3c"),
 		},
 	}
 
@@ -131,7 +132,9 @@ func TestProcessBlockHeader(t *testing.T) {
 
 			// sign
 			sk := []byte(fmt.Sprintf("%d", test.signerBP))
-			sig, err := shared.SignBlock(test.block, sk, []byte("domain")) // TODO - dynamic domain
+			blockDomain, err := shared.Domain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+			require.NoError(t, err)
+			sig, err := shared.SignBlock(test.block, sk, blockDomain) // TODO - dynamic domain
 			require.NoError(t, err)
 
 
