@@ -169,3 +169,141 @@ func GetBlockProposerIndex(state *core.State) (uint64, error) {
 	bps := GetActiveBlockProducers(state, epoch)
 	return ComputeProposerIndex(state, bps, hash[:])
 }
+
+/**
+def increase_balance(state: BeaconState, index: ValidatorIndex, delta: Gwei) -> None:
+    """
+    Increase the validator balance at index ``index`` by ``delta``.
+    """
+    state.balances[index] += delta
+ */
+func IncreaseBalance(state *core.State, index uint64, delta uint64) {
+	if bp := GetBlockProducer(state, index); bp != nil {
+		bp.Stake += delta
+	}
+}
+
+/**
+def decrease_balance(state: BeaconState, index: ValidatorIndex, delta: Gwei) -> None:
+    """
+    Decrease the validator balance at index ``index`` by ``delta``, with underflow protection.
+    """
+    state.balances[index] = 0 if delta > state.balances[index] else state.balances[index] - delta
+*/
+func DecreaseBalance(state *core.State, index uint64, delta uint64) {
+	if bp := GetBlockProducer(state, index); bp != nil {
+		if delta > bp.Stake {
+			bp.Stake = 0
+		} else {
+			bp.Stake -= delta
+		}
+	}
+}
+
+/**
+def initiate_validator_exit(state: BeaconState, index: ValidatorIndex) -> None:
+    """
+    Initiate the exit of the validator with index ``index``.
+    """
+    # Return if validator already initiated exit
+    validator = state.validators[index]
+    if validator.exit_epoch != FAR_FUTURE_EPOCH:
+        return
+
+    # Compute exit queue epoch
+    exit_epochs = [v.exit_epoch for v in state.validators if v.exit_epoch != FAR_FUTURE_EPOCH]
+    exit_queue_epoch = max(exit_epochs + [compute_activation_exit_epoch(get_current_epoch(state))])
+    exit_queue_churn = len([v for v in state.validators if v.exit_epoch == exit_queue_epoch])
+    if exit_queue_churn >= get_validator_churn_limit(state):
+        exit_queue_epoch += Epoch(1)
+
+    # Set validator exit epoch and withdrawable epoch
+    validator.exit_epoch = exit_queue_epoch
+    validator.withdrawable_epoch = Epoch(validator.exit_epoch + MIN_VALIDATOR_WITHDRAWABILITY_DELAY)
+ */
+func InitiateBlockProducerExit(state *core.State, index uint64) {
+	bp := GetBlockProducer(state, index)
+	if bp == nil {
+		return
+	}
+	if bp.ExitEpoch != params.ChainConfig.FarFutureEpoch {
+		return
+	}
+
+	// Compute exit queue epoch
+	exitEpochs := []uint64{}
+	for _, bp := range state.BlockProducers {
+		if bp.ExitEpoch != params.ChainConfig.FarFutureEpoch {
+			exitEpochs = append(exitEpochs, bp.ExitEpoch)
+		}
+	}
+	exitEpochs = append(exitEpochs, ComputeActivationExitEpoch(GetCurrentEpoch(state)))
+
+	// Obtain the exit queue epoch as the maximum number in the exit epochs array.
+	exitQueueEpoch := uint64(0)
+	for _, i := range exitEpochs {
+		if exitQueueEpoch < i {
+			exitQueueEpoch = i
+		}
+	}
+
+	// We use the exit queue churn to determine if we have passed a churn limit.
+	exitQueueChurn := 0
+	for _, bp := range state.BlockProducers {
+		if bp.ExitEpoch == exitQueueEpoch {
+			exitQueueChurn ++
+		}
+	}
+
+	// Set validator exit epoch and withdrawable epoch
+	bp.ExitEpoch = exitQueueEpoch
+	bp.WithdrawableEpoch = bp.ExitEpoch + params.ChainConfig.MinValidatorWithdrawabilityDelay
+}
+
+/**
+def slash_validator(state: BeaconState,
+                    slashed_index: ValidatorIndex,
+                    whistleblower_index: ValidatorIndex=None) -> None:
+    """
+    Slash the validator with index ``slashed_index``.
+    """
+    epoch = get_current_epoch(state)
+    initiate_validator_exit(state, slashed_index)
+    validator = state.validators[slashed_index]
+    validator.slashed = True
+    validator.withdrawable_epoch = max(validator.withdrawable_epoch, Epoch(epoch + EPOCHS_PER_SLASHINGS_VECTOR))
+    state.slashings[epoch % EPOCHS_PER_SLASHINGS_VECTOR] += validator.effective_balance
+    decrease_balance(state, slashed_index, validator.effective_balance // MIN_SLASHING_PENALTY_QUOTIENT)
+
+    # Apply proposer and whistleblower rewards
+    proposer_index = get_beacon_proposer_index(state)
+    if whistleblower_index is None:
+        whistleblower_index = proposer_index
+    whistleblower_reward = Gwei(validator.effective_balance // WHISTLEBLOWER_REWARD_QUOTIENT)
+    proposer_reward = Gwei(whistleblower_reward // PROPOSER_REWARD_QUOTIENT)
+    increase_balance(state, proposer_index, proposer_reward)
+    increase_balance(state, whistleblower_index, Gwei(whistleblower_reward - proposer_reward))
+ */
+func SlashBlockProducer(state *core.State, slashedIndex uint64) error {
+	epoch := GetCurrentEpoch(state)
+	InitiateBlockProducerExit(state, slashedIndex)
+	bp := GetBlockProducer(state, slashedIndex)
+	if bp == nil {
+		return fmt.Errorf("slash BP: block producer not found")
+	}
+	bp.Slashed = true
+	bp.WithdrawableEpoch = Max(bp.WithdrawableEpoch, epoch + params.ChainConfig.EpochsPerSlashingVector)
+	state.Slashings[epoch % params.ChainConfig.EpochsPerSlashingVector] += bp.Stake // TODO - should be effective balace?
+	DecreaseBalance(state, slashedIndex, bp.Stake / params.ChainConfig.MinSlashingPenaltyQuotient) // TODO - should be effective balace?
+
+	// Apply proposer and whistleblower rewards
+	proposer, err := GetBlockProposerIndex(state)
+	if err != nil {
+		return err
+	}
+	whistleblowerIndex := proposer
+	whistleblowerReward := bp.Stake / params.ChainConfig.WhitstleblowerRewardQuotient
+	proposerReward := whistleblowerReward / params.ChainConfig.ProposerRewardQuotient
+	IncreaseBalance(state, proposer, proposerReward)
+	IncreaseBalance(state, whistleblowerIndex, whistleblowerReward)
+}

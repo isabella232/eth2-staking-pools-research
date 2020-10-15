@@ -69,7 +69,7 @@ func TestBlockApplyConsistency(t *testing.T) {
 	}
 
 	// sign
-	blockDomain, err := shared.Domain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+	blockDomain, err := shared.GetDomain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
 	require.NoError(t, err)
 	sig, err := shared.SignBlock(
 		block,

@@ -23,36 +23,45 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type PoolsChainConfig struct {
-	GenesisSeed        []byte `protobuf:"bytes,10,opt,name=GenesisSeed,proto3" json:"GenesisSeed,omitempty"`
-	GenesisEpoch       uint64 `protobuf:"varint,11,opt,name=GenesisEpoch,proto3" json:"GenesisEpoch,omitempty"`
-	VaultSize          uint64 `protobuf:"varint,20,opt,name=VaultSize,proto3" json:"VaultSize,omitempty"`
-	BaseEth2DutyReward uint64 `protobuf:"varint,21,opt,name=BaseEth2DutyReward,proto3" json:"BaseEth2DutyReward,omitempty"`
-	DKGReward          uint64 `protobuf:"varint,22,opt,name=DKGReward,proto3" json:"DKGReward,omitempty"`
-	// slots and epochs
-	SlotsInEpoch                 uint64 `protobuf:"varint,30,opt,name=SlotsInEpoch,proto3" json:"SlotsInEpoch,omitempty"`
-	MinAttestationCommitteeSize  uint64 `protobuf:"varint,31,opt,name=MinAttestationCommitteeSize,proto3" json:"MinAttestationCommitteeSize,omitempty"`
-	MaxAttestationCommitteeSize  uint64 `protobuf:"varint,32,opt,name=MaxAttestationCommitteeSize,proto3" json:"MaxAttestationCommitteeSize,omitempty"`
-	MaxCommitteesPerSlot         uint64 `protobuf:"varint,33,opt,name=MaxCommitteesPerSlot,proto3" json:"MaxCommitteesPerSlot,omitempty"`
-	MinAttestationInclusionDelay uint64 `protobuf:"varint,34,opt,name=MinAttestationInclusionDelay,proto3" json:"MinAttestationInclusionDelay,omitempty"`
-	SlotsPerHistoricalRoot       uint64 `protobuf:"varint,35,opt,name=SlotsPerHistoricalRoot,proto3" json:"SlotsPerHistoricalRoot,omitempty"`
-	EpochsPerHistoricalVector    uint64 `protobuf:"varint,36,opt,name=EpochsPerHistoricalVector,proto3" json:"EpochsPerHistoricalVector,omitempty"`
-	MinPerEpochChurnLimit        uint64 `protobuf:"varint,37,opt,name=MinPerEpochChurnLimit,proto3" json:"MinPerEpochChurnLimit,omitempty"`
-	ChurnLimitQuotient           uint64 `protobuf:"varint,38,opt,name=ChurnLimitQuotient,proto3" json:"ChurnLimitQuotient,omitempty"`
-	// initial value constants
-	ZeroHash []byte `protobuf:"bytes,40,opt,name=ZeroHash,proto3" json:"ZeroHash,omitempty"`
+	// Time
+	SlotsInEpoch                     uint64 `protobuf:"varint,100,opt,name=SlotsInEpoch,proto3" json:"SlotsInEpoch,omitempty"`
+	MinAttestationInclusionDelay     uint64 `protobuf:"varint,101,opt,name=MinAttestationInclusionDelay,proto3" json:"MinAttestationInclusionDelay,omitempty"`
+	MaxSeedLookahead                 uint64 `protobuf:"varint,102,opt,name=MaxSeedLookahead,proto3" json:"MaxSeedLookahead,omitempty"`
+	MinSeedLookahead                 uint64 `protobuf:"varint,103,opt,name=MinSeedLookahead,proto3" json:"MinSeedLookahead,omitempty"`
+	SlotsPerHistoricalRoot           uint64 `protobuf:"varint,104,opt,name=SlotsPerHistoricalRoot,proto3" json:"SlotsPerHistoricalRoot,omitempty"`
+	MinValidatorWithdrawabilityDelay uint64 `protobuf:"varint,105,opt,name=MinValidatorWithdrawabilityDelay,proto3" json:"MinValidatorWithdrawabilityDelay,omitempty"`
+	// Misc
+	MinAttestationCommitteeSize uint64 `protobuf:"varint,200,opt,name=MinAttestationCommitteeSize,proto3" json:"MinAttestationCommitteeSize,omitempty"`
+	MaxAttestationCommitteeSize uint64 `protobuf:"varint,201,opt,name=MaxAttestationCommitteeSize,proto3" json:"MaxAttestationCommitteeSize,omitempty"`
+	MaxCommitteesPerSlot        uint64 `protobuf:"varint,202,opt,name=MaxCommitteesPerSlot,proto3" json:"MaxCommitteesPerSlot,omitempty"`
+	ChurnLimitQuotient          uint64 `protobuf:"varint,203,opt,name=ChurnLimitQuotient,proto3" json:"ChurnLimitQuotient,omitempty"`
+	VaultSize                   uint64 `protobuf:"varint,204,opt,name=VaultSize,proto3" json:"VaultSize,omitempty"`
+	MinPerEpochChurnLimit       uint64 `protobuf:"varint,205,opt,name=MinPerEpochChurnLimit,proto3" json:"MinPerEpochChurnLimit,omitempty"`
+	// constants
+	FarFutureEpoch uint64 `protobuf:"varint,300,opt,name=FarFutureEpoch,proto3" json:"FarFutureEpoch,omitempty"`
+	ZeroHash       []byte `protobuf:"bytes,301,opt,name=ZeroHash,proto3" json:"ZeroHash,omitempty"`
+	GenesisSeed    []byte `protobuf:"bytes,302,opt,name=GenesisSeed,proto3" json:"GenesisSeed,omitempty"`
+	GenesisEpoch   uint64 `protobuf:"varint,303,opt,name=GenesisEpoch,proto3" json:"GenesisEpoch,omitempty"`
+	// state list lengths
+	EpochsPerHistoricalVector uint64 `protobuf:"varint,400,opt,name=EpochsPerHistoricalVector,proto3" json:"EpochsPerHistoricalVector,omitempty"`
+	EpochsPerSlashingVector   uint64 `protobuf:"varint,401,opt,name=EpochsPerSlashingVector,proto3" json:"EpochsPerSlashingVector,omitempty"`
+	// rewards and penalties
+	BaseEth2DutyReward           uint64 `protobuf:"varint,500,opt,name=BaseEth2DutyReward,proto3" json:"BaseEth2DutyReward,omitempty"`
+	DKGReward                    uint64 `protobuf:"varint,501,opt,name=DKGReward,proto3" json:"DKGReward,omitempty"`
+	MinSlashingPenaltyQuotient   uint64 `protobuf:"varint,502,opt,name=MinSlashingPenaltyQuotient,proto3" json:"MinSlashingPenaltyQuotient,omitempty"`
+	WhitstleblowerRewardQuotient uint64 `protobuf:"varint,503,opt,name=WhitstleblowerRewardQuotient,proto3" json:"WhitstleblowerRewardQuotient,omitempty"`
+	ProposerRewardQuotient       uint64 `protobuf:"varint,504,opt,name=ProposerRewardQuotient,proto3" json:"ProposerRewardQuotient,omitempty"`
 	// domain
-	DomainBeaconProposer []byte `protobuf:"bytes,50,opt,name=DomainBeaconProposer,proto3" json:"DomainBeaconProposer,omitempty"`
-	DomainBeaconAttester []byte `protobuf:"bytes,51,opt,name=DomainBeaconAttester,proto3" json:"DomainBeaconAttester,omitempty"`
-	DomainRandao         []byte `protobuf:"bytes,52,opt,name=DomainRandao,proto3" json:"DomainRandao,omitempty"`
-	GenesisForkVersion   []byte `protobuf:"bytes,53,opt,name=GenesisForkVersion,proto3" json:"GenesisForkVersion,omitempty"`
-	// other
-	FarFutureEpoch       uint64   `protobuf:"varint,60,opt,name=FarFutureEpoch,proto3" json:"FarFutureEpoch,omitempty"`
-	MaxEffectiveBalance  uint64   `protobuf:"varint,61,opt,name=MaxEffectiveBalance,proto3" json:"MaxEffectiveBalance,omitempty"`
-	MaxSeedLookahead     uint64   `protobuf:"varint,62,opt,name=MaxSeedLookahead,proto3" json:"MaxSeedLookahead,omitempty"`
-	MinSeedLookahead     uint64   `protobuf:"varint,63,opt,name=MinSeedLookahead,proto3" json:"MinSeedLookahead,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	DomainBeaconProposer []byte `protobuf:"bytes,600,opt,name=DomainBeaconProposer,proto3" json:"DomainBeaconProposer,omitempty"`
+	DomainBeaconAttester []byte `protobuf:"bytes,601,opt,name=DomainBeaconAttester,proto3" json:"DomainBeaconAttester,omitempty"`
+	DomainRandao         []byte `protobuf:"bytes,602,opt,name=DomainRandao,proto3" json:"DomainRandao,omitempty"`
+	GenesisForkVersion   []byte `protobuf:"bytes,603,opt,name=GenesisForkVersion,proto3" json:"GenesisForkVersion,omitempty"`
+	// Gwei values
+	MaxEffectiveBalance       uint64   `protobuf:"varint,700,opt,name=MaxEffectiveBalance,proto3" json:"MaxEffectiveBalance,omitempty"`
+	EffectiveBalanceIncrement uint64   `protobuf:"varint,701,opt,name=EffectiveBalanceIncrement,proto3" json:"EffectiveBalanceIncrement,omitempty"`
+	XXX_NoUnkeyedLiteral      struct{} `json:"-"`
+	XXX_unrecognized          []byte   `json:"-"`
+	XXX_sizecache             int32    `json:"-"`
 }
 
 func (m *PoolsChainConfig) Reset()         { *m = PoolsChainConfig{} }
@@ -88,44 +97,44 @@ func (m *PoolsChainConfig) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PoolsChainConfig proto.InternalMessageInfo
 
-func (m *PoolsChainConfig) GetGenesisSeed() []byte {
-	if m != nil {
-		return m.GenesisSeed
-	}
-	return nil
-}
-
-func (m *PoolsChainConfig) GetGenesisEpoch() uint64 {
-	if m != nil {
-		return m.GenesisEpoch
-	}
-	return 0
-}
-
-func (m *PoolsChainConfig) GetVaultSize() uint64 {
-	if m != nil {
-		return m.VaultSize
-	}
-	return 0
-}
-
-func (m *PoolsChainConfig) GetBaseEth2DutyReward() uint64 {
-	if m != nil {
-		return m.BaseEth2DutyReward
-	}
-	return 0
-}
-
-func (m *PoolsChainConfig) GetDKGReward() uint64 {
-	if m != nil {
-		return m.DKGReward
-	}
-	return 0
-}
-
 func (m *PoolsChainConfig) GetSlotsInEpoch() uint64 {
 	if m != nil {
 		return m.SlotsInEpoch
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetMinAttestationInclusionDelay() uint64 {
+	if m != nil {
+		return m.MinAttestationInclusionDelay
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetMaxSeedLookahead() uint64 {
+	if m != nil {
+		return m.MaxSeedLookahead
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetMinSeedLookahead() uint64 {
+	if m != nil {
+		return m.MinSeedLookahead
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetSlotsPerHistoricalRoot() uint64 {
+	if m != nil {
+		return m.SlotsPerHistoricalRoot
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetMinValidatorWithdrawabilityDelay() uint64 {
+	if m != nil {
+		return m.MinValidatorWithdrawabilityDelay
 	}
 	return 0
 }
@@ -151,23 +160,16 @@ func (m *PoolsChainConfig) GetMaxCommitteesPerSlot() uint64 {
 	return 0
 }
 
-func (m *PoolsChainConfig) GetMinAttestationInclusionDelay() uint64 {
+func (m *PoolsChainConfig) GetChurnLimitQuotient() uint64 {
 	if m != nil {
-		return m.MinAttestationInclusionDelay
+		return m.ChurnLimitQuotient
 	}
 	return 0
 }
 
-func (m *PoolsChainConfig) GetSlotsPerHistoricalRoot() uint64 {
+func (m *PoolsChainConfig) GetVaultSize() uint64 {
 	if m != nil {
-		return m.SlotsPerHistoricalRoot
-	}
-	return 0
-}
-
-func (m *PoolsChainConfig) GetEpochsPerHistoricalVector() uint64 {
-	if m != nil {
-		return m.EpochsPerHistoricalVector
+		return m.VaultSize
 	}
 	return 0
 }
@@ -179,9 +181,9 @@ func (m *PoolsChainConfig) GetMinPerEpochChurnLimit() uint64 {
 	return 0
 }
 
-func (m *PoolsChainConfig) GetChurnLimitQuotient() uint64 {
+func (m *PoolsChainConfig) GetFarFutureEpoch() uint64 {
 	if m != nil {
-		return m.ChurnLimitQuotient
+		return m.FarFutureEpoch
 	}
 	return 0
 }
@@ -191,6 +193,69 @@ func (m *PoolsChainConfig) GetZeroHash() []byte {
 		return m.ZeroHash
 	}
 	return nil
+}
+
+func (m *PoolsChainConfig) GetGenesisSeed() []byte {
+	if m != nil {
+		return m.GenesisSeed
+	}
+	return nil
+}
+
+func (m *PoolsChainConfig) GetGenesisEpoch() uint64 {
+	if m != nil {
+		return m.GenesisEpoch
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetEpochsPerHistoricalVector() uint64 {
+	if m != nil {
+		return m.EpochsPerHistoricalVector
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetEpochsPerSlashingVector() uint64 {
+	if m != nil {
+		return m.EpochsPerSlashingVector
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetBaseEth2DutyReward() uint64 {
+	if m != nil {
+		return m.BaseEth2DutyReward
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetDKGReward() uint64 {
+	if m != nil {
+		return m.DKGReward
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetMinSlashingPenaltyQuotient() uint64 {
+	if m != nil {
+		return m.MinSlashingPenaltyQuotient
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetWhitstleblowerRewardQuotient() uint64 {
+	if m != nil {
+		return m.WhitstleblowerRewardQuotient
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetProposerRewardQuotient() uint64 {
+	if m != nil {
+		return m.ProposerRewardQuotient
+	}
+	return 0
 }
 
 func (m *PoolsChainConfig) GetDomainBeaconProposer() []byte {
@@ -221,13 +286,6 @@ func (m *PoolsChainConfig) GetGenesisForkVersion() []byte {
 	return nil
 }
 
-func (m *PoolsChainConfig) GetFarFutureEpoch() uint64 {
-	if m != nil {
-		return m.FarFutureEpoch
-	}
-	return 0
-}
-
 func (m *PoolsChainConfig) GetMaxEffectiveBalance() uint64 {
 	if m != nil {
 		return m.MaxEffectiveBalance
@@ -235,16 +293,9 @@ func (m *PoolsChainConfig) GetMaxEffectiveBalance() uint64 {
 	return 0
 }
 
-func (m *PoolsChainConfig) GetMaxSeedLookahead() uint64 {
+func (m *PoolsChainConfig) GetEffectiveBalanceIncrement() uint64 {
 	if m != nil {
-		return m.MaxSeedLookahead
-	}
-	return 0
-}
-
-func (m *PoolsChainConfig) GetMinSeedLookahead() uint64 {
-	if m != nil {
-		return m.MinSeedLookahead
+		return m.EffectiveBalanceIncrement
 	}
 	return 0
 }
@@ -256,41 +307,50 @@ func init() {
 func init() { proto.RegisterFile("src/core/config.proto", fileDescriptor_d0189c35229c86e3) }
 
 var fileDescriptor_d0189c35229c86e3 = []byte{
-	// 540 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x94, 0xdd, 0x6e, 0x13, 0x3f,
-	0x10, 0xc5, 0xff, 0x91, 0xfe, 0x54, 0xc5, 0xad, 0x50, 0x65, 0x9a, 0xca, 0x40, 0x15, 0x42, 0x80,
-	0x2a, 0xe2, 0x22, 0x45, 0x69, 0xe1, 0x86, 0xf2, 0x95, 0xaf, 0xb6, 0xa2, 0x91, 0x42, 0x22, 0xe5,
-	0xa2, 0x77, 0x66, 0x33, 0x61, 0xad, 0x6e, 0x3c, 0x91, 0xed, 0x85, 0x94, 0x27, 0xe1, 0x91, 0x10,
-	0x57, 0x3c, 0x02, 0x0a, 0x2f, 0x82, 0x3c, 0x1b, 0xd2, 0x6e, 0xb2, 0xe9, 0xa5, 0xcf, 0xf9, 0x9d,
-	0xd1, 0xec, 0xec, 0xd8, 0x2c, 0x6f, 0x4d, 0xb0, 0x1f, 0xa0, 0x81, 0xfd, 0x00, 0xf5, 0x50, 0x7d,
-	0xae, 0x8c, 0x0d, 0x3a, 0xe4, 0xb7, 0xac, 0x93, 0x0e, 0x4a, 0x3f, 0xd7, 0xd9, 0x56, 0x07, 0x31,
-	0xb2, 0xf5, 0x50, 0x2a, 0x5d, 0x27, 0x82, 0x17, 0xd9, 0xc6, 0x31, 0x68, 0xb0, 0xca, 0xf6, 0x00,
-	0x06, 0x82, 0x15, 0x73, 0xe5, 0xcd, 0xee, 0x75, 0x89, 0x97, 0xd8, 0xe6, 0xec, 0xd8, 0x1c, 0x63,
-	0x10, 0x8a, 0x8d, 0x62, 0xae, 0xfc, 0x7f, 0x37, 0xa5, 0xf1, 0x5d, 0x76, 0xbb, 0x2f, 0xe3, 0xc8,
-	0xf5, 0xd4, 0x37, 0x10, 0xdb, 0x04, 0x5c, 0x09, 0xbc, 0xc2, 0x78, 0x4d, 0x5a, 0x68, 0xba, 0xb0,
-	0xda, 0x88, 0xdd, 0x65, 0x17, 0xbe, 0x4a, 0x33, 0x10, 0x79, 0xc2, 0x32, 0x1c, 0x5f, 0xad, 0xf1,
-	0xe1, 0x78, 0x86, 0xed, 0x24, 0xd5, 0xe6, 0x82, 0xef, 0xa7, 0x17, 0xa1, 0xb3, 0xa7, 0x3a, 0xe9,
-	0xa7, 0x90, 0xf4, 0x73, 0x5d, 0xe3, 0xef, 0xd8, 0x83, 0xb6, 0xd2, 0xef, 0x9d, 0x03, 0xff, 0xe9,
-	0x0a, 0x75, 0x1d, 0x47, 0x23, 0xe5, 0x1c, 0x00, 0x75, 0xf8, 0x90, 0x22, 0x37, 0x21, 0x54, 0x41,
-	0x4e, 0x56, 0x56, 0x28, 0xce, 0x2a, 0xac, 0x46, 0x78, 0x95, 0x6d, 0xb7, 0xe5, 0x64, 0xae, 0xd9,
-	0x0e, 0x18, 0xdf, 0xa3, 0x78, 0x44, 0xd1, 0x4c, 0x8f, 0xd7, 0xd8, 0x6e, 0xba, 0xa9, 0x53, 0x1d,
-	0x44, 0xb1, 0x55, 0xa8, 0x1b, 0x10, 0xc9, 0x4b, 0x51, 0xa2, 0xec, 0x8d, 0x0c, 0x7f, 0xc9, 0x76,
-	0x68, 0x16, 0x1d, 0x30, 0x27, 0xca, 0x3a, 0x34, 0x2a, 0x90, 0x51, 0x17, 0xd1, 0x89, 0xc7, 0x94,
-	0x5e, 0xe1, 0xf2, 0x23, 0x76, 0x8f, 0x86, 0x97, 0xb6, 0xfa, 0x10, 0x38, 0x34, 0xe2, 0x09, 0x45,
-	0x57, 0x03, 0xfc, 0x90, 0xe5, 0xdb, 0x4a, 0x77, 0xc0, 0x10, 0x52, 0x0f, 0x63, 0xa3, 0xcf, 0xd4,
-	0x48, 0x39, 0xf1, 0x94, 0x92, 0xd9, 0xa6, 0xdf, 0x8c, 0xab, 0xd3, 0xc7, 0x18, 0x9d, 0x02, 0xed,
-	0xc4, 0x5e, 0xb2, 0x19, 0xcb, 0x0e, 0xbf, 0xcf, 0xd6, 0xcf, 0xc1, 0xe0, 0x89, 0xb4, 0xa1, 0x28,
-	0xd3, 0xaa, 0xce, 0xcf, 0x7e, 0xde, 0x0d, 0x1c, 0x49, 0xa5, 0x6b, 0x20, 0x03, 0xd4, 0x1d, 0x83,
-	0x63, 0xb4, 0x60, 0x44, 0x95, 0xb8, 0x4c, 0x6f, 0x31, 0x93, 0x0c, 0x15, 0x8c, 0x38, 0x58, 0xce,
-	0xfc, 0xf3, 0xfc, 0xfe, 0x25, 0x7a, 0x57, 0xea, 0x81, 0x44, 0x71, 0x48, 0x6c, 0x4a, 0xf3, 0xdf,
-	0x35, 0xbb, 0x1f, 0x2d, 0x34, 0x17, 0x7d, 0x30, 0xfe, 0xf7, 0x88, 0x17, 0x44, 0x66, 0x38, 0x7c,
-	0x8f, 0xdd, 0x69, 0x49, 0xd3, 0x8a, 0x5d, 0x6c, 0x20, 0xd9, 0xea, 0x23, 0x9a, 0xc1, 0x82, 0xca,
-	0x9f, 0xb3, 0xbb, 0x6d, 0x39, 0x69, 0x0e, 0x87, 0x10, 0x38, 0xf5, 0x05, 0x6a, 0x32, 0x92, 0x3a,
-	0x00, 0xf1, 0x9a, 0xe0, 0x2c, 0x8b, 0x3f, 0x63, 0x5b, 0x6d, 0x39, 0xf1, 0x17, 0xf9, 0x0c, 0xf1,
-	0x42, 0x86, 0x20, 0x07, 0xe2, 0x0d, 0xe1, 0x4b, 0x3a, 0xb1, 0x4a, 0xa7, 0xd9, 0xb7, 0x33, 0x76,
-	0x41, 0xaf, 0x89, 0x1f, 0xd3, 0x42, 0xee, 0xd7, 0xb4, 0x90, 0xfb, 0x3d, 0x2d, 0xe4, 0xbe, 0xff,
-	0x29, 0xfc, 0x77, 0xbe, 0x56, 0x79, 0xe5, 0x9f, 0x9e, 0x4f, 0x6b, 0xf4, 0xe8, 0x1c, 0xfc, 0x0d,
-	0x00, 0x00, 0xff, 0xff, 0xf3, 0x95, 0x8c, 0xf9, 0x8d, 0x04, 0x00, 0x00,
+	// 677 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x95, 0xcb, 0x6e, 0x13, 0x3f,
+	0x14, 0xc6, 0xff, 0xf9, 0xd3, 0x56, 0xe0, 0x56, 0xa8, 0x32, 0xb4, 0x18, 0x5a, 0xa2, 0x52, 0x16,
+	0x20, 0x16, 0xad, 0xa0, 0x02, 0x84, 0x10, 0x42, 0x4d, 0xd2, 0x1b, 0x34, 0x52, 0x48, 0xa4, 0x54,
+	0xea, 0xce, 0x9d, 0x39, 0xe9, 0x58, 0x9d, 0xf8, 0x54, 0x1e, 0x0f, 0x4d, 0x78, 0x0a, 0xd8, 0xf1,
+	0x10, 0x5c, 0x5e, 0x00, 0xf6, 0xe5, 0x26, 0xb1, 0xe4, 0xb2, 0x81, 0xf2, 0x0a, 0xdc, 0x96, 0xc8,
+	0xf6, 0x34, 0x25, 0xe9, 0x4c, 0xd8, 0x25, 0xdf, 0xf7, 0xfb, 0x8e, 0xe7, 0xe4, 0x9c, 0x89, 0xc9,
+	0x58, 0xa4, 0xbc, 0x59, 0x0f, 0x15, 0xcc, 0x7a, 0x28, 0x1b, 0x62, 0x73, 0x66, 0x5b, 0xa1, 0x46,
+	0x3a, 0x18, 0x69, 0xae, 0x61, 0xfa, 0xeb, 0x30, 0x19, 0xad, 0x20, 0x86, 0x51, 0x31, 0xe0, 0x42,
+	0x16, 0x2d, 0x41, 0xa7, 0xc9, 0x48, 0x2d, 0x44, 0x1d, 0xad, 0xc8, 0x85, 0x6d, 0xf4, 0x02, 0xe6,
+	0x4f, 0xe5, 0x2e, 0x0e, 0x54, 0xbb, 0x34, 0x5a, 0x20, 0x93, 0x65, 0x21, 0xe7, 0xb5, 0x06, 0x53,
+	0x48, 0xa0, 0x5c, 0x91, 0x5e, 0x18, 0x47, 0x02, 0x65, 0x09, 0x42, 0xde, 0x66, 0x60, 0x33, 0x7d,
+	0x19, 0x7a, 0x89, 0x8c, 0x96, 0x79, 0xab, 0x06, 0xe0, 0xaf, 0x22, 0x6e, 0xf1, 0x00, 0xb8, 0xcf,
+	0x1a, 0x36, 0x77, 0x48, 0xb7, 0xac, 0x90, 0xdd, 0xec, 0x66, 0xc2, 0xf6, 0xe8, 0xf4, 0x1a, 0x19,
+	0xb7, 0xcf, 0x5a, 0x01, 0xb5, 0x2c, 0x22, 0x8d, 0x4a, 0x78, 0x3c, 0xac, 0x22, 0x6a, 0x16, 0xd8,
+	0x44, 0x86, 0x4b, 0xef, 0x90, 0xa9, 0xb2, 0x90, 0x75, 0x1e, 0x0a, 0x9f, 0x6b, 0x54, 0x6b, 0x42,
+	0x07, 0xbe, 0xe2, 0x3b, 0x7c, 0x43, 0x84, 0x42, 0xb7, 0x5d, 0x5f, 0xc2, 0x56, 0xf8, 0x27, 0x47,
+	0xe7, 0xc9, 0x44, 0x77, 0xef, 0x45, 0x6c, 0x36, 0x85, 0xd6, 0x00, 0x35, 0xf1, 0x00, 0xd8, 0x6e,
+	0xce, 0xd6, 0xe9, 0xc7, 0xd8, 0x12, 0xbc, 0x95, 0x59, 0xe2, 0xd5, 0x7e, 0x89, 0x6c, 0x86, 0xce,
+	0x91, 0x93, 0x65, 0xde, 0xea, 0x68, 0xa6, 0x67, 0xd3, 0x3b, 0x7b, 0xed, 0xb2, 0xa9, 0x26, 0x9d,
+	0x25, 0xb4, 0x18, 0xc4, 0x4a, 0xae, 0x8a, 0xa6, 0xd0, 0xf7, 0x62, 0xd4, 0x02, 0xa4, 0x66, 0x6f,
+	0x5c, 0x24, 0xc5, 0xa2, 0x67, 0xc9, 0xb1, 0x3a, 0x8f, 0x43, 0x6d, 0x1f, 0xeb, 0xad, 0xe3, 0x0e,
+	0x14, 0x7a, 0x95, 0x8c, 0x95, 0x85, 0xac, 0x80, 0xb2, 0x9b, 0x73, 0x90, 0x67, 0xef, 0x1c, 0x9a,
+	0xee, 0xd2, 0x0b, 0xe4, 0xf8, 0x22, 0x57, 0x8b, 0xb1, 0x8e, 0x15, 0xb8, 0x3d, 0x7c, 0xf2, 0xbf,
+	0xe5, 0x7b, 0x64, 0x3a, 0x41, 0x8e, 0xae, 0x83, 0xc2, 0x65, 0x1e, 0x05, 0xec, 0xa9, 0x41, 0x46,
+	0xaa, 0x1d, 0x81, 0x9e, 0x23, 0xc3, 0x4b, 0x20, 0x21, 0x12, 0x91, 0xd9, 0x11, 0xf6, 0xcc, 0xf9,
+	0x7f, 0x6b, 0xf4, 0x3c, 0x19, 0x49, 0xbe, 0xba, 0x63, 0x9e, 0xbb, 0x63, 0xba, 0x44, 0x7a, 0x8b,
+	0x9c, 0xb6, 0x1f, 0xba, 0xd7, 0xa6, 0x0e, 0x9e, 0x46, 0xc5, 0x1e, 0x1e, 0xb1, 0x89, 0x6c, 0x82,
+	0xde, 0x20, 0xa7, 0x3a, 0x66, 0x2d, 0xe4, 0x51, 0x20, 0xe4, 0x66, 0x12, 0x7e, 0xe4, 0xc2, 0x59,
+	0xbe, 0x19, 0x47, 0x81, 0x47, 0xb0, 0xa0, 0x83, 0x2b, 0xa5, 0x58, 0xb7, 0xab, 0xb0, 0xc3, 0x95,
+	0xcf, 0xbe, 0xbb, 0x54, 0x8a, 0x65, 0xc6, 0x51, 0xba, 0xbb, 0x94, 0x70, 0x3f, 0x1c, 0x77, 0xa0,
+	0xd0, 0xdb, 0xe4, 0x8c, 0x79, 0x63, 0x92, 0x43, 0x2a, 0x20, 0x79, 0xa8, 0xdb, 0x9d, 0x31, 0xff,
+	0x74, 0x7c, 0x1f, 0x84, 0x16, 0xc9, 0xe4, 0x5a, 0x20, 0x74, 0xa4, 0x43, 0xd8, 0x08, 0x71, 0x07,
+	0x94, 0x2b, 0xdc, 0x29, 0xf1, 0xcb, 0x95, 0xe8, 0x0b, 0xd1, 0xeb, 0x64, 0xbc, 0xa2, 0x70, 0x1b,
+	0xa3, 0x43, 0xf1, 0xdf, 0x2e, 0x9e, 0x61, 0x9b, 0x95, 0x2e, 0x61, 0x93, 0x0b, 0x59, 0x00, 0xee,
+	0xa1, 0xdc, 0xa7, 0xd8, 0x87, 0x01, 0x3b, 0xd9, 0x54, 0xb3, 0x37, 0xe4, 0xde, 0x17, 0x50, 0xec,
+	0x63, 0x4a, 0x68, 0xdf, 0x34, 0x7b, 0xe1, 0xf4, 0x2a, 0x97, 0x3e, 0x47, 0xf6, 0xc9, 0xc1, 0x5d,
+	0xa2, 0x99, 0x4e, 0xb2, 0x27, 0x8b, 0xa8, 0xb6, 0xea, 0xa0, 0xcc, 0xdf, 0x1b, 0xfb, 0xec, 0xd0,
+	0x14, 0x8b, 0x5e, 0x26, 0x27, 0xca, 0xbc, 0xb5, 0xd0, 0x68, 0x80, 0xa7, 0xc5, 0x7d, 0x28, 0xf0,
+	0x90, 0x4b, 0x0f, 0xd8, 0x8b, 0x41, 0xdb, 0x75, 0x9a, 0x67, 0x77, 0xaf, 0x47, 0x5b, 0x91, 0x9e,
+	0x82, 0xa6, 0xf9, 0xb9, 0x5e, 0x0e, 0x26, 0xbb, 0x97, 0x45, 0x14, 0xd8, 0xee, 0x5e, 0x3e, 0xf7,
+	0x7e, 0x2f, 0x9f, 0xfb, 0xb2, 0x97, 0xcf, 0x3d, 0xfe, 0x96, 0xff, 0x6f, 0x7d, 0x68, 0xe6, 0xa6,
+	0xb9, 0x11, 0x36, 0x86, 0xec, 0x5d, 0x30, 0xf7, 0x27, 0x00, 0x00, 0xff, 0xff, 0x53, 0x67, 0xb8,
+	0xa6, 0x24, 0x06, 0x00, 0x00,
 }
 
 func (m *PoolsChainConfig) Marshal() (dAtA []byte, err error) {
@@ -317,31 +377,17 @@ func (m *PoolsChainConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if m.MinSeedLookahead != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.MinSeedLookahead))
+	if m.EffectiveBalanceIncrement != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.EffectiveBalanceIncrement))
 		i--
-		dAtA[i] = 0x3
+		dAtA[i] = 0x2b
 		i--
-		dAtA[i] = 0xf8
-	}
-	if m.MaxSeedLookahead != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.MaxSeedLookahead))
-		i--
-		dAtA[i] = 0x3
-		i--
-		dAtA[i] = 0xf0
+		dAtA[i] = 0xe8
 	}
 	if m.MaxEffectiveBalance != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.MaxEffectiveBalance))
 		i--
-		dAtA[i] = 0x3
-		i--
-		dAtA[i] = 0xe8
-	}
-	if m.FarFutureEpoch != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.FarFutureEpoch))
-		i--
-		dAtA[i] = 0x3
+		dAtA[i] = 0x2b
 		i--
 		dAtA[i] = 0xe0
 	}
@@ -350,141 +396,201 @@ func (m *PoolsChainConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.GenesisForkVersion)
 		i = encodeVarintConfig(dAtA, i, uint64(len(m.GenesisForkVersion)))
 		i--
-		dAtA[i] = 0x3
+		dAtA[i] = 0x25
 		i--
-		dAtA[i] = 0xaa
+		dAtA[i] = 0xda
 	}
 	if len(m.DomainRandao) > 0 {
 		i -= len(m.DomainRandao)
 		copy(dAtA[i:], m.DomainRandao)
 		i = encodeVarintConfig(dAtA, i, uint64(len(m.DomainRandao)))
 		i--
-		dAtA[i] = 0x3
+		dAtA[i] = 0x25
 		i--
-		dAtA[i] = 0xa2
+		dAtA[i] = 0xd2
 	}
 	if len(m.DomainBeaconAttester) > 0 {
 		i -= len(m.DomainBeaconAttester)
 		copy(dAtA[i:], m.DomainBeaconAttester)
 		i = encodeVarintConfig(dAtA, i, uint64(len(m.DomainBeaconAttester)))
 		i--
-		dAtA[i] = 0x3
+		dAtA[i] = 0x25
 		i--
-		dAtA[i] = 0x9a
+		dAtA[i] = 0xca
 	}
 	if len(m.DomainBeaconProposer) > 0 {
 		i -= len(m.DomainBeaconProposer)
 		copy(dAtA[i:], m.DomainBeaconProposer)
 		i = encodeVarintConfig(dAtA, i, uint64(len(m.DomainBeaconProposer)))
 		i--
-		dAtA[i] = 0x3
-		i--
-		dAtA[i] = 0x92
-	}
-	if len(m.ZeroHash) > 0 {
-		i -= len(m.ZeroHash)
-		copy(dAtA[i:], m.ZeroHash)
-		i = encodeVarintConfig(dAtA, i, uint64(len(m.ZeroHash)))
-		i--
-		dAtA[i] = 0x2
+		dAtA[i] = 0x25
 		i--
 		dAtA[i] = 0xc2
 	}
-	if m.ChurnLimitQuotient != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.ChurnLimitQuotient))
+	if m.ProposerRewardQuotient != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.ProposerRewardQuotient))
 		i--
-		dAtA[i] = 0x2
+		dAtA[i] = 0x1f
+		i--
+		dAtA[i] = 0xc0
+	}
+	if m.WhitstleblowerRewardQuotient != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.WhitstleblowerRewardQuotient))
+		i--
+		dAtA[i] = 0x1f
+		i--
+		dAtA[i] = 0xb8
+	}
+	if m.MinSlashingPenaltyQuotient != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinSlashingPenaltyQuotient))
+		i--
+		dAtA[i] = 0x1f
 		i--
 		dAtA[i] = 0xb0
-	}
-	if m.MinPerEpochChurnLimit != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.MinPerEpochChurnLimit))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0xa8
-	}
-	if m.EpochsPerHistoricalVector != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.EpochsPerHistoricalVector))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0xa0
-	}
-	if m.SlotsPerHistoricalRoot != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.SlotsPerHistoricalRoot))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0x98
-	}
-	if m.MinAttestationInclusionDelay != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.MinAttestationInclusionDelay))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0x90
-	}
-	if m.MaxCommitteesPerSlot != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.MaxCommitteesPerSlot))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0x88
-	}
-	if m.MaxAttestationCommitteeSize != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.MaxAttestationCommitteeSize))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0x80
-	}
-	if m.MinAttestationCommitteeSize != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.MinAttestationCommitteeSize))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xf8
-	}
-	if m.SlotsInEpoch != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.SlotsInEpoch))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xf0
 	}
 	if m.DKGReward != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.DKGReward))
 		i--
-		dAtA[i] = 0x1
+		dAtA[i] = 0x1f
 		i--
-		dAtA[i] = 0xb0
+		dAtA[i] = 0xa8
 	}
 	if m.BaseEth2DutyReward != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.BaseEth2DutyReward))
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xa8
-	}
-	if m.VaultSize != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.VaultSize))
-		i--
-		dAtA[i] = 0x1
+		dAtA[i] = 0x1f
 		i--
 		dAtA[i] = 0xa0
+	}
+	if m.EpochsPerSlashingVector != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.EpochsPerSlashingVector))
+		i--
+		dAtA[i] = 0x19
+		i--
+		dAtA[i] = 0x88
+	}
+	if m.EpochsPerHistoricalVector != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.EpochsPerHistoricalVector))
+		i--
+		dAtA[i] = 0x19
+		i--
+		dAtA[i] = 0x80
 	}
 	if m.GenesisEpoch != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.GenesisEpoch))
 		i--
-		dAtA[i] = 0x58
+		dAtA[i] = 0x12
+		i--
+		dAtA[i] = 0xf8
 	}
 	if len(m.GenesisSeed) > 0 {
 		i -= len(m.GenesisSeed)
 		copy(dAtA[i:], m.GenesisSeed)
 		i = encodeVarintConfig(dAtA, i, uint64(len(m.GenesisSeed)))
 		i--
-		dAtA[i] = 0x52
+		dAtA[i] = 0x12
+		i--
+		dAtA[i] = 0xf2
+	}
+	if len(m.ZeroHash) > 0 {
+		i -= len(m.ZeroHash)
+		copy(dAtA[i:], m.ZeroHash)
+		i = encodeVarintConfig(dAtA, i, uint64(len(m.ZeroHash)))
+		i--
+		dAtA[i] = 0x12
+		i--
+		dAtA[i] = 0xea
+	}
+	if m.FarFutureEpoch != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.FarFutureEpoch))
+		i--
+		dAtA[i] = 0x12
+		i--
+		dAtA[i] = 0xe0
+	}
+	if m.MinPerEpochChurnLimit != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinPerEpochChurnLimit))
+		i--
+		dAtA[i] = 0xc
+		i--
+		dAtA[i] = 0xe8
+	}
+	if m.VaultSize != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.VaultSize))
+		i--
+		dAtA[i] = 0xc
+		i--
+		dAtA[i] = 0xe0
+	}
+	if m.ChurnLimitQuotient != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.ChurnLimitQuotient))
+		i--
+		dAtA[i] = 0xc
+		i--
+		dAtA[i] = 0xd8
+	}
+	if m.MaxCommitteesPerSlot != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MaxCommitteesPerSlot))
+		i--
+		dAtA[i] = 0xc
+		i--
+		dAtA[i] = 0xd0
+	}
+	if m.MaxAttestationCommitteeSize != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MaxAttestationCommitteeSize))
+		i--
+		dAtA[i] = 0xc
+		i--
+		dAtA[i] = 0xc8
+	}
+	if m.MinAttestationCommitteeSize != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinAttestationCommitteeSize))
+		i--
+		dAtA[i] = 0xc
+		i--
+		dAtA[i] = 0xc0
+	}
+	if m.MinValidatorWithdrawabilityDelay != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinValidatorWithdrawabilityDelay))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xc8
+	}
+	if m.SlotsPerHistoricalRoot != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.SlotsPerHistoricalRoot))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xc0
+	}
+	if m.MinSeedLookahead != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinSeedLookahead))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xb8
+	}
+	if m.MaxSeedLookahead != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MaxSeedLookahead))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xb0
+	}
+	if m.MinAttestationInclusionDelay != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinAttestationInclusionDelay))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xa8
+	}
+	if m.SlotsInEpoch != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.SlotsInEpoch))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xa0
 	}
 	return len(dAtA) - i, nil
 }
@@ -506,24 +612,23 @@ func (m *PoolsChainConfig) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.GenesisSeed)
-	if l > 0 {
-		n += 1 + l + sovConfig(uint64(l))
-	}
-	if m.GenesisEpoch != 0 {
-		n += 1 + sovConfig(uint64(m.GenesisEpoch))
-	}
-	if m.VaultSize != 0 {
-		n += 2 + sovConfig(uint64(m.VaultSize))
-	}
-	if m.BaseEth2DutyReward != 0 {
-		n += 2 + sovConfig(uint64(m.BaseEth2DutyReward))
-	}
-	if m.DKGReward != 0 {
-		n += 2 + sovConfig(uint64(m.DKGReward))
-	}
 	if m.SlotsInEpoch != 0 {
 		n += 2 + sovConfig(uint64(m.SlotsInEpoch))
+	}
+	if m.MinAttestationInclusionDelay != 0 {
+		n += 2 + sovConfig(uint64(m.MinAttestationInclusionDelay))
+	}
+	if m.MaxSeedLookahead != 0 {
+		n += 2 + sovConfig(uint64(m.MaxSeedLookahead))
+	}
+	if m.MinSeedLookahead != 0 {
+		n += 2 + sovConfig(uint64(m.MinSeedLookahead))
+	}
+	if m.SlotsPerHistoricalRoot != 0 {
+		n += 2 + sovConfig(uint64(m.SlotsPerHistoricalRoot))
+	}
+	if m.MinValidatorWithdrawabilityDelay != 0 {
+		n += 2 + sovConfig(uint64(m.MinValidatorWithdrawabilityDelay))
 	}
 	if m.MinAttestationCommitteeSize != 0 {
 		n += 2 + sovConfig(uint64(m.MinAttestationCommitteeSize))
@@ -534,24 +639,49 @@ func (m *PoolsChainConfig) Size() (n int) {
 	if m.MaxCommitteesPerSlot != 0 {
 		n += 2 + sovConfig(uint64(m.MaxCommitteesPerSlot))
 	}
-	if m.MinAttestationInclusionDelay != 0 {
-		n += 2 + sovConfig(uint64(m.MinAttestationInclusionDelay))
+	if m.ChurnLimitQuotient != 0 {
+		n += 2 + sovConfig(uint64(m.ChurnLimitQuotient))
 	}
-	if m.SlotsPerHistoricalRoot != 0 {
-		n += 2 + sovConfig(uint64(m.SlotsPerHistoricalRoot))
-	}
-	if m.EpochsPerHistoricalVector != 0 {
-		n += 2 + sovConfig(uint64(m.EpochsPerHistoricalVector))
+	if m.VaultSize != 0 {
+		n += 2 + sovConfig(uint64(m.VaultSize))
 	}
 	if m.MinPerEpochChurnLimit != 0 {
 		n += 2 + sovConfig(uint64(m.MinPerEpochChurnLimit))
 	}
-	if m.ChurnLimitQuotient != 0 {
-		n += 2 + sovConfig(uint64(m.ChurnLimitQuotient))
+	if m.FarFutureEpoch != 0 {
+		n += 2 + sovConfig(uint64(m.FarFutureEpoch))
 	}
 	l = len(m.ZeroHash)
 	if l > 0 {
 		n += 2 + l + sovConfig(uint64(l))
+	}
+	l = len(m.GenesisSeed)
+	if l > 0 {
+		n += 2 + l + sovConfig(uint64(l))
+	}
+	if m.GenesisEpoch != 0 {
+		n += 2 + sovConfig(uint64(m.GenesisEpoch))
+	}
+	if m.EpochsPerHistoricalVector != 0 {
+		n += 2 + sovConfig(uint64(m.EpochsPerHistoricalVector))
+	}
+	if m.EpochsPerSlashingVector != 0 {
+		n += 2 + sovConfig(uint64(m.EpochsPerSlashingVector))
+	}
+	if m.BaseEth2DutyReward != 0 {
+		n += 2 + sovConfig(uint64(m.BaseEth2DutyReward))
+	}
+	if m.DKGReward != 0 {
+		n += 2 + sovConfig(uint64(m.DKGReward))
+	}
+	if m.MinSlashingPenaltyQuotient != 0 {
+		n += 2 + sovConfig(uint64(m.MinSlashingPenaltyQuotient))
+	}
+	if m.WhitstleblowerRewardQuotient != 0 {
+		n += 2 + sovConfig(uint64(m.WhitstleblowerRewardQuotient))
+	}
+	if m.ProposerRewardQuotient != 0 {
+		n += 2 + sovConfig(uint64(m.ProposerRewardQuotient))
 	}
 	l = len(m.DomainBeaconProposer)
 	if l > 0 {
@@ -569,17 +699,11 @@ func (m *PoolsChainConfig) Size() (n int) {
 	if l > 0 {
 		n += 2 + l + sovConfig(uint64(l))
 	}
-	if m.FarFutureEpoch != 0 {
-		n += 2 + sovConfig(uint64(m.FarFutureEpoch))
-	}
 	if m.MaxEffectiveBalance != 0 {
 		n += 2 + sovConfig(uint64(m.MaxEffectiveBalance))
 	}
-	if m.MaxSeedLookahead != 0 {
-		n += 2 + sovConfig(uint64(m.MaxSeedLookahead))
-	}
-	if m.MinSeedLookahead != 0 {
-		n += 2 + sovConfig(uint64(m.MinSeedLookahead))
+	if m.EffectiveBalanceIncrement != 0 {
+		n += 2 + sovConfig(uint64(m.EffectiveBalanceIncrement))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -622,117 +746,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: PoolsChainConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GenesisSeed", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthConfig
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfig
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.GenesisSeed = append(m.GenesisSeed[:0], dAtA[iNdEx:postIndex]...)
-			if m.GenesisSeed == nil {
-				m.GenesisSeed = []byte{}
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GenesisEpoch", wireType)
-			}
-			m.GenesisEpoch = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.GenesisEpoch |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 20:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VaultSize", wireType)
-			}
-			m.VaultSize = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.VaultSize |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 21:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BaseEth2DutyReward", wireType)
-			}
-			m.BaseEth2DutyReward = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BaseEth2DutyReward |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 22:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DKGReward", wireType)
-			}
-			m.DKGReward = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.DKGReward |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 30:
+		case 100:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SlotsInEpoch", wireType)
 			}
@@ -751,64 +765,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 31:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MinAttestationCommitteeSize", wireType)
-			}
-			m.MinAttestationCommitteeSize = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MinAttestationCommitteeSize |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 32:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxAttestationCommitteeSize", wireType)
-			}
-			m.MaxAttestationCommitteeSize = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MaxAttestationCommitteeSize |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 33:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxCommitteesPerSlot", wireType)
-			}
-			m.MaxCommitteesPerSlot = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MaxCommitteesPerSlot |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 34:
+		case 101:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MinAttestationInclusionDelay", wireType)
 			}
@@ -827,7 +784,45 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 35:
+		case 102:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxSeedLookahead", wireType)
+			}
+			m.MaxSeedLookahead = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxSeedLookahead |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 103:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinSeedLookahead", wireType)
+			}
+			m.MinSeedLookahead = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinSeedLookahead |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 104:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SlotsPerHistoricalRoot", wireType)
 			}
@@ -846,11 +841,11 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 36:
+		case 105:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EpochsPerHistoricalVector", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MinValidatorWithdrawabilityDelay", wireType)
 			}
-			m.EpochsPerHistoricalVector = 0
+			m.MinValidatorWithdrawabilityDelay = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowConfig
@@ -860,16 +855,16 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.EpochsPerHistoricalVector |= uint64(b&0x7F) << shift
+				m.MinValidatorWithdrawabilityDelay |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 37:
+		case 200:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MinPerEpochChurnLimit", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MinAttestationCommitteeSize", wireType)
 			}
-			m.MinPerEpochChurnLimit = 0
+			m.MinAttestationCommitteeSize = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowConfig
@@ -879,12 +874,50 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.MinPerEpochChurnLimit |= uint64(b&0x7F) << shift
+				m.MinAttestationCommitteeSize |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 38:
+		case 201:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxAttestationCommitteeSize", wireType)
+			}
+			m.MaxAttestationCommitteeSize = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxAttestationCommitteeSize |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 202:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxCommitteesPerSlot", wireType)
+			}
+			m.MaxCommitteesPerSlot = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxCommitteesPerSlot |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 203:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ChurnLimitQuotient", wireType)
 			}
@@ -903,7 +936,64 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 40:
+		case 204:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VaultSize", wireType)
+			}
+			m.VaultSize = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.VaultSize |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 205:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinPerEpochChurnLimit", wireType)
+			}
+			m.MinPerEpochChurnLimit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinPerEpochChurnLimit |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 300:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FarFutureEpoch", wireType)
+			}
+			m.FarFutureEpoch = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.FarFutureEpoch |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 301:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ZeroHash", wireType)
 			}
@@ -937,7 +1027,193 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				m.ZeroHash = []byte{}
 			}
 			iNdEx = postIndex
-		case 50:
+		case 302:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GenesisSeed", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthConfig
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GenesisSeed = append(m.GenesisSeed[:0], dAtA[iNdEx:postIndex]...)
+			if m.GenesisSeed == nil {
+				m.GenesisSeed = []byte{}
+			}
+			iNdEx = postIndex
+		case 303:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GenesisEpoch", wireType)
+			}
+			m.GenesisEpoch = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.GenesisEpoch |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 400:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EpochsPerHistoricalVector", wireType)
+			}
+			m.EpochsPerHistoricalVector = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EpochsPerHistoricalVector |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 401:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EpochsPerSlashingVector", wireType)
+			}
+			m.EpochsPerSlashingVector = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EpochsPerSlashingVector |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 500:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BaseEth2DutyReward", wireType)
+			}
+			m.BaseEth2DutyReward = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BaseEth2DutyReward |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 501:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DKGReward", wireType)
+			}
+			m.DKGReward = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DKGReward |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 502:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinSlashingPenaltyQuotient", wireType)
+			}
+			m.MinSlashingPenaltyQuotient = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinSlashingPenaltyQuotient |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 503:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitstleblowerRewardQuotient", wireType)
+			}
+			m.WhitstleblowerRewardQuotient = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.WhitstleblowerRewardQuotient |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 504:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProposerRewardQuotient", wireType)
+			}
+			m.ProposerRewardQuotient = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ProposerRewardQuotient |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 600:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DomainBeaconProposer", wireType)
 			}
@@ -971,7 +1247,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				m.DomainBeaconProposer = []byte{}
 			}
 			iNdEx = postIndex
-		case 51:
+		case 601:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DomainBeaconAttester", wireType)
 			}
@@ -1005,7 +1281,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				m.DomainBeaconAttester = []byte{}
 			}
 			iNdEx = postIndex
-		case 52:
+		case 602:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DomainRandao", wireType)
 			}
@@ -1039,7 +1315,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				m.DomainRandao = []byte{}
 			}
 			iNdEx = postIndex
-		case 53:
+		case 603:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field GenesisForkVersion", wireType)
 			}
@@ -1073,26 +1349,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				m.GenesisForkVersion = []byte{}
 			}
 			iNdEx = postIndex
-		case 60:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FarFutureEpoch", wireType)
-			}
-			m.FarFutureEpoch = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FarFutureEpoch |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 61:
+		case 700:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MaxEffectiveBalance", wireType)
 			}
@@ -1111,11 +1368,11 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 62:
+		case 701:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxSeedLookahead", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field EffectiveBalanceIncrement", wireType)
 			}
-			m.MaxSeedLookahead = 0
+			m.EffectiveBalanceIncrement = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowConfig
@@ -1125,26 +1382,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.MaxSeedLookahead |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 63:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MinSeedLookahead", wireType)
-			}
-			m.MinSeedLookahead = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MinSeedLookahead |= uint64(b&0x7F) << shift
+				m.EffectiveBalanceIncrement |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

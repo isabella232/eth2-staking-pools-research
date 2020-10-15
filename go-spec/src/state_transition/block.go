@@ -132,7 +132,7 @@ func verifyBlockSig(state *core.State, signedBlock *core.SignedPoolBlock) error 
 	if proposer == nil {
 		return fmt.Errorf("proposer not found")
 	}
-	domain, err := shared.Domain(epoch, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+	domain, err := shared.GetDomain(epoch, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
 	if err != nil {
 		return err
 	}

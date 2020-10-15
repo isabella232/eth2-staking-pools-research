@@ -3,6 +3,7 @@ package shared
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
+	"github.com/prysmaticlabs/go-bitfield"
 )
 
 /**
@@ -147,4 +148,28 @@ func GetVaultCommittee(state *core.State, poolId uint64, epoch uint64) ([]uint64
 		return nil, err
 	}
 	return vault, nil
+}
+
+/**
+def get_attesting_indices(state: BeaconState,
+                          data: AttestationData,
+                          bits: Bitlist[MAX_VALIDATORS_PER_COMMITTEE]) -> Set[ValidatorIndex]:
+    """
+    Return the set of attesting indices corresponding to ``data`` and ``bits``.
+    """
+    committee = get_beacon_committee(state, data.slot, data.index)
+    return set(index for i, index in enumerate(committee) if bits[i])
+ */
+func GetAttestingIndices(state *core.State, data *core.AttestationData, bits bitfield.Bitlist) ([]uint64, error) {
+	committee, err := GetAttestationCommittee(state, data.Slot, data.CommitteeIndex)
+	if err != nil {
+		return nil, err
+	}
+	ret := []uint64{}
+	for i := range bits {
+		if bits.BitAt(uint64(i)) {
+			ret = append(ret, committee[i])
+		}
+	}
+	return ret, nil
 }

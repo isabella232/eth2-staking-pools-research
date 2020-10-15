@@ -112,19 +112,26 @@ func VerifySignature(root []byte, pubKey []byte, sigByts []byte) (bool, error) {
 }
 
 // Spec pseudocode definition:
-//  def get_domain(state: BeaconState, domain_type: DomainType, epoch: Epoch=None) -> Domain:
+//  def get_domain(state: BeaconState, domain_type: DomainType, epoch: Epoch=None) -> GetDomain:
 //    """
 //    Return the signature domain (fork version concatenated with domain type) of a message.
 //    """
 //    epoch = get_current_epoch(state) if epoch is None else epoch
 //    fork_version = state.fork.previous_version if epoch < state.fork.epoch else state.fork.current_version
 //    return compute_domain(domain_type, fork_version, state.genesis_validators_root)
-func Domain(epoch uint64, domainType []byte, genesisRoot []byte) ([]byte, error) {
-	// TODO - add fork version
-	return ComputeDomain(domainType, nil, genesisRoot)
+func GetDomain(state *core.State, domainType []byte, epoch uint64) ([]byte, error) {
+	epoch = GetCurrentEpoch(state)
+	var forkVersion []byte
+	if epoch < state.Fork.Epoch {
+		forkVersion = state.Fork.PreviousVersion
+	} else {
+		forkVersion = state.Fork.CurrentVersion
+	}
+
+	return ComputeDomain(domainType, forkVersion, state.GenesisValidatorsRoot)
 }
 
-// def compute_domain(domain_type: DomainType, fork_version: Version=None, genesis_validators_root: Root=None) -> Domain:
+// def compute_domain(domain_type: DomainType, fork_version: Version=None, genesis_validators_root: Root=None) -> GetDomain:
 //    """
 //    Return the domain for the ``domain_type`` and ``fork_version``.
 //    """
@@ -133,7 +140,7 @@ func Domain(epoch uint64, domainType []byte, genesisRoot []byte) ([]byte, error)
 //    if genesis_validators_root is None:
 //        genesis_validators_root = Root()  # all bytes zero by default
 //    fork_data_root = compute_fork_data_root(fork_version, genesis_validators_root)
-//    return Domain(domain_type + fork_data_root[:28])
+//    return GetDomain(domain_type + fork_data_root[:28])
 func ComputeDomain(domainType []byte, forkVersion []byte, genesisValidatorRoot []byte) ([]byte, error) {
 	domainBytes := [4]byte{}
 	copy(domainBytes[:], domainType[0:4])

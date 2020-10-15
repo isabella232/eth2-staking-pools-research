@@ -71,7 +71,7 @@ func TestDomainOk(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		d, err := Domain(tt.epoch, tt.domainType, nil)
+		d, err := GetDomain(tt.epoch, tt.domainType, tt.epoch)
 		require.NoError(t, err)
 		require.EqualValues(t, tt.domain, d)
 	}

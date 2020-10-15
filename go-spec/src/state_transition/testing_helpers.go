@@ -277,7 +277,7 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 		block.StateRoot = root[:]
 
 		// sign
-		blockDomain, err := shared.Domain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+		blockDomain, err := shared.GetDomain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
 		if err != nil {
 			return nil, err
 		}

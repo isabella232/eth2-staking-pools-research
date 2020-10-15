@@ -132,7 +132,7 @@ func TestProcessBlockHeader(t *testing.T) {
 
 			// sign
 			sk := []byte(fmt.Sprintf("%d", test.signerBP))
-			blockDomain, err := shared.Domain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+			blockDomain, err := shared.GetDomain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
 			require.NoError(t, err)
 			sig, err := shared.SignBlock(test.block, sk, blockDomain) // TODO - dynamic domain
 			require.NoError(t, err)

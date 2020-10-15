@@ -74,7 +74,7 @@ func RANDAOSigningData(state *core.State) (data []byte, domain []byte, err error
 	data = make([]byte, 8) // 64 bit
 	binary.LittleEndian.PutUint64(data, epoch)
 
-	domain, err = shared.Domain(epoch, params.ChainConfig.DomainRandao, state.GenesisValidatorsRoot)
+	domain, err = shared.GetDomain(epoch, params.ChainConfig.DomainRandao, state.GenesisValidatorsRoot)
 	if err != nil {
 		return nil,nil, err
 	}

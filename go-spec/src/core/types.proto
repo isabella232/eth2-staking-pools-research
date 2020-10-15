@@ -7,10 +7,11 @@ import "src/core/actions.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 message State {
-    // time
+    // versioning
     uint64 GenesisTime = 10;
     uint64 CurrentSlot = 11;
     PoolBlockHeader LatestBlockHeader = 12;
+    Fork Fork = 13;
 
     // past
     repeated SlotAndBytes BlockRoots = 21;
@@ -29,6 +30,9 @@ message State {
     // network
     repeated BlockProducer BlockProducers = 41;
     repeated Pool Pools = 42;
+
+    // slashings
+    repeated uint64 Slashings = 50;
 }
 
 message BlockProducer {
@@ -97,7 +101,7 @@ message AttestationData {
     // Slot of the attestation attesting for.
     uint64 slot = 1;
     // The committee index that submitted this attestation.
-    uint32 committee_index = 2;
+    uint64 committee_index = 2;
     // 32 byte root of the LMD GHOST block vote.
     bytes beacon_block_root = 3;
     // The most recent justified checkpoint in the beacon state
@@ -144,7 +148,13 @@ message StateCommitment {
     repeated bytes NextCommittee = 5;
 }
 
+message Fork {
+    bytes previous_version = 1 [(gogoproto.moretags) = "ssz-size:\"4\""];
+    bytes current_version = 2 [(gogoproto.moretags) = "ssz-size:\"4\""];
+    uint64 epoch = 3;
+}
+
 message ForkData {
-    bytes CurrentVersion = 1;
-    bytes GenesisValidatorRoot = 2;
+    bytes CurrentVersion = 1 [(gogoproto.moretags) = "ssz-size:\"4\""];
+    bytes GenesisValidatorRoot = 2 [(gogoproto.moretags) = "ssz-size:\"32\""];
 }
