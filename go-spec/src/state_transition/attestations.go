@@ -147,7 +147,7 @@ func validateAttestationData(state *core.State, data *core.AttestationData) erro
 		return fmt.Errorf("slot to submit att. has passed")
 	}
 
-	if data.CommitteeIndex >= uint32(shared.GetCommitteeCountPerSlot(state, data.Slot)) {
+	if data.CommitteeIndex >= shared.GetCommitteeCountPerSlot(state, data.Slot) {
 		return fmt.Errorf("committee index out of range")
 	}
 

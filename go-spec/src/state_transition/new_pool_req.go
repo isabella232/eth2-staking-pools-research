@@ -63,17 +63,14 @@ func (st *StateTransition) processNewPoolRequests(state *core.State, requests []
 				}
 				partic := req.GetParticipation()
 				if partic[:].BitAt(uint64(i)) {
-					shared.IncreaseBPBalance(bp, params.ChainConfig.DKGReward)
+					shared.IncreaseBalance(state, bp.Id, params.ChainConfig.DKGReward)
 				} else {
-					err := shared.DecreaseBPBalance(bp, params.ChainConfig.DKGReward)
-					if err != nil {
-						return err
-					}
+					shared.DecreaseBalance(state, bp.Id, params.ChainConfig.DKGReward)
 				}
 			}
 
 			// special reward for leader
-			shared.IncreaseBPBalance(leader, 3* params.ChainConfig.DKGReward)
+			shared.IncreaseBalance(state, leader.Id, 3*params.ChainConfig.DKGReward)
 		case 2: // un-successful
 			// TODO - better define how the un-successful status is assigned.
 			for i := 0 ; i < len(committee) ; i ++ {
@@ -81,10 +78,7 @@ func (st *StateTransition) processNewPoolRequests(state *core.State, requests []
 				if bp == nil {
 					return fmt.Errorf("could not find BP %d", committee[i])
 				}
-				err := shared.DecreaseBPBalance(bp, params.ChainConfig.DKGReward)
-				if err != nil {
-					return err
-				}
+				shared.DecreaseBalance(state, bp.Id, params.ChainConfig.DKGReward)
 			}
 		}
 	}

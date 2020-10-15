@@ -129,11 +129,10 @@ func calculateAttestingBalances(state *core.State) (prev *Balances, current *Bal
 
 		// calculate attesting balance and indices
 		for _, att := range matchingAtt {
-			committee, err := shared.GetAttestationCommittee(state, att.Data.Slot, uint64(att.Data.CommitteeIndex))
+			attestingIndices, err := shared.GetAttestingIndices(state, att.Data, att.AggregationBits)
 			if err != nil {
 				return nil, err
 			}
-			attestingIndices := shared.AttestingIndices(att.AggregationBits, committee)
 			for _, idx := range attestingIndices {
 				bp := shared.GetBlockProducer(state, idx)
 				if bp != nil && !bp.Slashed {

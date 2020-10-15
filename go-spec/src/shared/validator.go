@@ -306,4 +306,5 @@ func SlashBlockProducer(state *core.State, slashedIndex uint64) error {
 	proposerReward := whistleblowerReward / params.ChainConfig.ProposerRewardQuotient
 	IncreaseBalance(state, proposer, proposerReward)
 	IncreaseBalance(state, whistleblowerIndex, whistleblowerReward)
+	return nil
 }

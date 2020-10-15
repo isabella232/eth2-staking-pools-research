@@ -1,7 +1,6 @@
 package shared
 
 import (
-	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/ulule/deepcopier"
@@ -80,29 +79,6 @@ func CopyState(state *core.State) *core.State {
 	}
 
 	return ret
-}
-
-// will return an 0 length byte array if not found
-func GetStateRoot(state *core.State, slot uint64) []byte {
-	for _, r := range state.StateRoots {
-		if r.Slot == slot {
-			return r.Bytes
-		}
-	}
-	return []byte{}
-}
-
-func DecreaseBPBalance(bp *core.BlockProducer, change uint64) error {
-	if bp.CDTBalance < change {
-		return fmt.Errorf("BP %d dosen't have enonugh Balance (%d) to decrease (%d)", bp.Id, bp.CDTBalance, change)
-	}
-
-	bp.CDTBalance -= change
-	return nil
-}
-
-func IncreaseBPBalance(bp *core.BlockProducer, change uint64) {
-	bp.CDTBalance += change
 }
 
 // will return nil if not found or inactive

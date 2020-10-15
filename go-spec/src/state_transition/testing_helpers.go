@@ -25,7 +25,7 @@ func generateAttestations(
 	slot uint64,
 	sourceCheckpoint *core.Checkpoint,
 	targetCheckpoint *core.Checkpoint,
-	committeeIdx uint32,
+	committeeIdx uint64,
 	finalized bool,
 	dutyType int32, // 0 - attestation, 1 - proposal, 2 - aggregation
 	) []*core.Attestation {
@@ -206,7 +206,7 @@ func populateJustificationAndFinalization(
 				AggregationBits:      aggBits,
 				Data:                 &core.AttestationData{
 					Slot:                 slotPointer,
-					CommitteeIndex:       uint32(cIndx),
+					CommitteeIndex:       cIndx,
 					Target:               targetCheckpoint,
 				},
 			})
@@ -277,7 +277,7 @@ func generateAndApplyBlocks(state *core.State, maxBlocks int) (*core.State, erro
 		block.StateRoot = root[:]
 
 		// sign
-		blockDomain, err := shared.GetDomain(0, params.ChainConfig.DomainBeaconProposer, state.GenesisValidatorsRoot)
+		blockDomain, err := shared.GetDomain(state, params.ChainConfig.DomainBeaconProposer, 0)
 		if err != nil {
 			return nil, err
 		}

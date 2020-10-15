@@ -39,19 +39,13 @@ func (st *StateTransition) processExecutionSummaries(state *core.State, summarie
 					}
 
 					if !duty.Finalized {
-						err := shared.DecreaseBPBalance(bp, 2*params.ChainConfig.BaseEth2DutyReward)
-						if err != nil {
-							return err
-						}
+						shared.DecreaseBalance(state, bp.Id, 2*params.ChainConfig.BaseEth2DutyReward)
 					} else {
 						participation := duty.GetParticipation()
 						if participation.BitAt(uint64(i)) {
-							shared.IncreaseBPBalance(bp, params.ChainConfig.BaseEth2DutyReward)
+							shared.IncreaseBalance(state, bp.Id, params.ChainConfig.BaseEth2DutyReward)
 						} else {
-							err := shared.DecreaseBPBalance(bp, params.ChainConfig.BaseEth2DutyReward)
-							if err != nil {
-								return err
-							}
+							shared.DecreaseBalance(state, bp.Id, params.ChainConfig.BaseEth2DutyReward)
 						}
 					}
 				}
@@ -63,19 +57,13 @@ func (st *StateTransition) processExecutionSummaries(state *core.State, summarie
 					}
 
 					if !duty.Finalized {
-						err := shared.DecreaseBPBalance(bp, 4*params.ChainConfig.BaseEth2DutyReward)
-						if err != nil {
-							return err
-						}
+						shared.DecreaseBalance(state, bp.Id, 4*params.ChainConfig.BaseEth2DutyReward)
 					} else {
 						participation := duty.GetParticipation()
 						if participation[:].BitAt(uint64(i)) {
-							shared.IncreaseBPBalance(bp, 2*params.ChainConfig.BaseEth2DutyReward)
+							shared.IncreaseBalance(state, bp.Id, 2*params.ChainConfig.BaseEth2DutyReward)
 						} else {
-							err := shared.DecreaseBPBalance(bp, 2*params.ChainConfig.BaseEth2DutyReward)
-							if err != nil {
-								return err
-							}
+							shared.DecreaseBalance(state, bp.Id, 2*params.ChainConfig.BaseEth2DutyReward)
 						}
 					}
 				}
