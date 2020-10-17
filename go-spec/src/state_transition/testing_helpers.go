@@ -110,7 +110,8 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 		bps[i] = &core.BlockProducer{
 			Id:      uint64(i),
 			CDTBalance: 1000,
-			Stake:   32,
+			EffectiveBalance:   32,
+			Balance : 32,
 			Slashed: false,
 			Active:  true,
 			PubKey:  sk.GetPublicKey().Serialize(),
@@ -145,11 +146,11 @@ func generateTestState(t *testing.T, headSlot int) *core.State {
 				Bytes:	params.ChainConfig.ZeroHash, // beacon chain uses an eth1 block hash as first seed
 			},
 		},
-		BlockRoots: 	[]*core.SlotAndBytes{},
-		StateRoots: 	[]*core.SlotAndBytes{},
+		XBlockRoots:               []*core.SlotAndBytes{},
+		XStateRoots:               []*core.SlotAndBytes{},
 		PreviousEpochAttestations: []*core.PendingAttestation{},
-		CurrentEpochAttestations:[]*core.PendingAttestation{},
-		JustificationBits: []byte{0},
+		CurrentEpochAttestations:  []*core.PendingAttestation{},
+		JustificationBits:         []byte{0},
 		PreviousJustifiedCheckpoint: &core.Checkpoint{
 			Epoch:                0,
 			Root:                 params.ChainConfig.ZeroHash, // TODO is it zero hash?

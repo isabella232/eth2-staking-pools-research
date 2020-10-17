@@ -1,9 +1,12 @@
 package shared
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/prysmaticlabs/go-bitfield"
+	"sort"
 )
 
 /**
@@ -169,6 +172,115 @@ func GetAttestingIndices(state *core.State, data *core.AttestationData, bits bit
 	for i := range bits {
 		if bits.BitAt(uint64(i)) {
 			ret = append(ret, committee[i])
+		}
+	}
+	return ret, nil
+}
+
+/**
+def get_unslashed_attesting_indices(state: BeaconState,
+                                    attestations: Sequence[PendingAttestation]) -> Set[ValidatorIndex]:
+    output = set()  # type: Set[ValidatorIndex]
+    for a in attestations:
+        output = output.union(get_attesting_indices(state, a.data, a.aggregation_bits))
+    return set(filter(lambda index: not state.validators[index].slashed, output))
+ */
+func GetUnslashedAttestingIndices(state *core.State, attestations []*core.PendingAttestation) ([]uint64, error) {
+	output := []uint64{}
+	seen := make(map[uint64]bool)
+
+	for _, a := range attestations {
+		indices, err := GetAttestingIndices(state, a.Data, a.AggregationBits)
+		if err != nil {
+			return nil, err
+		}
+		for _, i := range indices {
+			if !seen[i] {
+				output = append(output, i)
+			}
+			seen[i] = true
+		}
+	}
+
+	// Sort the attesting set indices by increasing order.
+	sort.Slice(output, func(i, j int) bool {
+		return output[i] < output[j]
+	})
+
+	// Remove the slashed validator indices.
+	for i := range output {
+		bp := GetBlockProducer(state, output[i])
+		if bp != nil && bp.Slashed {
+			output = append(output[:i], output[i+1:]...)
+		}
+	}
+	return output, nil
+}
+
+/**
+def get_matching_source_attestations(state: BeaconState, epoch: Epoch) -> Sequence[PendingAttestation]:
+    assert epoch in (get_previous_epoch(state), get_current_epoch(state))
+    return state.current_epoch_attestations if epoch == get_current_epoch(state) else state.previous_epoch_attestations
+ */
+func GetMatchingSourceAttestations(state *core.State, epoch uint64) ([]*core.PendingAttestation, error) {
+	if epoch != GetPreviousEpoch(state) || epoch != GetCurrentEpoch(state) {
+		return nil, fmt.Errorf("epoch not current nor previous")
+	}
+	if epoch == GetCurrentEpoch(state) {
+		return state.CurrentEpochAttestations, nil
+	} else {
+		return state.PreviousEpochAttestations, nil
+	}
+}
+
+
+/**
+def get_matching_target_attestations(state: BeaconState, epoch: Epoch) -> Sequence[PendingAttestation]:
+    return [
+        a for a in get_matching_source_attestations(state, epoch)
+        if a.data.target.root == get_block_root(state, epoch)
+    ]
+ */
+func GetMatchingTargetAttestations(state *core.State, epoch uint64) ([]*core.PendingAttestation, error) {
+	source, err := GetMatchingSourceAttestations(state, epoch)
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*core.PendingAttestation{}
+	for _, att := range source {
+		root, err := GetBlockRoot(state, epoch)
+		if err != nil {
+			return nil, err
+		}
+		if bytes.Equal(att.Data.Target.Root, root.Bytes) {
+			ret = append(ret, att)
+		}
+	}
+	return ret, nil
+}
+
+/**
+def get_matching_head_attestations(state: BeaconState, epoch: Epoch) -> Sequence[PendingAttestation]:
+    return [
+        a for a in get_matching_target_attestations(state, epoch)
+        if a.data.beacon_block_root == get_block_root_at_slot(state, a.data.slot)
+    ]
+ */
+func GetMatchingHeadAttestations(state *core.State, epoch uint64) ([]*core.PendingAttestation, error) {
+	source, err := GetMatchingTargetAttestations(state, epoch)
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*core.PendingAttestation{}
+	for _, att := range source {
+		root, err := GetBlockRootAtSlot(state, att.Data.Slot)
+		if err != nil {
+			return nil, err
+		}
+		if bytes.Equal(att.Data.BeaconBlockRoot, root.Bytes) {
+			ret = append(ret, att)
 		}
 	}
 	return ret, nil

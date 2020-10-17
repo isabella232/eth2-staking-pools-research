@@ -28,7 +28,7 @@ func IsActiveBP(bp *core.BlockProducer, epoch uint64) bool {
 		)
 */
 func IsEligibleForActivationQueue(bp *core.BlockProducer) bool {
-	return bp.ActivationEligibilityEpoch == params.ChainConfig.FarFutureEpoch && bp.Stake == params.ChainConfig.MaxEffectiveBalance
+	return bp.ActivationEligibilityEpoch == params.ChainConfig.FarFutureEpoch && bp.EffectiveBalance == params.ChainConfig.MaxEffectiveBalance
 }
 
 /**
@@ -97,9 +97,9 @@ func ComputeProposerIndex(state *core.State, indices []uint64, seed []byte) (uin
 		if bp == nil {
 			return 0, fmt.Errorf("could not find shuffled BP index %d", candidateIndex)
 		}
-		stake := bp.Stake
+		effectiveBalance := bp.EffectiveBalance
 
-		if stake * maxRandomByte >= params.ChainConfig.MaxEffectiveBalance * uint64(randomByte) {
+		if effectiveBalance * maxRandomByte >= params.ChainConfig.MaxEffectiveBalance * uint64(randomByte) {
 			return candidateIndex, nil
 		}
 	}
@@ -141,7 +141,7 @@ def get_validator_churn_limit(state: BeaconState) -> uint64:
     active_validator_indices = get_active_validator_indices(state, get_current_epoch(state))
     return max(MIN_PER_EPOCH_CHURN_LIMIT, uint64(len(active_validator_indices)) // CHURN_LIMIT_QUOTIENT)
  */
-func GetValidatorChurnLimit(state *core.State) uint64 {
+func GetBPChurnLimit(state *core.State) uint64 {
 	activeBPs := GetActiveBlockProducers(state, GetCurrentEpoch(state))
 	churLimit := uint64(len(activeBPs)) / params.ChainConfig.ChurnLimitQuotient
 	if churLimit < params.ChainConfig.MinPerEpochChurnLimit {
@@ -179,7 +179,7 @@ def increase_balance(state: BeaconState, index: ValidatorIndex, delta: Gwei) -> 
  */
 func IncreaseBalance(state *core.State, index uint64, delta uint64) {
 	if bp := GetBlockProducer(state, index); bp != nil {
-		bp.Stake += delta
+		bp.Balance += delta
 	}
 }
 
@@ -192,10 +192,10 @@ def decrease_balance(state: BeaconState, index: ValidatorIndex, delta: Gwei) -> 
 */
 func DecreaseBalance(state *core.State, index uint64, delta uint64) {
 	if bp := GetBlockProducer(state, index); bp != nil {
-		if delta > bp.Stake {
-			bp.Stake = 0
+		if delta > bp.Balance {
+			bp.Balance = 0
 		} else {
-			bp.Stake -= delta
+			bp.Balance -= delta
 		}
 	}
 }
@@ -293,8 +293,8 @@ func SlashBlockProducer(state *core.State, slashedIndex uint64) error {
 	}
 	bp.Slashed = true
 	bp.WithdrawableEpoch = Max(bp.WithdrawableEpoch, epoch + params.ChainConfig.EpochsPerSlashingVector)
-	state.Slashings[epoch % params.ChainConfig.EpochsPerSlashingVector] += bp.Stake // TODO - should be effective balace?
-	DecreaseBalance(state, slashedIndex, bp.Stake / params.ChainConfig.MinSlashingPenaltyQuotient) // TODO - should be effective balace?
+	state.Slashings[epoch % params.ChainConfig.EpochsPerSlashingVector] += bp.EffectiveBalance
+	DecreaseBalance(state, slashedIndex, bp.EffectiveBalance / params.ChainConfig.MinSlashingPenaltyQuotient)
 
 	// Apply proposer and whistleblower rewards
 	proposer, err := GetBlockProposerIndex(state)
@@ -302,7 +302,7 @@ func SlashBlockProducer(state *core.State, slashedIndex uint64) error {
 		return err
 	}
 	whistleblowerIndex := proposer
-	whistleblowerReward := bp.Stake / params.ChainConfig.WhitstleblowerRewardQuotient
+	whistleblowerReward := bp.EffectiveBalance / params.ChainConfig.WhitstleblowerRewardQuotient
 	proposerReward := whistleblowerReward / params.ChainConfig.ProposerRewardQuotient
 	IncreaseBalance(state, proposer, proposerReward)
 	IncreaseBalance(state, whistleblowerIndex, whistleblowerReward)

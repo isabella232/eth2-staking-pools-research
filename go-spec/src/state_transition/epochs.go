@@ -6,6 +6,8 @@ import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
+	"github.com/prysmaticlabs/go-ssz"
+	"sort"
 )
 
 //def process_epoch(state: BeaconState) -> None:
@@ -137,7 +139,7 @@ func calculateAttestingBalances(state *core.State) (prev *Balances, current *Bal
 				bp := shared.GetBlockProducer(state, idx)
 				if bp != nil && !bp.Slashed {
 					ret.AttestingIndexes = append(ret.AttestingIndexes, idx)
-					ret.AttestingBalance += bp.Stake
+					ret.AttestingBalance += bp.EffectiveBalance
 				}
 			}
 		}
@@ -147,7 +149,7 @@ func calculateAttestingBalances(state *core.State) (prev *Balances, current *Bal
 		for _, idx := range activeBps {
 			bp := shared.GetBlockProducer(state, idx)
 			if bp != nil {
-				ret.ActiveBalance += bp.Stake
+				ret.ActiveBalance += bp.EffectiveBalance
 			}
 		}
 
@@ -167,4 +169,162 @@ func calculateAttestingBalances(state *core.State) (prev *Balances, current *Bal
 
 
 	return prev, current, nil
+}
+
+/**
+def process_registry_updates(state: BeaconState) -> None:
+    # Process activation eligibility and ejections
+    for index, validator in enumerate(state.validators):
+        if is_eligible_for_activation_queue(validator):
+            validator.activation_eligibility_epoch = get_current_epoch(state) + 1
+
+        if is_active_validator(validator, get_current_epoch(state)) and validator.effective_balance <= EJECTION_BALANCE:
+            initiate_validator_exit(state, ValidatorIndex(index))
+
+    # Queue validators eligible for activation and not yet dequeued for activation
+    activation_queue = sorted([
+        index for index, validator in enumerate(state.validators)
+        if is_eligible_for_activation(state, validator)
+        # Order by the sequence of activation_eligibility_epoch setting and then index
+    ], key=lambda index: (state.validators[index].activation_eligibility_epoch, index))
+    # Dequeued validators for activation up to churn limit
+    for index in activation_queue[:get_validator_churn_limit(state)]:
+        validator = state.validators[index]
+        validator.activation_epoch = compute_activation_exit_epoch(get_current_epoch(state))
+*/
+func ProcessRegistryUpdates(state *core.State) {
+	for _, bp := range state.BlockProducers {
+		if shared.IsEligibleForActivationQueue(bp) {
+			bp.ActivationEligibilityEpoch = shared.GetCurrentEpoch(state) + 1
+		}
+
+		if shared.IsActiveBP(bp, shared.GetCurrentEpoch(state)) && bp.EffectiveBalance <= params.ChainConfig.EjectionBalance {
+			shared.InitiateBlockProducerExit(state, bp.Id)
+		}
+	}
+
+	// Queue validators eligible for activation and not yet dequeued for activation
+	activationQueue := []uint64{}
+	for index, bp := range state.BlockProducers {
+		if shared.IsEligibleForActivation(state, bp) {
+			activationQueue = append(activationQueue, uint64(index))
+		}
+	}
+	// Order by the sequence of activation_eligibility_epoch setting and then index
+	sort.SliceStable(activationQueue, func(i, j int) bool {
+		if state.BlockProducers[i].ActivationEligibilityEpoch == state.BlockProducers[j].ActivationEligibilityEpoch {
+			return i < j
+		}
+		return state.BlockProducers[i].ActivationEligibilityEpoch < state.BlockProducers[j].ActivationEligibilityEpoch
+	})
+
+	// Dequeued validators for activation up to churn limit
+	for index := range activationQueue[:shared.GetBPChurnLimit(state)] {
+		bp := state.BlockProducers[index]
+		bp.ActivationEpoch = shared.ComputeActivationExitEpoch(shared.GetCurrentEpoch(state))
+	}
+}
+
+/**
+def process_slashings(state: BeaconState) -> None:
+    epoch = get_current_epoch(state)
+    total_balance = get_total_active_balance(state)
+    adjusted_total_slashing_balance = min(sum(state.slashings) * PROPORTIONAL_SLASHING_MULTIPLIER, total_balance)
+    for index, validator in enumerate(state.validators):
+        if validator.slashed and epoch + EPOCHS_PER_SLASHINGS_VECTOR // 2 == validator.withdrawable_epoch:
+            increment = EFFECTIVE_BALANCE_INCREMENT  # Factored out from penalty numerator to avoid uint64 overflow
+            penalty_numerator = validator.effective_balance // increment * adjusted_total_slashing_balance
+            penalty = penalty_numerator // total_balance * increment
+            decrease_balance(state, ValidatorIndex(index), penalty)
+ */
+func ProcessSlashings(state *core.State) {
+	epoch := shared.GetCurrentEpoch(state)
+	totalBalance := shared.GetTotalActiveStake(state)
+	adjustedTotalSlashingBalance := shared.Min(
+			shared.SumSlashings(state) * params.ChainConfig.ProportionalSlashingMultiplier,
+			totalBalance,
+		)
+
+	for _, bp := range state.BlockProducers {
+		if bp.Slashed && epoch + params.ChainConfig.EpochsPerSlashingVector / 2 == bp.WithdrawableEpoch {
+			increment := params.ChainConfig.EffectiveBalanceIncrement // Factored out from penalty numerator to avoid uint64 overflow
+			penaltyNumerator := bp.EffectiveBalance / increment * adjustedTotalSlashingBalance
+			penalty := penaltyNumerator / totalBalance * increment
+			shared.DecreaseBalance(state, bp.Id, penalty)
+		}
+	}
+}
+
+/**
+def process_final_updates(state: BeaconState) -> None:
+    current_epoch = get_current_epoch(state)
+    next_epoch = Epoch(current_epoch + 1)
+    # Reset eth1 data votes
+    if next_epoch % EPOCHS_PER_ETH1_VOTING_PERIOD == 0:
+        state.eth1_data_votes = []
+    # Update effective balances with hysteresis
+    for index, validator in enumerate(state.validators):
+        balance = state.balances[index]
+        HYSTERESIS_INCREMENT = uint64(EFFECTIVE_BALANCE_INCREMENT // HYSTERESIS_QUOTIENT)
+        DOWNWARD_THRESHOLD = HYSTERESIS_INCREMENT * HYSTERESIS_DOWNWARD_MULTIPLIER
+        UPWARD_THRESHOLD = HYSTERESIS_INCREMENT * HYSTERESIS_UPWARD_MULTIPLIER
+        if (
+            balance + DOWNWARD_THRESHOLD < validator.effective_balance
+            or validator.effective_balance + UPWARD_THRESHOLD < balance
+        ):
+            validator.effective_balance = min(balance - balance % EFFECTIVE_BALANCE_INCREMENT, MAX_EFFECTIVE_BALANCE)
+    # Reset slashings
+    state.slashings[next_epoch % EPOCHS_PER_SLASHINGS_VECTOR] = Gwei(0)
+    # Set randao mix
+    state.randao_mixes[next_epoch % EPOCHS_PER_HISTORICAL_VECTOR] = get_randao_mix(state, current_epoch)
+    # Set historical root accumulator
+    if next_epoch % (SLOTS_PER_HISTORICAL_ROOT // SLOTS_PER_EPOCH) == 0:
+        historical_batch = HistoricalBatch(block_roots=state.block_roots, state_roots=state.state_roots)
+        state.historical_roots.append(hash_tree_root(historical_batch))
+    # Rotate current/previous epoch attestations
+    state.previous_epoch_attestations = state.current_epoch_attestations
+    state.current_epoch_attestations = []
+ */
+func ProcessFinalUpdates(state *core.State) error {
+	currentEpoch := shared.GetCurrentEpoch(state)
+	nextEpoch := currentEpoch + 1
+
+	// Reset eth1 data votes
+	if nextEpoch % params.ChainConfig.EpochsPerETH1VotingPeriod == 0 {
+		state.Eth1DataVotes = []*core.ETH1Data{}
+	}
+
+	// Update effective balances with hysteresis
+	for _, bp := range state.BlockProducers {
+		hysteresisIncrement := params.ChainConfig.EffectiveBalanceIncrement / params.ChainConfig.HysteresisQuotient
+		downwardThreshold := hysteresisIncrement * params.ChainConfig.HysteresisDownwardMultiplier
+		upwardThreshold := hysteresisIncrement * params.ChainConfig.HysteresisUpwardMultiplier
+		if bp.Balance + downwardThreshold < bp.EffectiveBalance || bp.EffectiveBalance + upwardThreshold < bp.Balance {
+			bp.EffectiveBalance = shared.Min(bp.Balance - bp.Balance % params.ChainConfig.EffectiveBalanceIncrement, params.ChainConfig.MaxEffectiveBalance)
+		}
+	}
+
+	// Reset slashings
+	state.Slashings[nextEpoch % params.ChainConfig.EpochsPerSlashingVector] = 0
+
+	// Set randao mix
+	state.RandaoMix[nextEpoch % params.ChainConfig.EpochsPerHistoricalVector] = shared.GetRandaoMix(state, currentEpoch)
+
+	// Set historical root accumulator
+	if nextEpoch % (params.ChainConfig.SlotsPerHistoricalRoot / params.ChainConfig.SlotsInEpoch) == 0 {
+		root, err := ssz.HashTreeRoot(&core.HistoricalBatch{
+			BlockRoots:           state.BlockRoots,
+			StateRoots:           state.StateRoots,
+		})
+		if err != nil {
+			return err;
+		}
+		state.HistoricalRoots = append(state.HistoricalRoots, root[:])
+	}
+
+	// Rotate current/previous epoch attestations
+	state.PreviousEpochAttestations = state.CurrentEpochAttestations
+	state.CurrentEpochAttestations = []*core.PendingAttestation{}
+
+	return nil
 }

@@ -30,27 +30,38 @@ type PoolsChainConfig struct {
 	MinSeedLookahead                 uint64 `protobuf:"varint,103,opt,name=MinSeedLookahead,proto3" json:"MinSeedLookahead,omitempty"`
 	SlotsPerHistoricalRoot           uint64 `protobuf:"varint,104,opt,name=SlotsPerHistoricalRoot,proto3" json:"SlotsPerHistoricalRoot,omitempty"`
 	MinValidatorWithdrawabilityDelay uint64 `protobuf:"varint,105,opt,name=MinValidatorWithdrawabilityDelay,proto3" json:"MinValidatorWithdrawabilityDelay,omitempty"`
+	MinEpochsToInactivityPenalty     uint64 `protobuf:"varint,106,opt,name=MinEpochsToInactivityPenalty,proto3" json:"MinEpochsToInactivityPenalty,omitempty"`
+	EpochsPerETH1VotingPeriod        uint64 `protobuf:"varint,107,opt,name=EpochsPerETH1VotingPeriod,proto3" json:"EpochsPerETH1VotingPeriod,omitempty"`
 	// Misc
-	MinAttestationCommitteeSize uint64 `protobuf:"varint,200,opt,name=MinAttestationCommitteeSize,proto3" json:"MinAttestationCommitteeSize,omitempty"`
-	MaxAttestationCommitteeSize uint64 `protobuf:"varint,201,opt,name=MaxAttestationCommitteeSize,proto3" json:"MaxAttestationCommitteeSize,omitempty"`
-	MaxCommitteesPerSlot        uint64 `protobuf:"varint,202,opt,name=MaxCommitteesPerSlot,proto3" json:"MaxCommitteesPerSlot,omitempty"`
-	ChurnLimitQuotient          uint64 `protobuf:"varint,203,opt,name=ChurnLimitQuotient,proto3" json:"ChurnLimitQuotient,omitempty"`
-	VaultSize                   uint64 `protobuf:"varint,204,opt,name=VaultSize,proto3" json:"VaultSize,omitempty"`
-	MinPerEpochChurnLimit       uint64 `protobuf:"varint,205,opt,name=MinPerEpochChurnLimit,proto3" json:"MinPerEpochChurnLimit,omitempty"`
+	MinAttestationCommitteeSize    uint64 `protobuf:"varint,200,opt,name=MinAttestationCommitteeSize,proto3" json:"MinAttestationCommitteeSize,omitempty"`
+	MaxAttestationCommitteeSize    uint64 `protobuf:"varint,201,opt,name=MaxAttestationCommitteeSize,proto3" json:"MaxAttestationCommitteeSize,omitempty"`
+	MaxCommitteesPerSlot           uint64 `protobuf:"varint,202,opt,name=MaxCommitteesPerSlot,proto3" json:"MaxCommitteesPerSlot,omitempty"`
+	ChurnLimitQuotient             uint64 `protobuf:"varint,203,opt,name=ChurnLimitQuotient,proto3" json:"ChurnLimitQuotient,omitempty"`
+	VaultSize                      uint64 `protobuf:"varint,204,opt,name=VaultSize,proto3" json:"VaultSize,omitempty"`
+	MinPerEpochChurnLimit          uint64 `protobuf:"varint,205,opt,name=MinPerEpochChurnLimit,proto3" json:"MinPerEpochChurnLimit,omitempty"`
+	MinGenesisTime                 uint64 `protobuf:"varint,206,opt,name=MinGenesisTime,proto3" json:"MinGenesisTime,omitempty"`
+	MinGenesisActiveBPCount        uint64 `protobuf:"varint,207,opt,name=MinGenesisActiveBPCount,proto3" json:"MinGenesisActiveBPCount,omitempty"`
+	ProportionalSlashingMultiplier uint64 `protobuf:"varint,208,opt,name=ProportionalSlashingMultiplier,proto3" json:"ProportionalSlashingMultiplier,omitempty"`
+	HysteresisQuotient             uint64 `protobuf:"varint,209,opt,name=HysteresisQuotient,proto3" json:"HysteresisQuotient,omitempty"`
+	HysteresisDownwardMultiplier   uint64 `protobuf:"varint,210,opt,name=HysteresisDownwardMultiplier,proto3" json:"HysteresisDownwardMultiplier,omitempty"`
+	HysteresisUpwardMultiplier     uint64 `protobuf:"varint,211,opt,name=HysteresisUpwardMultiplier,proto3" json:"HysteresisUpwardMultiplier,omitempty"`
 	// constants
-	FarFutureEpoch uint64 `protobuf:"varint,300,opt,name=FarFutureEpoch,proto3" json:"FarFutureEpoch,omitempty"`
-	ZeroHash       []byte `protobuf:"bytes,301,opt,name=ZeroHash,proto3" json:"ZeroHash,omitempty"`
-	GenesisSeed    []byte `protobuf:"bytes,302,opt,name=GenesisSeed,proto3" json:"GenesisSeed,omitempty"`
-	GenesisEpoch   uint64 `protobuf:"varint,303,opt,name=GenesisEpoch,proto3" json:"GenesisEpoch,omitempty"`
+	FarFutureEpoch      uint64 `protobuf:"varint,300,opt,name=FarFutureEpoch,proto3" json:"FarFutureEpoch,omitempty"`
+	ZeroHash            []byte `protobuf:"bytes,301,opt,name=ZeroHash,proto3" json:"ZeroHash,omitempty"`
+	GenesisSeed         []byte `protobuf:"bytes,302,opt,name=GenesisSeed,proto3" json:"GenesisSeed,omitempty"`
+	GenesisEpoch        uint64 `protobuf:"varint,303,opt,name=GenesisEpoch,proto3" json:"GenesisEpoch,omitempty"`
+	BaseRewardsPerEpoch uint64 `protobuf:"varint,304,opt,name=BaseRewardsPerEpoch,proto3" json:"BaseRewardsPerEpoch,omitempty"`
 	// state list lengths
 	EpochsPerHistoricalVector uint64 `protobuf:"varint,400,opt,name=EpochsPerHistoricalVector,proto3" json:"EpochsPerHistoricalVector,omitempty"`
 	EpochsPerSlashingVector   uint64 `protobuf:"varint,401,opt,name=EpochsPerSlashingVector,proto3" json:"EpochsPerSlashingVector,omitempty"`
 	// rewards and penalties
-	BaseEth2DutyReward           uint64 `protobuf:"varint,500,opt,name=BaseEth2DutyReward,proto3" json:"BaseEth2DutyReward,omitempty"`
+	BaseRewardFactor             uint64 `protobuf:"varint,500,opt,name=BaseRewardFactor,proto3" json:"BaseRewardFactor,omitempty"`
 	DKGReward                    uint64 `protobuf:"varint,501,opt,name=DKGReward,proto3" json:"DKGReward,omitempty"`
-	MinSlashingPenaltyQuotient   uint64 `protobuf:"varint,502,opt,name=MinSlashingPenaltyQuotient,proto3" json:"MinSlashingPenaltyQuotient,omitempty"`
-	WhitstleblowerRewardQuotient uint64 `protobuf:"varint,503,opt,name=WhitstleblowerRewardQuotient,proto3" json:"WhitstleblowerRewardQuotient,omitempty"`
-	ProposerRewardQuotient       uint64 `protobuf:"varint,504,opt,name=ProposerRewardQuotient,proto3" json:"ProposerRewardQuotient,omitempty"`
+	BaseEth2DutyReward           uint64 `protobuf:"varint,502,opt,name=BaseEth2DutyReward,proto3" json:"BaseEth2DutyReward,omitempty"`
+	MinSlashingPenaltyQuotient   uint64 `protobuf:"varint,503,opt,name=MinSlashingPenaltyQuotient,proto3" json:"MinSlashingPenaltyQuotient,omitempty"`
+	WhitstleblowerRewardQuotient uint64 `protobuf:"varint,504,opt,name=WhitstleblowerRewardQuotient,proto3" json:"WhitstleblowerRewardQuotient,omitempty"`
+	ProposerRewardQuotient       uint64 `protobuf:"varint,505,opt,name=ProposerRewardQuotient,proto3" json:"ProposerRewardQuotient,omitempty"`
+	InactivityPenaltyQuotient    uint64 `protobuf:"varint,506,opt,name=InactivityPenaltyQuotient,proto3" json:"InactivityPenaltyQuotient,omitempty"`
 	// domain
 	DomainBeaconProposer []byte `protobuf:"bytes,600,opt,name=DomainBeaconProposer,proto3" json:"DomainBeaconProposer,omitempty"`
 	DomainBeaconAttester []byte `protobuf:"bytes,601,opt,name=DomainBeaconAttester,proto3" json:"DomainBeaconAttester,omitempty"`
@@ -59,6 +70,7 @@ type PoolsChainConfig struct {
 	// Gwei values
 	MaxEffectiveBalance       uint64   `protobuf:"varint,700,opt,name=MaxEffectiveBalance,proto3" json:"MaxEffectiveBalance,omitempty"`
 	EffectiveBalanceIncrement uint64   `protobuf:"varint,701,opt,name=EffectiveBalanceIncrement,proto3" json:"EffectiveBalanceIncrement,omitempty"`
+	EjectionBalance           uint64   `protobuf:"varint,702,opt,name=EjectionBalance,proto3" json:"EjectionBalance,omitempty"`
 	XXX_NoUnkeyedLiteral      struct{} `json:"-"`
 	XXX_unrecognized          []byte   `json:"-"`
 	XXX_sizecache             int32    `json:"-"`
@@ -139,6 +151,20 @@ func (m *PoolsChainConfig) GetMinValidatorWithdrawabilityDelay() uint64 {
 	return 0
 }
 
+func (m *PoolsChainConfig) GetMinEpochsToInactivityPenalty() uint64 {
+	if m != nil {
+		return m.MinEpochsToInactivityPenalty
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetEpochsPerETH1VotingPeriod() uint64 {
+	if m != nil {
+		return m.EpochsPerETH1VotingPeriod
+	}
+	return 0
+}
+
 func (m *PoolsChainConfig) GetMinAttestationCommitteeSize() uint64 {
 	if m != nil {
 		return m.MinAttestationCommitteeSize
@@ -181,6 +207,48 @@ func (m *PoolsChainConfig) GetMinPerEpochChurnLimit() uint64 {
 	return 0
 }
 
+func (m *PoolsChainConfig) GetMinGenesisTime() uint64 {
+	if m != nil {
+		return m.MinGenesisTime
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetMinGenesisActiveBPCount() uint64 {
+	if m != nil {
+		return m.MinGenesisActiveBPCount
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetProportionalSlashingMultiplier() uint64 {
+	if m != nil {
+		return m.ProportionalSlashingMultiplier
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetHysteresisQuotient() uint64 {
+	if m != nil {
+		return m.HysteresisQuotient
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetHysteresisDownwardMultiplier() uint64 {
+	if m != nil {
+		return m.HysteresisDownwardMultiplier
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetHysteresisUpwardMultiplier() uint64 {
+	if m != nil {
+		return m.HysteresisUpwardMultiplier
+	}
+	return 0
+}
+
 func (m *PoolsChainConfig) GetFarFutureEpoch() uint64 {
 	if m != nil {
 		return m.FarFutureEpoch
@@ -209,6 +277,13 @@ func (m *PoolsChainConfig) GetGenesisEpoch() uint64 {
 	return 0
 }
 
+func (m *PoolsChainConfig) GetBaseRewardsPerEpoch() uint64 {
+	if m != nil {
+		return m.BaseRewardsPerEpoch
+	}
+	return 0
+}
+
 func (m *PoolsChainConfig) GetEpochsPerHistoricalVector() uint64 {
 	if m != nil {
 		return m.EpochsPerHistoricalVector
@@ -223,9 +298,9 @@ func (m *PoolsChainConfig) GetEpochsPerSlashingVector() uint64 {
 	return 0
 }
 
-func (m *PoolsChainConfig) GetBaseEth2DutyReward() uint64 {
+func (m *PoolsChainConfig) GetBaseRewardFactor() uint64 {
 	if m != nil {
-		return m.BaseEth2DutyReward
+		return m.BaseRewardFactor
 	}
 	return 0
 }
@@ -233,6 +308,13 @@ func (m *PoolsChainConfig) GetBaseEth2DutyReward() uint64 {
 func (m *PoolsChainConfig) GetDKGReward() uint64 {
 	if m != nil {
 		return m.DKGReward
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetBaseEth2DutyReward() uint64 {
+	if m != nil {
+		return m.BaseEth2DutyReward
 	}
 	return 0
 }
@@ -254,6 +336,13 @@ func (m *PoolsChainConfig) GetWhitstleblowerRewardQuotient() uint64 {
 func (m *PoolsChainConfig) GetProposerRewardQuotient() uint64 {
 	if m != nil {
 		return m.ProposerRewardQuotient
+	}
+	return 0
+}
+
+func (m *PoolsChainConfig) GetInactivityPenaltyQuotient() uint64 {
+	if m != nil {
+		return m.InactivityPenaltyQuotient
 	}
 	return 0
 }
@@ -300,6 +389,13 @@ func (m *PoolsChainConfig) GetEffectiveBalanceIncrement() uint64 {
 	return 0
 }
 
+func (m *PoolsChainConfig) GetEjectionBalance() uint64 {
+	if m != nil {
+		return m.EjectionBalance
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterType((*PoolsChainConfig)(nil), "state.PoolsChainConfig")
 }
@@ -307,50 +403,63 @@ func init() {
 func init() { proto.RegisterFile("src/core/config.proto", fileDescriptor_d0189c35229c86e3) }
 
 var fileDescriptor_d0189c35229c86e3 = []byte{
-	// 677 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x95, 0xcb, 0x6e, 0x13, 0x3f,
-	0x14, 0xc6, 0xff, 0xf9, 0xd3, 0x56, 0xe0, 0x56, 0xa8, 0x32, 0xb4, 0x18, 0x5a, 0xa2, 0x52, 0x16,
-	0x20, 0x16, 0xad, 0xa0, 0x02, 0x84, 0x10, 0x42, 0x4d, 0xd2, 0x1b, 0x34, 0x52, 0x48, 0xa4, 0x54,
-	0xea, 0xce, 0x9d, 0x39, 0xe9, 0x58, 0x9d, 0xf8, 0x54, 0x1e, 0x0f, 0x4d, 0x78, 0x0a, 0xd8, 0xf1,
-	0x10, 0x5c, 0x5e, 0x00, 0xf6, 0xe5, 0x26, 0xb1, 0xe4, 0xb2, 0x81, 0xf2, 0x0a, 0xdc, 0x96, 0xc8,
-	0xf6, 0x34, 0x25, 0xe9, 0x4c, 0xd8, 0x25, 0xdf, 0xf7, 0xfb, 0x8e, 0xe7, 0xe4, 0x9c, 0x89, 0xc9,
-	0x58, 0xa4, 0xbc, 0x59, 0x0f, 0x15, 0xcc, 0x7a, 0x28, 0x1b, 0x62, 0x73, 0x66, 0x5b, 0xa1, 0x46,
-	0x3a, 0x18, 0x69, 0xae, 0x61, 0xfa, 0xeb, 0x30, 0x19, 0xad, 0x20, 0x86, 0x51, 0x31, 0xe0, 0x42,
-	0x16, 0x2d, 0x41, 0xa7, 0xc9, 0x48, 0x2d, 0x44, 0x1d, 0xad, 0xc8, 0x85, 0x6d, 0xf4, 0x02, 0xe6,
-	0x4f, 0xe5, 0x2e, 0x0e, 0x54, 0xbb, 0x34, 0x5a, 0x20, 0x93, 0x65, 0x21, 0xe7, 0xb5, 0x06, 0x53,
-	0x48, 0xa0, 0x5c, 0x91, 0x5e, 0x18, 0x47, 0x02, 0x65, 0x09, 0x42, 0xde, 0x66, 0x60, 0x33, 0x7d,
-	0x19, 0x7a, 0x89, 0x8c, 0x96, 0x79, 0xab, 0x06, 0xe0, 0xaf, 0x22, 0x6e, 0xf1, 0x00, 0xb8, 0xcf,
-	0x1a, 0x36, 0x77, 0x48, 0xb7, 0xac, 0x90, 0xdd, 0xec, 0x66, 0xc2, 0xf6, 0xe8, 0xf4, 0x1a, 0x19,
-	0xb7, 0xcf, 0x5a, 0x01, 0xb5, 0x2c, 0x22, 0x8d, 0x4a, 0x78, 0x3c, 0xac, 0x22, 0x6a, 0x16, 0xd8,
-	0x44, 0x86, 0x4b, 0xef, 0x90, 0xa9, 0xb2, 0x90, 0x75, 0x1e, 0x0a, 0x9f, 0x6b, 0x54, 0x6b, 0x42,
-	0x07, 0xbe, 0xe2, 0x3b, 0x7c, 0x43, 0x84, 0x42, 0xb7, 0x5d, 0x5f, 0xc2, 0x56, 0xf8, 0x27, 0x47,
-	0xe7, 0xc9, 0x44, 0x77, 0xef, 0x45, 0x6c, 0x36, 0x85, 0xd6, 0x00, 0x35, 0xf1, 0x00, 0xd8, 0x6e,
-	0xce, 0xd6, 0xe9, 0xc7, 0xd8, 0x12, 0xbc, 0x95, 0x59, 0xe2, 0xd5, 0x7e, 0x89, 0x6c, 0x86, 0xce,
-	0x91, 0x93, 0x65, 0xde, 0xea, 0x68, 0xa6, 0x67, 0xd3, 0x3b, 0x7b, 0xed, 0xb2, 0xa9, 0x26, 0x9d,
-	0x25, 0xb4, 0x18, 0xc4, 0x4a, 0xae, 0x8a, 0xa6, 0xd0, 0xf7, 0x62, 0xd4, 0x02, 0xa4, 0x66, 0x6f,
-	0x5c, 0x24, 0xc5, 0xa2, 0x67, 0xc9, 0xb1, 0x3a, 0x8f, 0x43, 0x6d, 0x1f, 0xeb, 0xad, 0xe3, 0x0e,
-	0x14, 0x7a, 0x95, 0x8c, 0x95, 0x85, 0xac, 0x80, 0xb2, 0x9b, 0x73, 0x90, 0x67, 0xef, 0x1c, 0x9a,
-	0xee, 0xd2, 0x0b, 0xe4, 0xf8, 0x22, 0x57, 0x8b, 0xb1, 0x8e, 0x15, 0xb8, 0x3d, 0x7c, 0xf2, 0xbf,
-	0xe5, 0x7b, 0x64, 0x3a, 0x41, 0x8e, 0xae, 0x83, 0xc2, 0x65, 0x1e, 0x05, 0xec, 0xa9, 0x41, 0x46,
-	0xaa, 0x1d, 0x81, 0x9e, 0x23, 0xc3, 0x4b, 0x20, 0x21, 0x12, 0x91, 0xd9, 0x11, 0xf6, 0xcc, 0xf9,
-	0x7f, 0x6b, 0xf4, 0x3c, 0x19, 0x49, 0xbe, 0xba, 0x63, 0x9e, 0xbb, 0x63, 0xba, 0x44, 0x7a, 0x8b,
-	0x9c, 0xb6, 0x1f, 0xba, 0xd7, 0xa6, 0x0e, 0x9e, 0x46, 0xc5, 0x1e, 0x1e, 0xb1, 0x89, 0x6c, 0x82,
-	0xde, 0x20, 0xa7, 0x3a, 0x66, 0x2d, 0xe4, 0x51, 0x20, 0xe4, 0x66, 0x12, 0x7e, 0xe4, 0xc2, 0x59,
-	0xbe, 0x19, 0x47, 0x81, 0x47, 0xb0, 0xa0, 0x83, 0x2b, 0xa5, 0x58, 0xb7, 0xab, 0xb0, 0xc3, 0x95,
-	0xcf, 0xbe, 0xbb, 0x54, 0x8a, 0x65, 0xc6, 0x51, 0xba, 0xbb, 0x94, 0x70, 0x3f, 0x1c, 0x77, 0xa0,
-	0xd0, 0xdb, 0xe4, 0x8c, 0x79, 0x63, 0x92, 0x43, 0x2a, 0x20, 0x79, 0xa8, 0xdb, 0x9d, 0x31, 0xff,
-	0x74, 0x7c, 0x1f, 0x84, 0x16, 0xc9, 0xe4, 0x5a, 0x20, 0x74, 0xa4, 0x43, 0xd8, 0x08, 0x71, 0x07,
-	0x94, 0x2b, 0xdc, 0x29, 0xf1, 0xcb, 0x95, 0xe8, 0x0b, 0xd1, 0xeb, 0x64, 0xbc, 0xa2, 0x70, 0x1b,
-	0xa3, 0x43, 0xf1, 0xdf, 0x2e, 0x9e, 0x61, 0x9b, 0x95, 0x2e, 0x61, 0x93, 0x0b, 0x59, 0x00, 0xee,
-	0xa1, 0xdc, 0xa7, 0xd8, 0x87, 0x01, 0x3b, 0xd9, 0x54, 0xb3, 0x37, 0xe4, 0xde, 0x17, 0x50, 0xec,
-	0x63, 0x4a, 0x68, 0xdf, 0x34, 0x7b, 0xe1, 0xf4, 0x2a, 0x97, 0x3e, 0x47, 0xf6, 0xc9, 0xc1, 0x5d,
-	0xa2, 0x99, 0x4e, 0xb2, 0x27, 0x8b, 0xa8, 0xb6, 0xea, 0xa0, 0xcc, 0xdf, 0x1b, 0xfb, 0xec, 0xd0,
-	0x14, 0x8b, 0x5e, 0x26, 0x27, 0xca, 0xbc, 0xb5, 0xd0, 0x68, 0x80, 0xa7, 0xc5, 0x7d, 0x28, 0xf0,
-	0x90, 0x4b, 0x0f, 0xd8, 0x8b, 0x41, 0xdb, 0x75, 0x9a, 0x67, 0x77, 0xaf, 0x47, 0x5b, 0x91, 0x9e,
-	0x82, 0xa6, 0xf9, 0xb9, 0x5e, 0x0e, 0x26, 0xbb, 0x97, 0x45, 0x14, 0xd8, 0xee, 0x5e, 0x3e, 0xf7,
-	0x7e, 0x2f, 0x9f, 0xfb, 0xb2, 0x97, 0xcf, 0x3d, 0xfe, 0x96, 0xff, 0x6f, 0x7d, 0x68, 0xe6, 0xa6,
-	0xb9, 0x11, 0x36, 0x86, 0xec, 0x5d, 0x30, 0xf7, 0x27, 0x00, 0x00, 0xff, 0xff, 0x53, 0x67, 0xb8,
-	0xa6, 0x24, 0x06, 0x00, 0x00,
+	// 883 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x56, 0x5b, 0x6f, 0x1b, 0x45,
+	0x14, 0xc6, 0xd0, 0x54, 0x30, 0x44, 0x10, 0x06, 0x5a, 0x06, 0x5a, 0xac, 0x52, 0x1e, 0xb8, 0x49,
+	0x8d, 0x4a, 0x05, 0x08, 0x01, 0x42, 0xf1, 0x25, 0x17, 0xa8, 0x25, 0xe3, 0x04, 0x57, 0xea, 0xdb,
+	0x64, 0x7d, 0x92, 0x9d, 0x66, 0x3d, 0xc7, 0x9a, 0x99, 0x25, 0x36, 0xbf, 0x82, 0xbe, 0xf1, 0x23,
+	0xb8, 0xfd, 0x00, 0xe0, 0xb9, 0xdc, 0x0b, 0xbc, 0x70, 0x79, 0x41, 0xe1, 0x2f, 0x70, 0x7f, 0xaa,
+	0x66, 0xce, 0xda, 0x8e, 0xd7, 0xbb, 0xce, 0x63, 0xbe, 0xcb, 0x99, 0xc9, 0x77, 0xce, 0x1c, 0x2f,
+	0x3b, 0x63, 0x4d, 0xb4, 0x1a, 0xa1, 0x81, 0xd5, 0x08, 0xf5, 0x9e, 0xda, 0xbf, 0x34, 0x30, 0xe8,
+	0x90, 0x2f, 0x59, 0x27, 0x1d, 0x5c, 0xbc, 0xf9, 0x10, 0x5b, 0x69, 0x23, 0x26, 0xb6, 0x1e, 0x4b,
+	0xa5, 0xeb, 0x41, 0xc1, 0x2f, 0xb2, 0xe5, 0xed, 0x04, 0x9d, 0xdd, 0xd2, 0xcd, 0x01, 0x46, 0xb1,
+	0xe8, 0x5d, 0xa8, 0x3c, 0x73, 0xaa, 0x33, 0x83, 0xf1, 0x1a, 0x3b, 0xdf, 0x52, 0x7a, 0xcd, 0x39,
+	0xf0, 0x85, 0x14, 0xea, 0x2d, 0x1d, 0x25, 0xa9, 0x55, 0xa8, 0x1b, 0x90, 0xc8, 0x91, 0x80, 0xe0,
+	0x59, 0xa8, 0xe1, 0xcf, 0xb1, 0x95, 0x96, 0x1c, 0x6e, 0x03, 0xf4, 0xae, 0x22, 0x1e, 0xc8, 0x18,
+	0x64, 0x4f, 0xec, 0x05, 0xdf, 0x1c, 0x1e, 0xb4, 0x4a, 0xcf, 0x6a, 0xf7, 0x33, 0x6d, 0x0e, 0xe7,
+	0x2f, 0xb1, 0xb3, 0xe1, 0xae, 0x6d, 0x30, 0x9b, 0xca, 0x3a, 0x34, 0x2a, 0x92, 0x49, 0x07, 0xd1,
+	0x89, 0x38, 0x38, 0x4a, 0x58, 0xfe, 0x26, 0xbb, 0xd0, 0x52, 0xba, 0x2b, 0x13, 0xd5, 0x93, 0x0e,
+	0xcd, 0x35, 0xe5, 0xe2, 0x9e, 0x91, 0x87, 0x72, 0x57, 0x25, 0xca, 0x8d, 0xe8, 0xff, 0x52, 0xa1,
+	0xc2, 0x89, 0xba, 0x2c, 0x9f, 0x90, 0x95, 0xdd, 0xc1, 0x2d, 0x2d, 0x23, 0xa7, 0xde, 0x55, 0x6e,
+	0xd4, 0x06, 0x2d, 0x13, 0x37, 0x12, 0x37, 0x26, 0xf9, 0x94, 0x6a, 0xf8, 0x6b, 0xec, 0x31, 0x22,
+	0xdb, 0x60, 0x9a, 0x3b, 0x9b, 0x97, 0xbb, 0xe8, 0x94, 0xde, 0x6f, 0x83, 0x51, 0xd8, 0x13, 0x07,
+	0xa1, 0x40, 0xb9, 0x80, 0xaf, 0xb1, 0x73, 0xb3, 0xe9, 0xd7, 0xb1, 0xdf, 0x57, 0xce, 0x01, 0x6c,
+	0xab, 0xf7, 0x40, 0xdc, 0xaa, 0x84, 0x02, 0x8b, 0x34, 0xa1, 0x84, 0x1c, 0x96, 0x96, 0xf8, 0x72,
+	0x5c, 0xa2, 0x5c, 0xc3, 0xaf, 0xb0, 0x47, 0x5a, 0x72, 0x38, 0xc1, 0xfc, 0x4d, 0x7d, 0xfa, 0xe2,
+	0x2b, 0xf2, 0x16, 0x92, 0x7c, 0x95, 0xf1, 0x7a, 0x9c, 0x1a, 0x7d, 0x55, 0xf5, 0x95, 0x7b, 0x3b,
+	0x45, 0xa7, 0x40, 0x3b, 0xf1, 0x35, 0x59, 0x0a, 0x28, 0xfe, 0x04, 0xbb, 0xaf, 0x2b, 0xd3, 0xc4,
+	0x85, 0x6b, 0x7d, 0x43, 0xba, 0x29, 0xc2, 0x5f, 0x64, 0x67, 0x5a, 0x4a, 0xfb, 0x90, 0x7c, 0x5a,
+	0x53, 0xbf, 0xf8, 0x96, 0xa4, 0xc5, 0x2c, 0x7f, 0x9a, 0x3d, 0xd0, 0x52, 0x7a, 0x03, 0x34, 0x58,
+	0x65, 0x77, 0x54, 0x1f, 0xc4, 0x77, 0xa4, 0xcf, 0xc1, 0xfc, 0x15, 0xf6, 0xe8, 0x14, 0x59, 0xf3,
+	0x5d, 0x84, 0x5a, 0xbb, 0x8e, 0xa9, 0x76, 0xe2, 0x7b, 0x72, 0x94, 0xf1, 0x7c, 0x83, 0x55, 0xdb,
+	0x06, 0x07, 0x68, 0x7c, 0x74, 0x32, 0xd9, 0x4e, 0xa4, 0x8d, 0x95, 0xde, 0x6f, 0xa5, 0x89, 0x53,
+	0x83, 0x44, 0x81, 0x11, 0xb7, 0xa9, 0xc2, 0x09, 0x32, 0x9f, 0xd9, 0xe6, 0xc8, 0x3a, 0x30, 0xfe,
+	0x8c, 0x49, 0x66, 0x3f, 0x64, 0x99, 0xcd, 0x53, 0xbc, 0xce, 0xce, 0x4f, 0xd1, 0x06, 0x1e, 0xea,
+	0x43, 0x69, 0x7a, 0xc7, 0xce, 0xfd, 0x91, 0xac, 0x0b, 0x45, 0xfc, 0x0d, 0xf6, 0xf8, 0x94, 0x7f,
+	0x67, 0x90, 0x2b, 0xf1, 0x13, 0x95, 0x58, 0x20, 0xf1, 0x19, 0xaf, 0x4b, 0xb3, 0x9e, 0xba, 0xd4,
+	0x00, 0x6d, 0x9b, 0x0f, 0xef, 0xa6, 0x8c, 0x67, 0x61, 0x7e, 0x8e, 0xdd, 0x7b, 0x1d, 0x0c, 0x6e,
+	0x4a, 0x1b, 0x8b, 0x8f, 0xbc, 0x64, 0xb9, 0x33, 0x01, 0xf8, 0x93, 0xec, 0xfe, 0x2c, 0x5d, 0xbf,
+	0x09, 0xc4, 0xc7, 0xc4, 0x1f, 0xc7, 0xf8, 0x53, 0x6c, 0x39, 0xfb, 0x93, 0x8e, 0xf9, 0x84, 0x8e,
+	0x99, 0x01, 0xf9, 0x65, 0xf6, 0x70, 0x4d, 0x5a, 0xe8, 0x80, 0xbf, 0xa5, 0x1d, 0x8f, 0x84, 0xf8,
+	0x94, 0xb4, 0x45, 0x1c, 0x7f, 0xfd, 0xd8, 0x23, 0x9d, 0xee, 0x93, 0x2e, 0x44, 0x0e, 0x8d, 0x78,
+	0xff, 0x9e, 0xdc, 0x2b, 0xcd, 0x2b, 0xfc, 0xe8, 0x4c, 0xc8, 0x71, 0x57, 0x33, 0xf3, 0x4d, 0x32,
+	0x97, 0xf1, 0xfc, 0x79, 0xb6, 0x32, 0xbd, 0xd0, 0xba, 0x0c, 0x9e, 0x3f, 0xc9, 0x33, 0x47, 0xf8,
+	0x17, 0xd2, 0x78, 0x6b, 0x83, 0x20, 0xf1, 0x17, 0xa9, 0xa6, 0x88, 0x9f, 0x1e, 0x6f, 0x69, 0xba,
+	0xf8, 0x85, 0x46, 0xea, 0x46, 0x99, 0xee, 0x6f, 0xd2, 0x15, 0x50, 0xbe, 0xf1, 0x7e, 0xef, 0x66,
+	0x37, 0xca, 0x36, 0xd6, 0x64, 0xec, 0xfe, 0x21, 0xe3, 0x02, 0x89, 0x1f, 0xbf, 0x6b, 0xb1, 0x72,
+	0xd6, 0x25, 0xb0, 0x9b, 0xe0, 0x21, 0x18, 0x2a, 0x3c, 0x29, 0xf1, 0x2f, 0x95, 0x58, 0x28, 0xe2,
+	0x2f, 0xb3, 0xb3, 0xe1, 0x59, 0xd8, 0x39, 0xfb, 0x7f, 0x64, 0x2f, 0xa1, 0x7d, 0xd7, 0xe6, 0xf6,
+	0xed, 0xc4, 0xfb, 0x7f, 0xd6, 0xb5, 0x52, 0x85, 0xdf, 0x6a, 0x0d, 0xec, 0x4b, 0xa5, 0x6b, 0x20,
+	0x23, 0xd4, 0xe3, 0x43, 0xc4, 0xcf, 0xa7, 0xc2, 0xe0, 0x15, 0x92, 0x79, 0x13, 0xad, 0x4c, 0x30,
+	0xe2, 0x97, 0x02, 0xd3, 0x98, 0xf4, 0x63, 0x4b, 0x78, 0x47, 0xea, 0x9e, 0x44, 0xf1, 0x2b, 0x89,
+	0x67, 0x40, 0xdf, 0xbd, 0x6c, 0x8c, 0xd7, 0xd1, 0x1c, 0x74, 0xc1, 0xf8, 0xdf, 0x58, 0xf1, 0x1b,
+	0x49, 0x0b, 0x28, 0x3f, 0xe7, 0x2d, 0x39, 0x6c, 0xee, 0xed, 0x01, 0x2d, 0x23, 0x99, 0x48, 0x1d,
+	0x81, 0xf8, 0x6c, 0x89, 0xe6, 0xbc, 0x80, 0x0b, 0x73, 0x9e, 0xc3, 0xb6, 0x74, 0x64, 0xa0, 0xef,
+	0x13, 0xfb, 0x7c, 0x29, 0x9b, 0xf3, 0x32, 0x05, 0x7f, 0x96, 0x3d, 0xd8, 0xbc, 0xe1, 0x39, 0xd4,
+	0xe3, 0xd3, 0xbe, 0x20, 0x53, 0x1e, 0xaf, 0x89, 0x5b, 0x47, 0xd5, 0xca, 0xed, 0xa3, 0x6a, 0xe5,
+	0xf7, 0xa3, 0x6a, 0xe5, 0x83, 0x3f, 0xaa, 0x77, 0x5d, 0x3f, 0x7d, 0xe9, 0x55, 0xff, 0x05, 0xb3,
+	0x7b, 0x3a, 0x7c, 0xbb, 0x5c, 0xb9, 0x13, 0x00, 0x00, 0xff, 0xff, 0xdb, 0xdf, 0xeb, 0x89, 0xd4,
+	0x08, 0x00, 0x00,
 }
 
 func (m *PoolsChainConfig) Marshal() (dAtA []byte, err error) {
@@ -376,6 +485,13 @@ func (m *PoolsChainConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.XXX_unrecognized != nil {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.EjectionBalance != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.EjectionBalance))
+		i--
+		dAtA[i] = 0x2b
+		i--
+		dAtA[i] = 0xf0
 	}
 	if m.EffectiveBalanceIncrement != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.EffectiveBalanceIncrement))
@@ -427,22 +543,36 @@ func (m *PoolsChainConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0xc2
 	}
+	if m.InactivityPenaltyQuotient != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.InactivityPenaltyQuotient))
+		i--
+		dAtA[i] = 0x1f
+		i--
+		dAtA[i] = 0xd0
+	}
 	if m.ProposerRewardQuotient != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.ProposerRewardQuotient))
 		i--
 		dAtA[i] = 0x1f
 		i--
-		dAtA[i] = 0xc0
+		dAtA[i] = 0xc8
 	}
 	if m.WhitstleblowerRewardQuotient != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.WhitstleblowerRewardQuotient))
 		i--
 		dAtA[i] = 0x1f
 		i--
-		dAtA[i] = 0xb8
+		dAtA[i] = 0xc0
 	}
 	if m.MinSlashingPenaltyQuotient != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.MinSlashingPenaltyQuotient))
+		i--
+		dAtA[i] = 0x1f
+		i--
+		dAtA[i] = 0xb8
+	}
+	if m.BaseEth2DutyReward != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.BaseEth2DutyReward))
 		i--
 		dAtA[i] = 0x1f
 		i--
@@ -455,8 +585,8 @@ func (m *PoolsChainConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0xa8
 	}
-	if m.BaseEth2DutyReward != 0 {
-		i = encodeVarintConfig(dAtA, i, uint64(m.BaseEth2DutyReward))
+	if m.BaseRewardFactor != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.BaseRewardFactor))
 		i--
 		dAtA[i] = 0x1f
 		i--
@@ -473,6 +603,13 @@ func (m *PoolsChainConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintConfig(dAtA, i, uint64(m.EpochsPerHistoricalVector))
 		i--
 		dAtA[i] = 0x19
+		i--
+		dAtA[i] = 0x80
+	}
+	if m.BaseRewardsPerEpoch != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.BaseRewardsPerEpoch))
+		i--
+		dAtA[i] = 0x13
 		i--
 		dAtA[i] = 0x80
 	}
@@ -507,6 +644,48 @@ func (m *PoolsChainConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i--
 		dAtA[i] = 0xe0
+	}
+	if m.HysteresisUpwardMultiplier != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.HysteresisUpwardMultiplier))
+		i--
+		dAtA[i] = 0xd
+		i--
+		dAtA[i] = 0x98
+	}
+	if m.HysteresisDownwardMultiplier != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.HysteresisDownwardMultiplier))
+		i--
+		dAtA[i] = 0xd
+		i--
+		dAtA[i] = 0x90
+	}
+	if m.HysteresisQuotient != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.HysteresisQuotient))
+		i--
+		dAtA[i] = 0xd
+		i--
+		dAtA[i] = 0x88
+	}
+	if m.ProportionalSlashingMultiplier != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.ProportionalSlashingMultiplier))
+		i--
+		dAtA[i] = 0xd
+		i--
+		dAtA[i] = 0x80
+	}
+	if m.MinGenesisActiveBPCount != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinGenesisActiveBPCount))
+		i--
+		dAtA[i] = 0xc
+		i--
+		dAtA[i] = 0xf8
+	}
+	if m.MinGenesisTime != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinGenesisTime))
+		i--
+		dAtA[i] = 0xc
+		i--
+		dAtA[i] = 0xf0
 	}
 	if m.MinPerEpochChurnLimit != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.MinPerEpochChurnLimit))
@@ -549,6 +728,20 @@ func (m *PoolsChainConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0xc
 		i--
 		dAtA[i] = 0xc0
+	}
+	if m.EpochsPerETH1VotingPeriod != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.EpochsPerETH1VotingPeriod))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xd8
+	}
+	if m.MinEpochsToInactivityPenalty != 0 {
+		i = encodeVarintConfig(dAtA, i, uint64(m.MinEpochsToInactivityPenalty))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xd0
 	}
 	if m.MinValidatorWithdrawabilityDelay != 0 {
 		i = encodeVarintConfig(dAtA, i, uint64(m.MinValidatorWithdrawabilityDelay))
@@ -630,6 +823,12 @@ func (m *PoolsChainConfig) Size() (n int) {
 	if m.MinValidatorWithdrawabilityDelay != 0 {
 		n += 2 + sovConfig(uint64(m.MinValidatorWithdrawabilityDelay))
 	}
+	if m.MinEpochsToInactivityPenalty != 0 {
+		n += 2 + sovConfig(uint64(m.MinEpochsToInactivityPenalty))
+	}
+	if m.EpochsPerETH1VotingPeriod != 0 {
+		n += 2 + sovConfig(uint64(m.EpochsPerETH1VotingPeriod))
+	}
 	if m.MinAttestationCommitteeSize != 0 {
 		n += 2 + sovConfig(uint64(m.MinAttestationCommitteeSize))
 	}
@@ -648,6 +847,24 @@ func (m *PoolsChainConfig) Size() (n int) {
 	if m.MinPerEpochChurnLimit != 0 {
 		n += 2 + sovConfig(uint64(m.MinPerEpochChurnLimit))
 	}
+	if m.MinGenesisTime != 0 {
+		n += 2 + sovConfig(uint64(m.MinGenesisTime))
+	}
+	if m.MinGenesisActiveBPCount != 0 {
+		n += 2 + sovConfig(uint64(m.MinGenesisActiveBPCount))
+	}
+	if m.ProportionalSlashingMultiplier != 0 {
+		n += 2 + sovConfig(uint64(m.ProportionalSlashingMultiplier))
+	}
+	if m.HysteresisQuotient != 0 {
+		n += 2 + sovConfig(uint64(m.HysteresisQuotient))
+	}
+	if m.HysteresisDownwardMultiplier != 0 {
+		n += 2 + sovConfig(uint64(m.HysteresisDownwardMultiplier))
+	}
+	if m.HysteresisUpwardMultiplier != 0 {
+		n += 2 + sovConfig(uint64(m.HysteresisUpwardMultiplier))
+	}
 	if m.FarFutureEpoch != 0 {
 		n += 2 + sovConfig(uint64(m.FarFutureEpoch))
 	}
@@ -662,17 +879,23 @@ func (m *PoolsChainConfig) Size() (n int) {
 	if m.GenesisEpoch != 0 {
 		n += 2 + sovConfig(uint64(m.GenesisEpoch))
 	}
+	if m.BaseRewardsPerEpoch != 0 {
+		n += 2 + sovConfig(uint64(m.BaseRewardsPerEpoch))
+	}
 	if m.EpochsPerHistoricalVector != 0 {
 		n += 2 + sovConfig(uint64(m.EpochsPerHistoricalVector))
 	}
 	if m.EpochsPerSlashingVector != 0 {
 		n += 2 + sovConfig(uint64(m.EpochsPerSlashingVector))
 	}
-	if m.BaseEth2DutyReward != 0 {
-		n += 2 + sovConfig(uint64(m.BaseEth2DutyReward))
+	if m.BaseRewardFactor != 0 {
+		n += 2 + sovConfig(uint64(m.BaseRewardFactor))
 	}
 	if m.DKGReward != 0 {
 		n += 2 + sovConfig(uint64(m.DKGReward))
+	}
+	if m.BaseEth2DutyReward != 0 {
+		n += 2 + sovConfig(uint64(m.BaseEth2DutyReward))
 	}
 	if m.MinSlashingPenaltyQuotient != 0 {
 		n += 2 + sovConfig(uint64(m.MinSlashingPenaltyQuotient))
@@ -682,6 +905,9 @@ func (m *PoolsChainConfig) Size() (n int) {
 	}
 	if m.ProposerRewardQuotient != 0 {
 		n += 2 + sovConfig(uint64(m.ProposerRewardQuotient))
+	}
+	if m.InactivityPenaltyQuotient != 0 {
+		n += 2 + sovConfig(uint64(m.InactivityPenaltyQuotient))
 	}
 	l = len(m.DomainBeaconProposer)
 	if l > 0 {
@@ -704,6 +930,9 @@ func (m *PoolsChainConfig) Size() (n int) {
 	}
 	if m.EffectiveBalanceIncrement != 0 {
 		n += 2 + sovConfig(uint64(m.EffectiveBalanceIncrement))
+	}
+	if m.EjectionBalance != 0 {
+		n += 2 + sovConfig(uint64(m.EjectionBalance))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -860,6 +1089,44 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 106:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinEpochsToInactivityPenalty", wireType)
+			}
+			m.MinEpochsToInactivityPenalty = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinEpochsToInactivityPenalty |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 107:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EpochsPerETH1VotingPeriod", wireType)
+			}
+			m.EpochsPerETH1VotingPeriod = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EpochsPerETH1VotingPeriod |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		case 200:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MinAttestationCommitteeSize", wireType)
@@ -974,6 +1241,120 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 206:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinGenesisTime", wireType)
+			}
+			m.MinGenesisTime = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinGenesisTime |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 207:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinGenesisActiveBPCount", wireType)
+			}
+			m.MinGenesisActiveBPCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinGenesisActiveBPCount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 208:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProportionalSlashingMultiplier", wireType)
+			}
+			m.ProportionalSlashingMultiplier = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ProportionalSlashingMultiplier |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 209:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HysteresisQuotient", wireType)
+			}
+			m.HysteresisQuotient = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.HysteresisQuotient |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 210:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HysteresisDownwardMultiplier", wireType)
+			}
+			m.HysteresisDownwardMultiplier = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.HysteresisDownwardMultiplier |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 211:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HysteresisUpwardMultiplier", wireType)
+			}
+			m.HysteresisUpwardMultiplier = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.HysteresisUpwardMultiplier |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		case 300:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FarFutureEpoch", wireType)
@@ -1080,6 +1461,25 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 304:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BaseRewardsPerEpoch", wireType)
+			}
+			m.BaseRewardsPerEpoch = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BaseRewardsPerEpoch |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		case 400:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EpochsPerHistoricalVector", wireType)
@@ -1120,9 +1520,9 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 			}
 		case 500:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BaseEth2DutyReward", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BaseRewardFactor", wireType)
 			}
-			m.BaseEth2DutyReward = 0
+			m.BaseRewardFactor = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowConfig
@@ -1132,7 +1532,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BaseEth2DutyReward |= uint64(b&0x7F) << shift
+				m.BaseRewardFactor |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1158,6 +1558,25 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 			}
 		case 502:
 			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BaseEth2DutyReward", wireType)
+			}
+			m.BaseEth2DutyReward = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BaseEth2DutyReward |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 503:
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MinSlashingPenaltyQuotient", wireType)
 			}
 			m.MinSlashingPenaltyQuotient = 0
@@ -1175,7 +1594,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 503:
+		case 504:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field WhitstleblowerRewardQuotient", wireType)
 			}
@@ -1194,7 +1613,7 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 504:
+		case 505:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ProposerRewardQuotient", wireType)
 			}
@@ -1209,6 +1628,25 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ProposerRewardQuotient |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 506:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InactivityPenaltyQuotient", wireType)
+			}
+			m.InactivityPenaltyQuotient = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.InactivityPenaltyQuotient |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1383,6 +1821,25 @@ func (m *PoolsChainConfig) Unmarshal(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.EffectiveBalanceIncrement |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 702:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EjectionBalance", wireType)
+			}
+			m.EjectionBalance = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EjectionBalance |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

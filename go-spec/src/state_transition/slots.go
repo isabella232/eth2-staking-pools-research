@@ -47,7 +47,7 @@ func processSlot(state *core.State) error {
 	if err != nil {
 		return err
 	}
-	state.StateRoots = append(state.StateRoots, &core.SlotAndBytes{
+	state.XStateRoots = append(state.XStateRoots, &core.SlotAndBytes{
 		Slot:                 state.CurrentSlot,
 		Bytes:                stateRoot[:],// TODO - SLOTS_PER_HISTORICAL_ROOT
 	})
@@ -60,7 +60,7 @@ func processSlot(state *core.State) error {
 	if err != nil {
 		return err
 	}
-	state.BlockRoots = append(state.BlockRoots, &core.SlotAndBytes{
+	state.XBlockRoots = append(state.XBlockRoots, &core.SlotAndBytes{
 		Slot:                state.CurrentSlot,
 		Bytes:               root[:], // TODO - SLOTS_PER_HISTORICAL_ROOT
 	})

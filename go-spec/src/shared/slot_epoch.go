@@ -77,7 +77,7 @@ func GetBlockRootAtSlot(state *core.State, slot uint64) (*core.SlotAndBytes, err
 	if slot >= state.CurrentSlot || state.CurrentSlot > slot + params.ChainConfig.SlotsPerHistoricalRoot {
 		return nil, fmt.Errorf("block root at slot not found")
 	}
-	for _, blk := range state.BlockRoots {
+	for _, blk := range state.XBlockRoots {
 		if blk.Slot == slot {
 			return blk, nil
 		}

@@ -2,6 +2,7 @@ package shared
 
 import (
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
+	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/ulule/deepcopier"
 )
@@ -15,16 +16,16 @@ func CopyState(state *core.State) *core.State {
 
 	ret.CurrentSlot = state.CurrentSlot
 
-	ret.BlockRoots = make([]*core.SlotAndBytes, len(state.BlockRoots))
-	for i, r := range state.BlockRoots {
-		ret.BlockRoots[i] = &core.SlotAndBytes{}
-		deepcopier.Copy(r).To(ret.BlockRoots[i])
+	ret.XBlockRoots = make([]*core.SlotAndBytes, len(state.XBlockRoots))
+	for i, r := range state.XBlockRoots {
+		ret.XBlockRoots[i] = &core.SlotAndBytes{}
+		deepcopier.Copy(r).To(ret.XBlockRoots[i])
 	}
 
-	ret.StateRoots = make([]*core.SlotAndBytes, len(state.StateRoots))
-	for i, r := range state.StateRoots {
-		ret.StateRoots[i] = &core.SlotAndBytes{}
-		deepcopier.Copy(r).To(ret.StateRoots[i])
+	ret.XBlockRoots = make([]*core.SlotAndBytes, len(state.XBlockRoots))
+	for i, r := range state.XBlockRoots {
+		ret.XBlockRoots[i] = &core.SlotAndBytes{}
+		deepcopier.Copy(r).To(ret.XBlockRoots[i])
 	}
 
 	ret.Randao = make([]*core.SlotAndBytes, len(state.Randao))
@@ -101,3 +102,28 @@ func GetPool(state *core.State, id uint64) *core.Pool {
 	return nil
 }
 
+/**
+def is_valid_genesis_state(state: BeaconState) -> bool:
+    if state.genesis_time < MIN_GENESIS_TIME:
+        return False
+    if len(get_active_validator_indices(state, GENESIS_EPOCH)) < MIN_GENESIS_ACTIVE_VALIDATOR_COUNT:
+        return False
+    return True
+ */
+func IsValidGenesisState(state *core.State) bool {
+	if state.GenesisTime < params.ChainConfig.MinGenesisTime {
+		return false
+	}
+	if uint64(len(GetActiveBlockProducers(state, params.ChainConfig.GenesisEpoch))) < params.ChainConfig.MinGenesisActiveBPCount {
+		return false
+	}
+	return true
+}
+
+func SumSlashings(state *core.State) uint64 {
+	totalSlashing := uint64(0)
+	for _, slashing := range state.Slashings {
+		totalSlashing += slashing
+	}
+	return totalSlashing
+}

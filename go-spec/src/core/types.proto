@@ -14,10 +14,14 @@ message State {
     Fork Fork = 13;
 
     // past
-    repeated SlotAndBytes BlockRoots = 21;
-    repeated SlotAndBytes StateRoots = 22;
-    repeated SlotAndBytes Randao = 23;
-    bytes GenesisValidatorsRoot = 24;
+    repeated SlotAndBytes xBlockRoots = 21; // TODO - delete for BlockRoots
+    repeated bytes BlockRoots = 211;
+    repeated SlotAndBytes xStateRoots = 22; // TODO - delete for StateRoots
+    repeated bytes StateRoots = 221;
+    repeated SlotAndBytes Randao = 23; // TODO - delete for RandaoMix
+    repeated bytes RandaoMix = 24;
+    repeated bytes HistoricalRoots = 25;
+    bytes GenesisValidatorsRoot = 26;
 
     // Finalization & justification
     repeated PendingAttestation PreviousEpochAttestations = 31;
@@ -27,25 +31,31 @@ message State {
     Checkpoint CurrentJustifiedCheckpoint = 35;
     Checkpoint FinalizedCheckpoint = 36;
 
+    // eth 1
+    ETH1Data Eth1Data = 40;
+    repeated ETH1Data Eth1DataVotes = 41;
+    uint64 Eth1DepositIndex = 42;
+
     // network
-    repeated BlockProducer BlockProducers = 41;
-    repeated Pool Pools = 42;
+    repeated BlockProducer BlockProducers = 50;
+    repeated Pool Pools = 51;
 
     // slashings
-    repeated uint64 Slashings = 50;
+    repeated uint64 Slashings = 60;
 }
 
 message BlockProducer {
-    uint64 Id = 1;
+    uint64 Id = 1; // TODO - spec doesn't have ID but rather their enumerated location
     bytes PubKey = 2;
     uint64 CDTBalance = 3;
-    uint64 Stake = 4; // In ETH
-    bool Slashed = 5;
-    bool Active = 6;
-    uint64 ExitEpoch = 7;
-    uint64 ActivationEpoch = 8;
-    uint64 ActivationEligibilityEpoch = 9;
-    uint64 WithdrawableEpoch = 10;
+    uint64 EffectiveBalance = 4; // In ETH
+    uint64 Balance = 5;
+    bool Slashed = 6;
+    bool Active = 7;
+    uint64 ExitEpoch = 8;
+    uint64 ActivationEpoch = 9;
+    uint64 ActivationEligibilityEpoch = 10;
+    uint64 WithdrawableEpoch = 11;
 }
 
 message Pool {
@@ -157,4 +167,15 @@ message Fork {
 message ForkData {
     bytes CurrentVersion = 1 [(gogoproto.moretags) = "ssz-size:\"4\""];
     bytes GenesisValidatorRoot = 2 [(gogoproto.moretags) = "ssz-size:\"32\""];
+}
+
+message ETH1Data {
+    bytes DepositRoot = 1;
+    uint64 DepositCount = 2;
+    bytes BlockHash = 3;
+}
+
+message HistoricalBatch {
+    repeated bytes BlockRoots = 1;
+    repeated bytes StateRoots = 2;
 }
