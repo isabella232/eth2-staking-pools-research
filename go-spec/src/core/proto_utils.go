@@ -13,3 +13,11 @@ func AttestationDataEqual(att1 *AttestationData, att2 *AttestationData) bool {
 		CheckpointsEqual(att1.Source, att2.Source) &&
 		bytes.Equal(att1.BeaconBlockRoot, att2.BeaconBlockRoot)
 }
+
+func BlockHeaderEqual(head1 *PoolBlockHeader, head2 *PoolBlockHeader) bool {
+	return head1.ProposerIndex == head2.ProposerIndex &&
+		head1.Slot == head2.Slot &&
+		bytes.Equal(head1.StateRoot, head2.StateRoot) &&
+		bytes.Equal(head1.ParentRoot, head2.ParentRoot) &&
+		bytes.Equal(head1.BodyRoot, head2.BodyRoot)
+}

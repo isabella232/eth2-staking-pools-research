@@ -30,7 +30,7 @@ func TestCreatedNewPoolReq(t *testing.T) {
 
 	st := NewStateTransition()
 
-	err := st.processNewPoolRequests(state, req)
+	err := st.ProcessNewPoolRequests(state, req)
 	require.NoError(t, err)
 
 	// check created
@@ -84,7 +84,7 @@ func TestNotCreatedNewPoolReq(t *testing.T) {
 
 	st := NewStateTransition()
 
-	err := st.processNewPoolRequests(state, req)
+	err := st.ProcessNewPoolRequests(state, req)
 	require.NoError(t, err)
 
 	// check not created
@@ -128,6 +128,6 @@ func TestCreatedNewPoolReqWithExistingId(t *testing.T) {
 
 	st := NewStateTransition()
 
-	err := st.processNewPoolRequests(state, req)
+	err := st.ProcessNewPoolRequests(state, req)
 	require.Error(t, err, "new pool id == req id, this is already exists")
 }

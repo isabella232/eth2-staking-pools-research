@@ -27,7 +27,7 @@ func TestFinalizedAttestation(t *testing.T) {
 	)
 	st := NewStateTransition()
 
-	err := st.processExecutionSummaries(state, atts[0].Data.ExecutionSummaries)
+	err := st.ProcessExecutionSummaries(state, atts[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
@@ -64,7 +64,7 @@ func TestNotFinalizedAttestation(t *testing.T) {
 
 	st := NewStateTransition()
 
-	err := st.processExecutionSummaries(state, atts[0].Data.ExecutionSummaries)
+	err := st.ProcessExecutionSummaries(state, atts[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
@@ -95,7 +95,7 @@ func TestFinalizedProposal(t *testing.T) {
 	)
 	st := NewStateTransition()
 
-	err := st.processExecutionSummaries(state, att[0].Data.ExecutionSummaries)
+	err := st.ProcessExecutionSummaries(state, att[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards
@@ -132,7 +132,7 @@ func TestNotFinalizedProposal(t *testing.T) {
 
 	st := NewStateTransition()
 
-	err := st.processExecutionSummaries(state, att[0].Data.ExecutionSummaries)
+	err := st.ProcessExecutionSummaries(state, att[0].Data.ExecutionSummaries)
 	require.NoError(t, err)
 
 	// check rewards

@@ -27,6 +27,7 @@ func testConfig() *core.PoolsChainConfig {
 		MinValidatorWithdrawabilityDelay: 2^8, // 256 epochs, ~27 hours
 		MinEpochsToInactivityPenalty: 2^2, // 4 epochs 25.6 min
 		EpochsPerETH1VotingPeriod: 2^5, // 32 ~3.4 hours
+		ShardCommitteePeriod: 2^8, // 256, ~27H
 
 		// initial values
 
@@ -50,6 +51,7 @@ func testConfig() *core.PoolsChainConfig {
 		GenesisSeed: 	       	genesisSeed,
 		GenesisEpoch: 		   	0,
 		BaseRewardsPerEpoch:   	4,
+		DepositContractTreeDepth: 2^5, // 32
 
 		// state list lengths
 		EpochsPerHistoricalVector: 2 ^ 16, // ~36 days
@@ -68,12 +70,23 @@ func testConfig() *core.PoolsChainConfig {
 		DomainBeaconProposer: Bytes4(0),
 		DomainBeaconAttester: Bytes4(1),
 		DomainRandao: Bytes4(2),
+		DomainDeposit: Bytes4(3),
+		DomainVoluntaryExit: Bytes4(4),
+		DomainSelectionProof:Bytes4(5),
+		DomainAggregateAndProof:Bytes4(6),
 		GenesisForkVersion: []byte{},
 
 		// Gwei values
 		MaxEffectiveBalance: 2^5 * 10^9, // 32 ETH
 		EffectiveBalanceIncrement: 2^0 * 2^9, // 1 ETH
 		EjectionBalance: 2^0 * 2^9, // 16 ETH
+
+		// Max operations per block
+		MaxProposerSlashings: 16,
+		MaxAttesterSlashings: 2,
+		MaxAttestations: 128,
+		MaxDeposits: 16,
+		MaxVoluntaryExits: 16,
 	}
 }
 

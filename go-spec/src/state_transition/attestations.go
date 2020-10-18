@@ -9,17 +9,17 @@ import (
 	"github.com/prysmaticlabs/go-ssz"
 )
 
-func (st *StateTransition) processBlockAttestations(state *core.State, attestations []*core.Attestation) error {
+func ProcessBlockAttestations(state *core.State, attestations []*core.Attestation) error {
 	for _, att := range attestations {
-		if err := st.processAttestation(state, att); err != nil {
+		if err := processAttestation(state, att); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (st *StateTransition) processAttestation(state *core.State, attestation *core.Attestation) error {
-	if err := processAttestationNoSigVerify(st, state, attestation); err != nil {
+func processAttestation(state *core.State, attestation *core.Attestation) error {
+	if err := processAttestationNoSigVerify(state, attestation); err != nil {
 		return err
 	}
 	if err := validateAttestationSignature(state, attestation, attestation.Data.Slot); err != nil {
@@ -58,7 +58,7 @@ func (st *StateTransition) processAttestation(state *core.State, attestation *co
 //
 //    # Check signature
 //    assert is_valid_indexed_attestation(state, get_indexed_attestation(state, attestation))
-func processAttestationNoSigVerify(st *StateTransition, state *core.State, attestation *core.Attestation) error {
+func processAttestationNoSigVerify(state *core.State, attestation *core.Attestation) error {
 	if err := validateAttestationData(state, attestation.Data); err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func processAttestationNoSigVerify(st *StateTransition, state *core.State, attes
 	if err := appendPendingAttestation(state, attestation); err != nil {
 		return err
 	}
-	if err := st.processExecutionSummaries(state, attestation.Data.ExecutionSummaries); err != nil {
+	if err := ProcessExecutionSummaries(state, attestation.Data.ExecutionSummaries); err != nil {
 		return err
 	}
 	return nil

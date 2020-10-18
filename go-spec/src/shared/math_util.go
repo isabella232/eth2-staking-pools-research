@@ -50,3 +50,13 @@ func IntegerSquareRoot(n uint64) uint64 {
 
 	return uint64(math.Sqrt(float64(n)))
 }
+
+// PowerOf2 returns an integer that is the provided
+// exponent of 2. Can only return powers of 2 till 63,
+// after that it overflows
+func PowerOf2(n uint64) uint64 {
+	if n >= 64 {
+		panic("integer overflow")
+	}
+	return 1 << n
+}

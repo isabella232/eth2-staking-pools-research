@@ -72,9 +72,6 @@ type IStateTransition interface {
 	//        state.slot += 1
 	//    ]
 	ProcessSlots(state *core.State, slot uint64) error
-
-	processNewPoolRequests(state *core.State, requests []*core.CreateNewPoolRequest) error
-	processBlockAttestations(state *core.State, attestations []*core.Attestation) error
 }
 
 type StateTransition struct {}

@@ -90,22 +90,30 @@ func VerifyRandaoRevealSignature(data []byte, domain []byte, pubKey []byte, sigB
 }
 
 func VerifySignature(root []byte, pubKey []byte, sigByts []byte) (bool, error) {
-	// pk
-	pk := &bls.PublicKey{}
-	err := pk.Deserialize(pubKey)
-	if err != nil {
-		return false, err
+	return VerifyAggregateSignature(root, [][]byte{pubKey}, sigByts)
+}
+
+func VerifyAggregateSignature(root []byte, pubkeys [][]byte, sigByts []byte) (bool, error) {
+	// pks
+	pks := []bls.PublicKey{}
+	for _, pk := range pubkeys {
+		_pk := bls.PublicKey{}
+		err := _pk.Deserialize(pk)
+		if err != nil {
+			return false, err
+		}
+		pks = append(pks, _pk)
 	}
 
 	// sig
 	sig := &bls.Sign{}
-	err = sig.Deserialize(sigByts)
+	err := sig.Deserialize(sigByts)
 	if err != nil {
 		return false, err
 	}
 
 	// verify
-	if !sig.VerifyByte(pk, root) {
+	if !sig.FastAggregateVerify(pks, root) {
 		return false, nil
 	}
 	return true, nil
@@ -197,4 +205,25 @@ func ComputeForkDigest(version []byte, root []byte) ([4]byte, error) {
 		return [4]byte{}, err
 	}
 	return ToBytes4(dataRoot[:]), nil
+}
+
+/**
+def compute_signing_root(ssz_object: SSZObject, domain: Domain) -> Root:
+    """
+    Return the signing root for the corresponding signing data.
+    """
+    return hash_tree_root(SigningData(
+        object_root=hash_tree_root(ssz_object),
+        domain=domain,
+    ))
+ */
+func ComputeSigningRoot(obj interface{}, domain []byte) ([32]byte, error) {
+	container := struct {
+		ObjectRoot interface{}
+		Domain []byte
+	}{
+		obj,
+		domain,
+	}
+	return ssz.HashTreeRoot(container)
 }

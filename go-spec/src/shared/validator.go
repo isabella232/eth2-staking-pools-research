@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/core"
 	"github.com/bloxapp/eth2-staking-pools-research/go-spec/src/shared/params"
@@ -306,5 +307,15 @@ func SlashBlockProducer(state *core.State, slashedIndex uint64) error {
 	proposerReward := whistleblowerReward / params.ChainConfig.ProposerRewardQuotient
 	IncreaseBalance(state, proposer, proposerReward)
 	IncreaseBalance(state, whistleblowerIndex, whistleblowerReward)
+	return nil
+}
+
+func BPByPubkey(state *core.State, pk []byte) *core.BlockProducer {
+	// TODO - BPByPubkey optimize with some kind of map
+	for _, bp := range state.BlockProducers {
+		if bytes.Equal(pk, bp.PubKey) {
+			return bp
+		}
+	}
 	return nil
 }

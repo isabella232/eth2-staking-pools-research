@@ -13,8 +13,7 @@ message PoolsChainConfig {
   uint64 MinValidatorWithdrawabilityDelay = 105;
   uint64 MinEpochsToInactivityPenalty = 106;
   uint64 EpochsPerETH1VotingPeriod = 107;
-
-  // initial values
+  uint64 ShardCommitteePeriod = 108;
 
   // Misc
   uint64 MinAttestationCommitteeSize = 200;
@@ -36,6 +35,7 @@ message PoolsChainConfig {
   bytes GenesisSeed = 302; // should be auto calculated somehow
   uint64 GenesisEpoch = 303;
   uint64 BaseRewardsPerEpoch = 304;
+  uint64 DepositContractTreeDepth = 305;
 
 
   // state list lengths
@@ -55,11 +55,22 @@ message PoolsChainConfig {
   bytes DomainBeaconProposer = 600;
   bytes DomainBeaconAttester = 601;
   bytes DomainRandao = 602;
-  bytes GenesisForkVersion = 603;
+  bytes DomainDeposit = 603;
+  bytes DomainVoluntaryExit = 604;
+  bytes DomainSelectionProof = 605;
+  bytes DomainAggregateAndProof = 606;
+  bytes GenesisForkVersion = 607;
 
 
   // Gwei values
   uint64 MaxEffectiveBalance = 700;
   uint64 EffectiveBalanceIncrement = 701;
   uint64 EjectionBalance = 702;
+
+  // Max operations per block
+  uint64 MaxProposerSlashings = 800;
+  uint64 MaxAttesterSlashings = 801;
+  uint64 MaxAttestations = 802;
+  uint64 MaxDeposits = 803;
+  uint64 MaxVoluntaryExits = 804;
 }

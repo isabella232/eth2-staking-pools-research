@@ -203,9 +203,9 @@ func TestAttestationProcessing(t *testing.T) {
 			st := NewStateTransition()
 
 			if test.expectedError != nil {
-				require.EqualError(t, st.processBlockAttestations(stateCopy, test.block.Body.Attestations), test.expectedError.Error())
+				require.EqualError(t, st.ProcessBlockAttestations(stateCopy, test.block.Body.Attestations), test.expectedError.Error())
 			} else {
-				require.NoError(t, st.processBlockAttestations(stateCopy, test.block.Body.Attestations))
+				require.NoError(t, st.ProcessBlockAttestations(stateCopy, test.block.Body.Attestations))
 			}
 		})
 	}

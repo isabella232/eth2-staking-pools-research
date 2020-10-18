@@ -42,8 +42,31 @@ def is_valid_indexed_attestation(state: BeaconState, indexed_attestation: Indexe
     return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
 // TODO - is_valid_indexed_attestation
  */
-func IsValidIndexedAttestation(state *core.State) bool {
-	return false
+func IsValidIndexedAttestation(state *core.State, attestation *core.IndexedAttestation) (bool, error) {
+	// Verify indices are sorted and unique
+	indices := attestation.AttestingIndices
+	if len(indices) == 0 {
+		return false, fmt.Errorf("indices length 0")
+	}
+	// TODO - or not indices == sorted(set(indices))
+	// Verify aggregate signature
+	pubkeys := [][]byte{}
+	for _, index := range indices {
+		bp := GetBlockProducer(state, index)
+		if bp == nil {
+			return false, fmt.Errorf("BP not found")
+		}
+		pubkeys = append(pubkeys, bp.PubKey)
+	}
+	domain, err := GetDomain(state, params.ChainConfig.DomainBeaconAttester, attestation.Data.Target.Epoch)
+	if err != nil {
+		return false, err
+	}
+	root, err := ComputeSigningRoot(attestation.Data, domain)
+	if err != nil {
+		return false, err
+	}
+	return VerifyAggregateSignature(root[:], pubkeys, domain)
 }
 
 /**
