@@ -12,9 +12,13 @@ The key word here is open as in autonomous and open to join by anyone.
 ### Overview
 Conceptually a pools nerwork can be thought of as a 3 layer stack. 
 
-Layer 1 - 
+<b>Layer 1</b> - Every pool is a collection of 32 ETH validators represented by a public BLS key. 
+<b>Layer 2</b> - Every pool's public key has a corresponding distribuited private key controlled via an SSV group of operators
+<b>Layer 2</b> - All pools (and their SSV groups) coordinate via a consensus layer which also deals with rewards, penalties, slashing, creation/ liquidation of pools and more.\
 
-<div style="text-align:center"><img src="./img/design.png" width="400"></div>\
+<div style="text-align:center"><img src="./img/design.png" width="400"></div>
+
+
 
 
 
