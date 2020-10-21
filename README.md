@@ -1,5 +1,5 @@
 # ETH 2.0 Decentralized Staking Pools - Research
-[<img src="https://www.bloxstaking.com/wp-content/uploads/2020/04/Blox-Staking_logo_blue.png" width="100">](https://www.bloxstaking.com/)
+[<img src="./img/header.png" width="100">](https://www.bloxstaking.com/)
 
 This repo aims to have in one place all the research around decentralized staking pools for eth 2.0.
 
