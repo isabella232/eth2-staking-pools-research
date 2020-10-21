@@ -41,4 +41,5 @@ Pool liquidation is an event that is triggered by an ERC-20 token holders specif
     * [python SSV node](https://github.com/dankrad/python-ssv)
     * [SSV compatible valdiator](https://github.com/alonmuroch/prysm/tree/ssv)
 * [BLS keys](https://medium.com/@alonmuroch_65570/bls-signatures-part-1-overview-47d9eebf1c75) + [bi-linear pairings](https://medium.com/@alonmuroch_65570/bls-signatures-part-2-key-concepts-of-pairings-27a8a9533d0c)
+* [Isolated Casper + Ghost consensus as candidate for the pool's network consensus](https://github.com/bloxapp/go-casper-ghost-SDK)
 
