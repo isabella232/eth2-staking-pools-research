@@ -10,7 +10,7 @@ Adding a consensus protocol that rewards and punishes pool participants, control
 The key word here is open as in autonomous and open to join by anyone.
 
 ### Overview
-<div style="text-align:center">[<img src="./img/design.png" width="400">](https://www.bloxstaking.com/)</div>
+<div style="text-align:center"><img src="./img/design.png" width="400"></div>
 
 The network has 2 actors: block producers (BP) and staker. 
 A BP is a bonded actor (staked)  which has the responsibility of executing eth2 validator assignments and pool network assignments (producing a block and signing it).
