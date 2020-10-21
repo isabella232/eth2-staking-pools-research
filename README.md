@@ -28,8 +28,8 @@ For more information reggarding network economics see [CDT2.0](https://github.co
 
 
 ### Research
-* [Pools mini paper]() for in-depth details
-* [DKG theory](./dkg.md) 
+* [Pools mini paper](pools_mini_paper.pdf) for in-depth details
+* [DKG theory](dkg.md) 
 * [DKG + key rotation POC](./go_minimal_pool)
 * SSV nodes
     * [python ibft implementation](https://github.com/dankrad/python-ibft)
