@@ -23,7 +23,7 @@ Conceptually a pools network can be thought of as a 3 layer stack.
 The network has 2 actors: block producers (BP) and staker.\
 A BP is a bonded actor (staked)  which has the responsibility of executing top consensus (attest to blocks, propose blocks and more) and local SSV group assignments (mostly eth2 network duties).<br /><br />
 A block producer is economically incentivized to run a pool node, participate in the network and more. The block producer's collateral is also staked.\
-<i>For more information regarding network economics see [CDT2.0](pools_mini_paper.pdf)</i>.<br /><br />
+<i>For more information regarding network economics click [here](https://www.bloxstaking.com/blog/ethereum-2-0/an-introduction-to-decentralized-staking-pools/)</i>.<br /><br />
 
 A staker that deposited ETH into a smart contact to stake in a pool will, in return, mint a fungible ERC-20 token representing his stake + future rewards. At deposit time the amount minted of that token will be 1:1 to the deposit amount, as time goes on and the network as a whole gains reward the user's ERC-20 token balance (and so for every other user) will grow relatively.\
 The ERC-20 token creates instant transferability, detached from a specific pool liquidation.<br /><br />
@@ -42,4 +42,5 @@ Pool liquidation is an event that is triggered by an ERC-20 token holders specif
     * [SSV compatible valdiator](https://github.com/alonmuroch/prysm/tree/ssv)
 * [BLS keys](https://medium.com/@alonmuroch_65570/bls-signatures-part-1-overview-47d9eebf1c75) + [bi-linear pairings](https://medium.com/@alonmuroch_65570/bls-signatures-part-2-key-concepts-of-pairings-27a8a9533d0c)
 * [Isolated Casper + Ghost consensus as candidate for the pool's network consensus](https://github.com/bloxapp/go-casper-ghost-SDK)
+* [Network tokonomics](https://www.bloxstaking.com/blog/ethereum-2-0/an-introduction-to-decentralized-staking-pools/)
 
